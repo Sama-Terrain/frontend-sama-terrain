@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import loginBg from '../../assets/terrain-login.png';
 import { mockUser } from '../../data/mockUser';
 
-export default function Connexion({ onNavigate, onLoginSuccess }) {
+export default function Connexion({ onLoginSuccess }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +19,7 @@ export default function Connexion({ onNavigate, onLoginSuccess }) {
     // Vérification avec mockUser
     if (email.trim().toLowerCase() === mockUser.email.toLowerCase() && password === mockUser.password) {
       if (onLoginSuccess) onLoginSuccess(mockUser);
-      if (onNavigate) onNavigate('verify-email', { email: mockUser.email });
+      navigate('/verify-email', { state: { email: mockUser.email } });
     } else {
       setError('Identifiants incorrects. Indice: mariegodmer@gmail.com / password123');
     }
@@ -142,7 +144,7 @@ export default function Connexion({ onNavigate, onLoginSuccess }) {
           <p className="text-center text-xs text-gray-500 pt-4">
             Don't you have an account?{' '}
             <button
-              onClick={() => onNavigate && onNavigate('register')}
+              onClick={() => navigate('/register')}
               className="text-[#D4AF37] font-bold hover:underline cursor-pointer"
             >
               Sign up

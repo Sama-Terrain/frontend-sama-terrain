@@ -1,41 +1,37 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight, Filter, SlidersHorizontal } from 'lucide-react';
-import TerrainCard from '../../components/terrain/TerrainCard';
+import { useNavigate, useLocation } from 'react-router-dom';
 import TerrainFilters from '../../components/terrain/TerrainFilters';
+import TerrainCard from '../../components/terrain/TerrainCard';
 import { terrainService } from '../../services/terrainService';
 
-export default function RechercheTerrains({ onNavigate, onSelectTerrain, initialSearch = {} }) {
+export default function RechercheTerrains() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const initialSearch = location.state || {};
+
   const [terrains, setTerrains] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // État des filtres
+  
+  // État unique synchronisé pour les filtres
   const [filters, setFilters] = useState({
     localisation: initialSearch.searchZone || 'Tous les quartiers',
-    date: initialSearch.searchDate || 'Dim. 24 Novembre',
+    date: 'Dim. 24 Novembre',
     types: ['5v5'],
     surfaces: [],
-    maxPrix: 30000,
+    maxPrix: 20000,
     equipements: []
   });
 
-  // État de tri
-  const [sortBy, setSortBy] = useState('recommande');
+  const [sortBy, setSortBy] = useState('Recommandé');
 
-  // État pagination
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // État tiroir mobile filtres
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-
-  // Chargement des terrains via le service
   useEffect(() => {
     async function fetchTerrains() {
       try {
         setLoading(true);
-        const data = await terrainService.getTerrains();
+        const data = await terrainService.getAllTerrains();
         setTerrains(data);
-      } catch (error) {
-        console.error('Erreur chargement terrains :', error);
+      } catch (err) {
+        console.error('Erreur chargement terrains:', err);
       } finally {
         setLoading(false);
       }
@@ -43,49 +39,7 @@ export default function RechercheTerrains({ onNavigate, onSelectTerrain, initial
     fetchTerrains();
   }, []);
 
-  // Filtrage des terrains
-  const filteredTerrains = terrains.filter((terrain) => {
-    // Filtre Localisation
-    if (
-      filters.localisation &&
-      filters.localisation !== 'Tous les quartiers' &&
-      !terrain.localisation.toLowerCase().includes(filters.localisation.toLowerCase())
-    ) {
-      return false;
-    }
-
-    // Filtre Type (ex: 5v5, 6v6, 7v7)
-    if (filters.types && filters.types.length > 0) {
-      if (!filters.types.includes(terrain.type)) {
-        return false;
-      }
-    }
-
-    // Filtre Prix Max
-    if (filters.maxPrix && terrain.prixHeure > filters.maxPrix) {
-      return false;
-    }
-
-    // Filtre Surface
-    if (filters.surfaces && filters.surfaces.length > 0) {
-      if (!filters.surfaces.includes(terrain.surface)) {
-        return false;
-      }
-    }
-
-    // Filtre Équipements
-    if (filters.equipements && filters.equipements.length > 0) {
-      const hasAllEq = filters.equipements.every((eq) =>
-        (terrain.equipements || []).includes(eq)
-      );
-      if (!hasAllEq) return false;
-    }
-
-    return true;
-  });
-
-  // Réinitialiser tous les filtres
-  const handleResetFilters = () => {
+  const handleReset = () => {
     setFilters({
       localisation: 'Tous les quartiers',
       date: 'Dim. 24 Novembre',
@@ -96,150 +50,135 @@ export default function RechercheTerrains({ onNavigate, onSelectTerrain, initial
     });
   };
 
+  const filteredTerrains = terrains.filter((terrain) => {
+    // Localisation
+    if (filters.localisation && filters.localisation !== 'Tous les quartiers') {
+      if (!terrain.localisation.toLowerCase().includes(filters.localisation.toLowerCase())) {
+        return false;
+      }
+    }
+    // Type (5v5, 6v6, 7v7)
+    if (filters.types && filters.types.length > 0) {
+      if (!filters.types.includes(terrain.type)) {
+        return false;
+      }
+    }
+    // Surface
+    if (filters.surfaces && filters.surfaces.length > 0) {
+      if (!filters.surfaces.includes(terrain.surface)) {
+        return false;
+      }
+    }
+    // Prix max
+    if (filters.maxPrix && terrain.prixHeure > filters.maxPrix) {
+      return false;
+    }
+    // Équipements
+    if (filters.equipements && filters.equipements.length > 0) {
+      const hasAllEquipments = filters.equipements.every((eq) =>
+        (terrain.equipements || []).includes(eq)
+      );
+      if (!hasAllEquipments) return false;
+    }
+
+    return true;
+  });
+
+  const sortedTerrains = [...filteredTerrains].sort((a, b) => {
+    if (sortBy === 'prixAsc') return a.prixHeure - b.prixHeure;
+    if (sortBy === 'prixDesc') return b.prixHeure - a.prixHeure;
+    if (sortBy === 'note') return b.note - a.note;
+    return b.nombreAvis - a.nombreAvis;
+  });
+
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-20 font-sans">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-20 font-sans text-left">
+      <div className="max-w-7xl mx-auto space-y-6">
         
-        {/* Grille principale Layout (Filtres à gauche, Terrains à droite) */}
+        {/* Layout : Filtres à gauche, Grille terrains à droite */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           
-          {/* Sidebar des Filtres Desktop */}
-          <aside className="hidden lg:block lg:col-span-1 sticky top-24">
+          {/* Panneau latéral de filtres */}
+          <div className="lg:col-span-1">
             <TerrainFilters
               filters={filters}
               setFilters={setFilters}
-              onReset={handleResetFilters}
+              onReset={handleReset}
             />
-          </aside>
-
-          {/* Bouton d'affichage des filtres sur Mobile */}
-          <div className="lg:hidden flex items-center justify-between mb-4 bg-white p-4 rounded-xl border border-gray-200">
-            <span className="text-sm font-bold text-gray-800">
-              {filteredTerrains.length} terrains trouvés
-            </span>
-            <button
-              onClick={() => setShowMobileFilters(!showMobileFilters)}
-              className="px-3.5 py-2 bg-emerald-50 text-[#004030] font-bold text-xs rounded-lg flex items-center gap-2"
-            >
-              <SlidersHorizontal size={16} />
-              <span>Filtres</span>
-            </button>
           </div>
 
-          {/* Tiroir Filtres Mobile */}
-          {showMobileFilters && (
-            <div className="lg:hidden mb-6">
-              <TerrainFilters
-                filters={filters}
-                setFilters={setFilters}
-                onReset={handleResetFilters}
-              />
-            </div>
-          )}
-
-          {/* Zone Principale des Terrains */}
-          <main className="lg:col-span-3 space-y-6">
+          {/* Zone principale : En-tête + Liste des cartes */}
+          <div className="lg:col-span-3 space-y-6">
             
-            {/* Barre Supérieure d'Information & Tri */}
-            <div className="bg-white rounded-2xl p-4 sm:px-6 sm:py-3.5 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h2 className="text-sm font-extrabold text-gray-900">
-                {filteredTerrains.length} terrains trouvés à Dakar
-              </h2>
+            {/* En-tête de la liste avec compteur "12 terrains trouvés à Dakar" & Tri */}
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="text-xs font-bold text-gray-800">
+                <span className="text-sm font-black text-gray-900">{filteredTerrains.length}</span> terrains trouvés à Dakar
+              </div>
 
-              <div className="flex items-center space-x-2 text-xs text-gray-600 self-end sm:self-auto">
-                <label htmlFor="sortBy" className="font-semibold text-gray-500">
-                  Trier par :
-                </label>
+              <div className="flex items-center space-x-3 text-xs">
+                <span className="text-gray-500 font-medium">Trier par :</span>
                 <select
-                  id="sortBy"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="bg-transparent font-bold text-gray-900 focus:outline-none cursor-pointer"
                 >
-                  <option value="recommande">Recommandé</option>
-                  <option value="prix_croissant">Prix : croissant</option>
-                  <option value="prix_decroissant">Prix : décroissant</option>
-                  <option value="note">Meilleurs avis</option>
+                  <option value="Recommandé">Recommandé</option>
+                  <option value="note">Meilleures notes</option>
+                  <option value="prixAsc">Prix croissant</option>
+                  <option value="prixDesc">Prix décroissant</option>
                 </select>
               </div>
             </div>
 
-            {/* Grille des Terrains */}
+            {/* Grille de cartes de terrains (SANS toucher au composant TerrainCard) */}
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-80 bg-gray-200 rounded-2xl animate-pulse" />
-                ))}
+              <div className="py-20 text-center space-y-3">
+                <div className="w-10 h-10 border-4 border-[#004030] border-t-transparent rounded-full animate-spin mx-auto" />
+                <p className="text-xs text-gray-500 font-semibold">Chargement des terrains...</p>
               </div>
-            ) : filteredTerrains.length === 0 ? (
-              <div className="bg-white rounded-2xl p-12 text-center border border-gray-200 space-y-4">
-                <p className="text-gray-500 text-sm">
-                  Aucun terrain ne correspond à vos critères de recherche actuels.
-                </p>
+            ) : sortedTerrains.length === 0 ? (
+              <div className="bg-white rounded-2xl p-12 text-center border border-gray-200 space-y-3">
+                <p className="text-base font-bold text-gray-700">Aucun terrain ne correspond à vos critères</p>
+                <p className="text-xs text-gray-500">Essayez d'élargir le prix max ou d'effacer les filtres.</p>
                 <button
-                  onClick={handleResetFilters}
-                  className="px-4 py-2 bg-[#004030] text-white font-bold text-xs rounded-xl hover:bg-[#005943]"
+                  onClick={handleReset}
+                  className="px-4 py-2 bg-[#004030] text-white font-bold text-xs rounded-[8px] hover:bg-[#005943]"
                 >
                   Réinitialiser les filtres
                 </button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {filteredTerrains.map((terrain) => (
+                {sortedTerrains.map((terrain) => (
                   <TerrainCard
                     key={terrain.id}
                     terrain={terrain}
-                    onSelect={(t) => {
-                      if (onSelectTerrain) onSelectTerrain(t);
-                      if (onNavigate) onNavigate('detail', { terrainId: t.id });
-                    }}
+                    onSelect={() => navigate(`/terrains/${terrain.id}`)}
                   />
                 ))}
               </div>
             )}
 
-            {/* Pagination au bas de page (Fidèle à la maquette Figma) */}
-            <div className="pt-8 flex items-center justify-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(1)}
-                className={`w-9 h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-colors ${
-                  currentPage === 1
-                    ? 'bg-[#004030] text-white'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                1
-              </button>
-              <button
-                onClick={() => setCurrentPage(2)}
-                className={`w-9 h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-colors ${
-                  currentPage === 2
-                    ? 'bg-[#004030] text-white'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                2
-              </button>
-              <button
-                onClick={() => setCurrentPage(3)}
-                className={`w-9 h-9 rounded-lg font-bold text-xs flex items-center justify-center transition-colors ${
-                  currentPage === 3
-                    ? 'bg-[#004030] text-white'
-                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                3
-              </button>
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, 3))}
-                className="w-9 h-9 rounded-lg bg-white border border-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-50"
-                title="Page suivante"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
+            {/* Pagination (1 2 3 >) identique Figma */}
+            {!loading && sortedTerrains.length > 0 && (
+              <div className="flex justify-center items-center space-x-2 pt-6">
+                <button className="w-8 h-8 rounded-[8px] bg-[#004030] text-white font-bold text-xs flex items-center justify-center">
+                  1
+                </button>
+                <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
+                  2
+                </button>
+                <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
+                  3
+                </button>
+                <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
+                  ›
+                </button>
+              </div>
+            )}
 
-          </main>
+          </div>
 
         </div>
 

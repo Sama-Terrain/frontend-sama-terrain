@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Eye, ShieldCheck, Upload, ArrowRight, CheckCircle2 } from 'lucide-react';
 import heroBg from '../../assets/herobg.jpeg';
 
-export default function DevenirGerant({ onNavigate }) {
+export default function DevenirGerant() {
+  const navigate = useNavigate();
+
   // État du formulaire
   const [formData, setFormData] = useState({
     prenom: '',
@@ -126,7 +129,7 @@ export default function DevenirGerant({ onNavigate }) {
                 Merci {formData.prenom} ! Notre équipe d'intégration valide votre dossier pour le complexe <strong>{formData.nomComplexe || 'sportif'}</strong> et vous contactera sous 24h.
               </p>
               <button
-                onClick={() => onNavigate && onNavigate('accueil')}
+                onClick={() => navigate('/')}
                 className="px-6 py-2.5 bg-[#004030] text-white font-bold text-xs rounded-[8px] hover:bg-[#005943]"
               >
                 Retour à l'accueil

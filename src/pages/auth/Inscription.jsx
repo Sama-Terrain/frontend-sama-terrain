@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import loginBg from '../../assets/terrain-login.png';
 
-export default function Inscription({ onNavigate }) {
+export default function Inscription() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     prenom: '',
     nom: '',
@@ -30,9 +32,7 @@ export default function Inscription({ onNavigate }) {
     }
 
     // Navigation vers la vérification d'email
-    if (onNavigate) {
-      onNavigate('verify-email', { email: formData.email });
-    }
+    navigate('/verify-email', { state: { email: formData.email } });
   };
 
   return (
@@ -188,7 +188,7 @@ export default function Inscription({ onNavigate }) {
           <p className="text-center text-xs text-gray-500 pt-3">
             Already have an account?{' '}
             <button
-              onClick={() => onNavigate && onNavigate('login')}
+              onClick={() => navigate('/login')}
               className="text-[#D4AF37] font-bold hover:underline cursor-pointer"
             >
               Sign in

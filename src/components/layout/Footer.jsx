@@ -1,24 +1,24 @@
-import { MapPin, Mail, Phone, Globe, Share2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Globe, Share2 } from 'lucide-react';
 import logoBlanc from '../../assets/sama-logo-clair.png';
 
-export default function Footer({ onNavigate }) {
+export default function Footer() {
   return (
     <footer className="bg-[#032b1f] text-white pt-16 pb-8 border-t border-[#004030]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Grille Principale */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-emerald-900/60">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-emerald-900/60 text-left">
           
           {/* Colonne 1: Marque */}
           <div className="space-y-4">
-            <div className="flex items-center">
+            <Link to="/" className="flex items-center">
               <img 
                 src={logoBlanc} 
                 alt="Logo Sama Terrain" 
                 className="h-24 w-auto object-contain cursor-pointer" 
-                onClick={() => onNavigate && onNavigate('accueil')}
               />
-            </div>
+            </Link>
             <p className="text-gray-300 text-sm leading-relaxed max-w-sm font-normal">
               La plateforme n°1 au Sénégal pour trouver et réserver des terrains de mini-foot près de chez vous. Rejoignez la communauté des passionnés du ballon rond.
             </p>
@@ -31,24 +31,24 @@ export default function Footer({ onNavigate }) {
             </h4>
             <ul className="space-y-2.5 text-sm text-gray-300">
               <li>
-                <button onClick={() => onNavigate && onNavigate('accueil')} className="hover:text-white transition-colors">
+                <Link to="/" className="hover:text-white transition-colors">
                   Accueil
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate && onNavigate('terrains')} className="hover:text-white transition-colors">
+                <Link to="/terrains" className="hover:text-white transition-colors">
                   Terrains
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate && onNavigate('accueil')} className="hover:text-white transition-colors">
+                <Link to="/" className="hover:text-white transition-colors">
                   Comment ça marche
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => onNavigate && onNavigate('gerant')} className="hover:text-white transition-colors">
+                <Link to="/gerant" className="hover:text-white transition-colors">
                   Devenir Gérant
-                </button>
+                </Link>
               </li>
             </ul>
           </div>

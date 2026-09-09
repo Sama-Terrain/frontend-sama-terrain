@@ -1,10 +1,15 @@
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Calendar as CalendarIcon, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
 import { MOCK_CRENEAUX } from '../../data/mockCreneaux';
 
-export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot, currentUser }) {
+export default function DetailTerrain({ onSelectSlot, currentUser }) {
+  const { id } = useParams();
+  const terrainId = Number(id) || 1;
+  const navigate = useNavigate();
+
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -136,7 +141,7 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot,
 
   const handleReserverSlot = () => {
     if (!currentUser) {
-      if (onNavigate) onNavigate('login');
+      navigate('/login');
       return;
     }
 
@@ -153,7 +158,7 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot,
     };
 
     if (onSelectSlot) onSelectSlot(reservationData);
-    if (onNavigate) onNavigate('reservation', reservationData);
+    navigate('/reservations');
   };
 
   if (loading) {
@@ -171,11 +176,11 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot,
         
         {/* BREADCRUMB */}
         <nav className="flex items-center space-x-2 text-xs text-gray-500 font-medium">
-          <button onClick={() => onNavigate && onNavigate('accueil')} className="hover:text-[#004030]">
+          <button onClick={() => navigate('/')} className="hover:text-[#004030]">
             Accueil
           </button>
           <span>/</span>
-          <button onClick={() => onNavigate && onNavigate('terrains')} className="hover:text-[#004030]">
+          <button onClick={() => navigate('/terrains')} className="hover:text-[#004030]">
             Terrains
           </button>
           <span>/</span>
@@ -422,7 +427,7 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot,
                 <button
                   onClick={() => {
                     if (!currentUser) {
-                      if (onNavigate) onNavigate('login');
+                      navigate('/login');
                     } else {
                       setShowAvisModal(true);
                     }

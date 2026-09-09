@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, CheckCircle2, Bot, X } from 'lucide-react';
 import TerrainCard from '../../components/terrain/TerrainCard';
 import { terrainService } from '../../services/terrainService';
@@ -7,7 +8,9 @@ import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
 
-export default function Accueil({ onNavigate, onSelectTerrain }) {
+export default function Accueil() {
+  const navigate = useNavigate();
+
   // États locaux pour les données chargées depuis les services
   const [terrainsVedettes, setTerrainsVedettes] = useState([]);
   const [avisJoueurs, setAvisJoueurs] = useState([]);
@@ -48,9 +51,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
   // Handler de soumission du formulaire de recherche
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (onNavigate) {
-      onNavigate('terrains', { searchZone, searchDate, searchCreneau });
-    }
+    navigate('/terrains', { state: { searchZone, searchDate, searchCreneau } });
   };
 
   // Handler d'envoi de message à l'assistant IA
@@ -264,7 +265,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
             </div>
 
             <button
-              onClick={() => onNavigate && onNavigate('terrains')}
+              onClick={() => navigate('/terrains')}
               className="px-5 py-2.5 bg-[#e6f4ea] text-[#004030] font-bold text-xs rounded-[8px] hover:bg-[#004030] hover:text-white transition-colors cursor-pointer border border-[#004030]/10 self-start sm:self-auto"
             >
               Voir tous les terrains
@@ -285,8 +286,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
                   key={terrain.id}
                   terrain={terrain}
                   onSelect={(t) => {
-                    if (onSelectTerrain) onSelectTerrain(t);
-                    if (onNavigate) onNavigate('detail', { terrainId: t.id });
+                    navigate(`/terrains/${t.id}`);
                   }}
                 />
               ))}
@@ -315,7 +315,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           </div>
 
           <button
-            onClick={() => onNavigate && onNavigate('gerant')}
+            onClick={() => navigate('/gerant')}
             className="px-6 py-3.5 bg-white text-[#004030] font-bold rounded-[8px] hover:bg-emerald-50 transition-colors shrink-0 cursor-pointer text-sm"
           >
             Devenir Gérant

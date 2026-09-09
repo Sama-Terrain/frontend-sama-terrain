@@ -13,6 +13,10 @@ export const terrainService = {
     return MOCK_TERRAINS;
   },
 
+  async getAllTerrains() {
+    return this.getTerrains();
+  },
+
   // Récupérer les terrains vedettes pour la page d'accueil
   async getTerrainsVedettes() {
     await new Promise((resolve) => setTimeout(resolve, 200));

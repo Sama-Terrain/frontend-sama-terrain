@@ -1,8 +1,12 @@
 import { useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import loginBg from '../../assets/terrain-login.png';
 
-export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gmail.com' }) {
-  // Code à 5 chiffres (4 8 2 1 ...)
+export default function VerificationEmail() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email || 'mariegodmer@gmail.com';
+
   const [code, setCode] = useState(['4', '8', '2', '1', '']);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -17,7 +21,6 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
     newCode[index] = value;
     setCode(newCode);
 
-    // Auto focus sur la case suivante
     if (value && index < 4) {
       inputRefs[index + 1].current?.focus();
     }
@@ -34,11 +37,10 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
     setError('');
 
     const fullCode = code.join('');
-    // On accepte 4821 ou tout code complet de 5 chiffres pour la démo
     if (fullCode.length >= 4) {
       setSuccess(true);
       setTimeout(() => {
-        if (onNavigate) onNavigate('accueil');
+        navigate('/');
       }, 1500);
     } else {
       setError('Veuillez entrer les 4 à 5 chiffres du code');
@@ -47,7 +49,6 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
 
   return (
     <div className="min-h-screen bg-white flex font-sans">
-      {/* Colonne Gauche - Vérification E-mail */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-center">
           
@@ -72,7 +73,6 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
             </div>
           )}
 
-          {/* Formulaire des 5 cases de code */}
           <form onSubmit={handleVerify} className="space-y-8">
             <div className="flex justify-center items-center space-x-2 sm:space-x-3 pt-2">
               {code.map((digit, idx) => (
@@ -89,7 +89,6 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
               ))}
             </div>
 
-            {/* Bouton VÉRIFIER */}
             <button
               type="submit"
               className="w-full py-3.5 bg-[#004030] hover:bg-[#005943] text-white font-bold rounded-[8px] text-xs uppercase tracking-wider transition-colors cursor-pointer"
@@ -98,7 +97,6 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
             </button>
           </form>
 
-          {/* Section Renvoyer le code */}
           <div className="space-y-2 pt-2">
             <div className="relative flex py-2 items-center">
               <div className="flex-grow border-t border-gray-100"></div>
@@ -117,10 +115,9 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
             </button>
           </div>
 
-          {/* Lien retour connexion */}
           <div className="pt-6">
             <button
-              onClick={() => onNavigate && onNavigate('login')}
+              onClick={() => navigate('/login')}
               className="text-xs text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
             >
               Retourner à la <span className="font-bold text-gray-900">page de connexion</span>
@@ -130,7 +127,6 @@ export default function VerificationEmail({ onNavigate, email = 'mariegodmer@gma
         </div>
       </div>
 
-      {/* Colonne Droite - Image Figma */}
       <div className="hidden lg:block lg:w-1/2 bg-gray-200 relative overflow-hidden">
         <img
           src={loginBg}

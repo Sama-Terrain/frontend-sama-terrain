@@ -1,9 +1,37 @@
+import { useState } from 'react';
 import { Calendar, RotateCcw } from 'lucide-react';
 
-export default function TerrainFilters({ filters, setFilters, onReset }) {
+export default function TerrainFilters({ filters = {}, setFilters, onReset, initialFilters, onFilterChange }) {
+  // Support both (filters, setFilters) and (initialFilters, onFilterChange) props gracefully
+  const [internalFilters, setInternalFilters] = useState({
+    localisation: 'Tous les quartiers',
+    date: 'Dim. 24 Novembre',
+    types: [],
+    surfaces: [],
+    maxPrix: 35000,
+    equipements: [],
+    ...(filters || initialFilters || {})
+  });
+
+  const activeFilters = filters && Object.keys(filters).length > 0 ? filters : internalFilters;
+
+  const updateFilters = (updater) => {
+    if (typeof setFilters === 'function') {
+      setFilters(updater);
+    } else {
+      setInternalFilters((prev) => {
+        const next = typeof updater === 'function' ? updater(prev) : updater;
+        if (typeof onFilterChange === 'function') {
+          onFilterChange(next);
+        }
+        return next;
+      });
+    }
+  };
+
   const handleTypeChange = (type) => {
-    setFilters((prev) => {
-      const currentTypes = prev.types || [];
+    updateFilters((prev) => {
+      const currentTypes = prev?.types || [];
       const newTypes = currentTypes.includes(type)
         ? currentTypes.filter((t) => t !== type)
         : [...currentTypes, type];
@@ -12,8 +40,8 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
   };
 
   const handleSurfaceChange = (surface) => {
-    setFilters((prev) => {
-      const currentSurfaces = prev.surfaces || [];
+    updateFilters((prev) => {
+      const currentSurfaces = prev?.surfaces || [];
       const newSurfaces = currentSurfaces.includes(surface)
         ? currentSurfaces.filter((s) => s !== surface)
         : [...currentSurfaces, surface];
@@ -22,13 +50,26 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
   };
 
   const handleEquipementChange = (eq) => {
-    setFilters((prev) => {
-      const currentEqs = prev.equipements || [];
+    updateFilters((prev) => {
+      const currentEqs = prev?.equipements || [];
       const newEqs = currentEqs.includes(eq)
         ? currentEqs.filter((item) => item !== eq)
         : [...currentEqs, eq];
       return { ...prev, equipements: newEqs };
     });
+  };
+
+  const handleResetFilters = () => {
+    const defaultState = {
+      localisation: 'Tous les quartiers',
+      date: 'Dim. 24 Novembre',
+      types: [],
+      surfaces: [],
+      maxPrix: 35000,
+      equipements: []
+    };
+    if (onReset) onReset();
+    updateFilters(defaultState);
   };
 
   return (
@@ -38,7 +79,7 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
       <div className="flex items-center justify-between pb-4 border-b border-gray-100">
         <h3 className="text-lg font-extrabold text-gray-900">Filtres</h3>
         <button
-          onClick={onReset}
+          onClick={handleResetFilters}
           className="text-xs font-bold text-[#D4AF37] hover:text-[#b08d25] transition-colors cursor-pointer flex items-center gap-1"
         >
           <RotateCcw size={12} />
@@ -52,8 +93,8 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
           Localisation
         </label>
         <select
-          value={filters.localisation || 'Tous les quartiers'}
-          onChange={(e) => setFilters((prev) => ({ ...prev, localisation: e.target.value }))}
+          value={activeFilters?.localisation || activeFilters?.quartier || 'Tous les quartiers'}
+          onChange={(e) => updateFilters((prev) => ({ ...prev, localisation: e.target.value, quartier: e.target.value }))}
           className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
         >
           <option value="Tous les quartiers">Tous les quartiers</option>
@@ -75,8 +116,8 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
         <div className="relative">
           <input
             type="text"
-            value={filters.date || 'Dim. 24 Novembre'}
-            onChange={(e) => setFilters((prev) => ({ ...prev, date: e.target.value }))}
+            value={activeFilters?.date || 'Dim. 24 Novembre'}
+            onChange={(e) => updateFilters((prev) => ({ ...prev, date: e.target.value }))}
             className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030]"
           />
           <Calendar size={15} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
@@ -97,7 +138,7 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
             <label key={item.id} className="flex items-center space-x-2.5 cursor-pointer">
               <input
                 type="checkbox"
-                checked={(filters.types || []).includes(item.id)}
+                checked={(activeFilters?.types || []).includes(item.id)}
                 onChange={() => handleTypeChange(item.id)}
                 className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
               />
@@ -117,7 +158,7 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
             <label key={surf} className="flex items-center space-x-2.5 cursor-pointer">
               <input
                 type="checkbox"
-                checked={(filters.surfaces || []).includes(surf)}
+                checked={(activeFilters?.surfaces || []).includes(surf)}
                 onChange={() => handleSurfaceChange(surf)}
                 className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
               />
@@ -139,17 +180,17 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
         <input
           type="range"
           min="5000"
-          max="35000"
+          max="50000"
           step="1000"
-          value={filters.maxPrix || 20000}
-          onChange={(e) => setFilters((prev) => ({ ...prev, maxPrix: Number(e.target.value) }))}
+          value={activeFilters?.maxPrix || activeFilters?.prixMax || 35000}
+          onChange={(e) => updateFilters((prev) => ({ ...prev, maxPrix: Number(e.target.value), prixMax: Number(e.target.value) }))}
           className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#004030]"
         />
 
         <div className="flex justify-between text-xs font-bold text-gray-600">
           <span>5 000</span>
-          <span className="text-[#004030] font-black">{(filters.maxPrix || 20000).toLocaleString()}</span>
-          <span>35 000</span>
+          <span className="text-[#004030] font-black">{(activeFilters?.maxPrix || activeFilters?.prixMax || 35000).toLocaleString()}</span>
+          <span>50 000</span>
         </div>
       </div>
 
@@ -163,7 +204,7 @@ export default function TerrainFilters({ filters, setFilters, onReset }) {
             <label key={eq} className="flex items-center space-x-2.5 cursor-pointer">
               <input
                 type="checkbox"
-                checked={(filters.equipements || []).includes(eq)}
+                checked={(activeFilters?.equipements || []).includes(eq)}
                 onChange={() => handleEquipementChange(eq)}
                 className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
               />
