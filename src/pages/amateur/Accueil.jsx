@@ -107,7 +107,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           {/* Formulaire de Recherche Rapide (Fidèle au Figma) */}
           <form 
             onSubmit={handleSearchSubmit}
-            className="mt-10 bg-white rounded-3xl p-5 sm:p-6 w-full text-gray-800 grid grid-cols-1 md:grid-cols-4 gap-4 items-end border border-gray-100"
+            className="mt-10 bg-white rounded-[16px] p-5 sm:p-6 w-full text-gray-800 grid grid-cols-1 md:grid-cols-4 gap-4 items-end border border-gray-100"
           >
             {/* Champ 1: Zone / Quartier */}
             <div className="flex flex-col space-y-1.5 text-left">
@@ -199,9 +199,9 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Étape 1 */}
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
+          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-xl bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
                 <Search size={24} />
               </div>
               <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
@@ -215,9 +215,9 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           </div>
 
           {/* Étape 2 */}
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
+          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-xl bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
                 <Calendar size={24} />
               </div>
               <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
@@ -231,9 +231,9 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           </div>
 
           {/* Étape 3 */}
-          <div className="bg-white p-8 rounded-2xl border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
+          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-xl bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
                 <CheckCircle2 size={24} />
               </div>
               <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
@@ -265,7 +265,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
 
             <button
               onClick={() => onNavigate && onNavigate('terrains')}
-              className="px-5 py-2.5 bg-[#e6f4ea] text-[#004030] font-bold text-xs rounded-xl hover:bg-[#004030] hover:text-white transition-colors cursor-pointer border border-[#004030]/10 self-start sm:self-auto"
+              className="px-5 py-2.5 bg-[#e6f4ea] text-[#004030] font-bold text-xs rounded-[8px] hover:bg-[#004030] hover:text-white transition-colors cursor-pointer border border-[#004030]/10 self-start sm:self-auto"
             >
               Voir tous les terrains
             </button>
@@ -275,7 +275,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-80 bg-gray-100 rounded-2xl animate-pulse"></div>
+                <div key={i} className="h-80 bg-gray-100 rounded-[8px] animate-pulse"></div>
               ))}
             </div>
           ) : (
@@ -316,7 +316,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
 
           <button
             onClick={() => onNavigate && onNavigate('gerant')}
-            className="px-6 py-3.5 bg-white text-[#004030] font-bold rounded-xl hover:bg-emerald-50 transition-colors shrink-0 cursor-pointer text-sm"
+            className="px-6 py-3.5 bg-white text-[#004030] font-bold rounded-[8px] hover:bg-emerald-50 transition-colors shrink-0 cursor-pointer text-sm"
           >
             Devenir Gérant
           </button>
@@ -352,7 +352,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           </div>
 
           {/* Visuel Carte Dakar */}
-          <div className="bg-emerald-50/50 rounded-2xl p-6 border border-emerald-100 relative min-h-[280px] flex items-center justify-center text-center">
+          <div className="bg-emerald-50/50 rounded-[8px] p-6 border border-emerald-100 relative min-h-[280px] flex items-center justify-center text-center">
             <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-full text-xs font-bold text-[#004030] border border-gray-200 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               14 terrains disponibles ce soir à Dakar
@@ -392,7 +392,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
           {avisJoueurs.map((avis) => (
             <div
               key={avis.id}
-              className="bg-white p-6 rounded-2xl border border-gray-200 flex flex-col justify-between"
+              className="bg-white p-6 rounded-[8px] border border-gray-200 flex flex-col justify-between"
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">

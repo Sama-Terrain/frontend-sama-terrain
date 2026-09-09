@@ -14,7 +14,7 @@ export default function TerrainCard({ terrain, onSelect }) {
   } = terrain;
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 flex flex-col group">
+    <div className="bg-white rounded-[8px] overflow-hidden border border-gray-200 flex flex-col group">
       
       {/* Image du terrain à la une */}
       <div className="relative h-48 w-full overflow-hidden bg-gray-100">
