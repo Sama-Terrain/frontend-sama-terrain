@@ -4,7 +4,7 @@ import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
 import { MOCK_CRENEAUX } from '../../data/mockCreneaux';
 
-export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot }) {
+export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot, currentUser }) {
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -135,6 +135,11 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot 
   const resteAPayer = Math.max(0, currentPrix - avanceNum);
 
   const handleReserverSlot = () => {
+    if (!currentUser) {
+      if (onNavigate) onNavigate('login');
+      return;
+    }
+
     if (!isFormComplete) return;
 
     const reservationData = {
@@ -415,7 +420,13 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot 
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-extrabold text-gray-900">Avis des clients</h3>
                 <button
-                  onClick={() => setShowAvisModal(true)}
+                  onClick={() => {
+                    if (!currentUser) {
+                      if (onNavigate) onNavigate('login');
+                    } else {
+                      setShowAvisModal(true);
+                    }
+                  }}
                   className="px-4 py-2 bg-[#004030] hover:bg-[#005943] text-white font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
                 >
                   Laisser un avis

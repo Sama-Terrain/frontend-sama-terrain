@@ -5,6 +5,10 @@ import Accueil from './pages/amateur/Accueil';
 import RechercheTerrains from './pages/amateur/RechercheTerrains';
 import DetailTerrain from './pages/amateur/DetailTerrain';
 import DevenirGerant from './pages/gerant/DevenirGerant';
+import Connexion from './pages/auth/Connexion';
+import Inscription from './pages/auth/Inscription';
+import VerificationEmail from './pages/auth/VerificationEmail';
+import { mockUser } from './data/mockUser';
 
 function App() {
   // Récupération de la page actuelle depuis localStorage au rechargement (F5)
@@ -18,6 +22,8 @@ function App() {
     return saved ? Number(saved) : 1;
   });
 
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authEmail, setAuthEmail] = useState(mockUser.email);
   const [searchParams, setSearchParams] = useState({});
   const [reservationData, setReservationData] = useState(null);
 
@@ -30,6 +36,9 @@ function App() {
       setSelectedTerrain(params.terrainId);
       localStorage.setItem('sama_selected_terrain', params.terrainId);
     }
+    if (params.email) {
+      setAuthEmail(params.email);
+    }
     if (params) {
       setSearchParams(params);
     }
@@ -37,8 +46,15 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gray-50 font-sans">
-      {/* Barre de navigation supérieure */}
-      <Navbar onNavigate={handleNavigate} currentPage={currentPage} />
+      {/* Masquer Navbar et Footer sur les pages plein écran d'authentification */}
+      {currentPage !== 'login' && currentPage !== 'register' && currentPage !== 'verify-email' && (
+        <Navbar 
+          onNavigate={handleNavigate} 
+          currentPage={currentPage} 
+          currentUser={currentUser} 
+          onLogout={() => setCurrentUser(null)} 
+        />
+      )}
 
       {/* Contenu principal de la page actuelle */}
       <main className="flex-1">
@@ -68,6 +84,7 @@ function App() {
             terrainId={selectedTerrain || 1}
             onNavigate={handleNavigate}
             onSelectSlot={setReservationData}
+            currentUser={currentUser}
           />
         )}
 
@@ -75,8 +92,29 @@ function App() {
           <DevenirGerant onNavigate={handleNavigate} />
         )}
 
-        {/* Espace pour les autres pages */}
-        {currentPage !== 'accueil' && currentPage !== 'terrains' && currentPage !== 'detail' && currentPage !== 'gerant' && (
+        {currentPage === 'login' && (
+          <Connexion 
+            onNavigate={handleNavigate} 
+            onLoginSuccess={(u) => setCurrentUser(u)} 
+          />
+        )}
+
+        {currentPage === 'register' && (
+          <Inscription onNavigate={handleNavigate} />
+        )}
+
+        {currentPage === 'verify-email' && (
+          <VerificationEmail onNavigate={handleNavigate} email={authEmail} />
+        )}
+
+        {/* Espace pour les autres pages non encore créées */}
+        {currentPage !== 'accueil' && 
+         currentPage !== 'terrains' && 
+         currentPage !== 'detail' && 
+         currentPage !== 'gerant' &&
+         currentPage !== 'login' &&
+         currentPage !== 'register' &&
+         currentPage !== 'verify-email' && (
           <div className="max-w-4xl mx-auto py-20 px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Page "{currentPage}" bientôt prête !
@@ -95,7 +133,9 @@ function App() {
       </main>
 
       {/* Pied de page */}
-      <Footer onNavigate={handleNavigate} />
+      {currentPage !== 'login' && currentPage !== 'register' && currentPage !== 'verify-email' && (
+        <Footer onNavigate={handleNavigate} />
+      )}
     </div>
   );
 }
