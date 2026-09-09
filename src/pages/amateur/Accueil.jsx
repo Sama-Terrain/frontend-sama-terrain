@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { Search, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, CheckCircle2, Bot, X } from 'lucide-react';
 import TerrainCard from '../../components/terrain/TerrainCard';
 import { terrainService } from '../../services/terrainService';
-import { avisService } from '../../services/avisService';
-import heroBg from '../../assets/hero.png';
+import { avisService } from '../../services/avisService'; 
+import heroBg from '../../assets/herobg.jpeg';
+import ctaBg from '../../assets/cta.png';
+import chatbotGif from '../../assets/chatbot.gif';
 
 export default function Accueil({ onNavigate, onSelectTerrain }) {
   // États locaux pour les données chargées depuis les services
@@ -76,11 +78,11 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       
       {/* 1. HERO BANNER SECTION */}
-      <section className="relative bg-[#004030] text-white py-16 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200">
+      <section className="relative bg-[#004030] text-white py-25 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200">
         
         {/* Fond d'écran Football */}
         <div 
-          className="absolute inset-0 opacity-25 bg-cover bg-center pointer-events-none"
+          className="absolute inset-0 opacity-90 bg-cover bg-center pointer-events-none"
           style={{ backgroundImage: `url(${heroBg})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#004030]/90 via-[#004030]/80 to-[#004030] pointer-events-none" />
@@ -298,8 +300,8 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
       <section className="w-full bg-[#004030] text-white py-16 px-4 sm:px-6 lg:px-20 relative overflow-hidden">
         {/* Motif du terrain de football en arrière-plan */}
         <div 
-          className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none"
-          style={{ backgroundImage: `url(${heroBg})` }}
+          className="absolute inset-0 opacity-90 bg-cover bg-center pointer-events-none"
+          style={{ backgroundImage: `url(${ctaBg})` }}
         />
 
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
@@ -423,10 +425,14 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
         {!isAiOpen ? (
           <button
             onClick={() => setIsAiOpen(true)}
-            className="w-14 h-14 bg-[#004030] hover:bg-[#005943] text-white rounded-full flex items-center justify-center transition-transform hover:scale-105 cursor-pointer border border-emerald-700"
+            className="w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
             title="Ouvrir l'assistant IA"
           >
-            <Bot size={28} />
+            <img
+              src={chatbotGif}
+              alt="Assistant IA"
+              className="w-full h-full object-contain"
+            />
           </button>
         ) : (
           <div className="w-80 sm:w-96 bg-white rounded-2xl border border-gray-300 overflow-hidden">
@@ -435,6 +441,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
                 <Bot size={20} className="text-emerald-300" />
                 <span className="font-bold text-sm">Assistant Sama-Terrain</span>
               </div>
+
               <button
                 onClick={() => setIsAiOpen(false)}
                 className="text-gray-300 hover:text-white p-1"
@@ -447,7 +454,9 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
               {aiMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${
+                    msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                  }`}
                 >
                   <div
                     className={`max-w-[80%] p-3 rounded-xl ${
@@ -462,7 +471,10 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
               ))}
             </div>
 
-            <form onSubmit={handleSendAiMessage} className="p-3 bg-white border-t border-gray-200 flex gap-2">
+            <form
+              onSubmit={handleSendAiMessage}
+              className="p-3 bg-white border-t border-gray-200 flex gap-2"
+            >
               <input
                 type="text"
                 value={aiInput}
@@ -470,6 +482,7 @@ export default function Accueil({ onNavigate, onSelectTerrain }) {
                 placeholder="Ex: Terrain disponible à Yoff..."
                 className="flex-1 bg-gray-100 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#004030]"
               />
+
               <button
                 type="submit"
                 className="px-3 py-2 bg-[#004030] text-white font-bold rounded-lg text-xs hover:bg-[#005943]"
