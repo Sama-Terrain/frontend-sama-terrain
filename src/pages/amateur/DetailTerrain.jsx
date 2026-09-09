@@ -540,67 +540,91 @@ export default function DetailTerrain({ terrainId = 1, onNavigate, onSelectSlot 
 
       </div>
 
-      {/* MODAL AVIS */}
+      {/* MODAL AVIS (100% FIDÈLE À LA MAQUETTE FIGMA) */}
       {showAvisModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-4 animate-in fade-in duration-200">
-            <h3 className="text-base font-bold text-gray-900">Laisser un avis</h3>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[8px] p-6 sm:p-8 max-w-lg w-full space-y-6 relative animate-in zoom-in-95 duration-200 text-left">
+            
+            {/* EN-TÊTE MODAL (Titre & Bouton Fermer X) */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-extrabold text-gray-900">
+                Votre avis sur {terrain?.nom || ''}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowAvisModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full cursor-pointer"
+                title="Fermer"
+              >
+                <span className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-xs font-bold text-gray-500 hover:bg-gray-100">✕</span>
+              </button>
+            </div>
 
-            <form onSubmit={handleAddAvis} className="space-y-3 text-xs">
-              <div>
-                <label className="block font-semibold text-gray-700 mb-1">Votre Nom</label>
-                <input
-                  type="text"
-                  required
-                  value={newAvisNom}
-                  onChange={(e) => setNewAvisNom(e.target.value)}
-                  placeholder="Babacar Ndiaye"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-3 py-2 text-gray-900"
-                />
+            <form onSubmit={handleAddAvis} className="space-y-6">
+              
+              {/* SÉLECTEUR ÉTOILES NOTE GLOBALE */}
+              <div className="text-center space-y-2">
+                <p className="text-xs font-semibold text-gray-600">Note globale</p>
+                
+                <div className="flex justify-center items-center space-x-2">
+                  {[1, 2, 3, 4, 5].map((starIndex) => (
+                    <button
+                      key={starIndex}
+                      type="button"
+                      onClick={() => setNewAvisNote(starIndex)}
+                      className="p-1 cursor-pointer transition-transform hover:scale-110 focus:outline-none"
+                    >
+                      <Star
+                        size={32}
+                        className={
+                          starIndex <= newAvisNote
+                            ? 'fill-[#c06c11] text-[#c06c11]'
+                            : 'text-gray-300'
+                        }
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div>
-                <label className="block font-semibold text-gray-700 mb-1">Note (1 à 5 étoiles)</label>
-                <select
-                  value={newAvisNote}
-                  onChange={(e) => setNewAvisNote(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-3 py-2 text-gray-900 font-bold"
-                >
-                  <option value="5">5 Étoiles - Excellent</option>
-                  <option value="4">4 Étoiles - Très Bon</option>
-                  <option value="3">3 Étoiles - Moyen</option>
-                  <option value="2">2 Étoiles - Passable</option>
-                  <option value="1">1 Étoile - Mauvais</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-semibold text-gray-700 mb-1">Votre commentaire</label>
+              {/* CHAMP COMMENTAIRE AVEC COMPTEUR 0/500 */}
+              <div className="space-y-2">
+                <label className="block text-xs font-extrabold text-gray-900">
+                  Décrivez votre expérience <span className="font-normal text-gray-500">(optionnel)</span>
+                </label>
+                
                 <textarea
-                  rows="3"
-                  required
+                  rows="4"
+                  maxLength={500}
                   value={newAvisTexte}
                   onChange={(e) => setNewAvisTexte(e.target.value)}
-                  placeholder="Partagez votre expérience sur ce terrain..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-3 py-2 text-gray-900"
+                  placeholder="Terrain en excellent état, équipe d'accueil chaleureuse ! Idéal pour un match amical entre collègues..."
+                  className="w-full bg-[#f4f7f6] border border-gray-200/80 rounded-2xl p-4 text-xs font-medium text-gray-800 focus:outline-none focus:border-[#004030] placeholder-gray-400"
                 ></textarea>
+
+                {/* Compteur de caractères */}
+                <div className="text-right text-[11px] text-gray-400 font-medium">
+                  {newAvisTexte.length} / 500
+                </div>
               </div>
 
-              <div className="flex justify-end space-x-2 pt-2">
+              {/* BOUTONS D'ACTION (ANNULER CONTOUR VERT & PUBLIER SOLIDE VERT) */}
+              <div className="flex items-center justify-end space-x-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAvisModal(false)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 font-semibold rounded-[8px] hover:bg-gray-200"
+                  className="px-6 py-2.5 bg-white border border-[#004030] text-[#004030] hover:bg-emerald-50 font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#004030] text-white font-bold rounded-[8px] hover:bg-[#005943]"
+                  className="px-6 py-2.5 bg-[#004030] hover:bg-[#005943] text-white font-bold text-xs rounded-[8px] transition-colors cursor-pointer shadow-xs"
                 >
-                  Publier l'avis
+                  Publier mon avis
                 </button>
               </div>
+
             </form>
           </div>
         </div>
