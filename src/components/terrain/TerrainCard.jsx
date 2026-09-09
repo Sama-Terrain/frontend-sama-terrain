@@ -64,7 +64,7 @@ export default function TerrainCard({ terrain, onSelect }) {
         {/* Bouton "Voir détails" pleine largeur en vert clair */}
         <button
           onClick={() => onSelect && onSelect(terrain)}
-          className="w-full py-2.5 px-4 bg-[#e6f4ea] hover:bg-[#004030] text-[#004030] hover:text-white font-bold text-xs rounded-xl transition-colors duration-200 cursor-pointer text-center"
+          className="w-full py-2.5 px-4 bg-[#e6f4ea] hover:bg-[#004030] text-[#004030] hover:text-white font-bold text-xs rounded-[8px] transition-colors duration-200 cursor-pointer text-center"
         >
           Voir détails
         </button>

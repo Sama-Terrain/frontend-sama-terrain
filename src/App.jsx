@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Accueil from './pages/amateur/Accueil';
 import RechercheTerrains from './pages/amateur/RechercheTerrains';
 import DetailTerrain from './pages/amateur/DetailTerrain';
+import DevenirGerant from './pages/gerant/DevenirGerant';
 
 function App() {
   // Récupération de la page actuelle depuis localStorage au rechargement (F5)
@@ -70,14 +71,18 @@ function App() {
           />
         )}
 
-        {/* Espace pour les pages à venir */}
-        {currentPage !== 'accueil' && currentPage !== 'terrains' && currentPage !== 'detail' && (
+        {currentPage === 'gerant' && (
+          <DevenirGerant onNavigate={handleNavigate} />
+        )}
+
+        {/* Espace pour les autres pages */}
+        {currentPage !== 'accueil' && currentPage !== 'terrains' && currentPage !== 'detail' && currentPage !== 'gerant' && (
           <div className="max-w-4xl mx-auto py-20 px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Page "{currentPage}" bientôt prête !
             </h2>
             <p className="text-gray-600 mb-6">
-              Cette étape sera intégrée juste après la validation de la page Détail.
+              Cette étape sera intégrée à la suite du parcours.
             </p>
             <button
               onClick={() => handleNavigate('accueil')}
