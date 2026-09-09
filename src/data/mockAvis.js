@@ -5,22 +5,25 @@ export const MOCK_AVIS = [
     role: 'Capitaine FC Almadies',
     initiales: 'AD',
     note: 5,
-    commentaire: 'Sama-Terrain a changé notre façon d’organiser nos matchs hebdomadaires. Plus besoin d’appeler pendant des heures pour réserver !'
+    date: '15 Oct 2024',
+    commentaire: 'Excellent terrain, bien entretenu et éclairage parfait pour les matchs en soirée. Je recommande vivement !'
   },
   {
     id: 2,
-    nom: 'Mariama Sy',
+    nom: 'Fatou Sow',
     role: 'Responsable Tournoi Amical',
-    initiales: 'MS',
-    note: 5,
-    commentaire: 'Une visibilité claire sur les créneaux disponibles. Le paiement et la confirmation sont super rapides et sécurisés.'
+    initiales: 'FS',
+    note: 4,
+    date: '10 Oct 2024',
+    commentaire: 'Très bon complexe, vestiaires propres. Seul bémole, le parking était un peu plein ce soir-là.'
   },
   {
     id: 3,
-    nom: 'Khadim Ndiaye',
+    nom: 'Moussa Ndiaye',
     role: 'Joueur Régulier',
-    initiales: 'KN',
+    initiales: 'MN',
     note: 5,
-    commentaire: 'Super pratique de trouver des terrains de 5v5 à Dakar avec les prix et avis. L’application est fluide et intuitive.'
+    date: '5 Oct 2024',
+    commentaire: 'Le meilleur terrain de mini-foot des Almadies. Pelouse synthétique de qualité, on reviendra !'
   }
 ];

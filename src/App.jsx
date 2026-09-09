@@ -1,17 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Accueil from './pages/amateur/Accueil';
 import RechercheTerrains from './pages/amateur/RechercheTerrains';
+import DetailTerrain from './pages/amateur/DetailTerrain';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('accueil');
-  const [selectedTerrain, setSelectedTerrain] = useState(null);
-  const [searchParams, setSearchParams] = useState({});
+  // Récupération de la page actuelle depuis localStorage au rechargement (F5)
+  const [currentPage, setCurrentPage] = useState(() => {
+    return localStorage.getItem('sama_current_page') || 'accueil';
+  });
 
-  // Fonction simple de navigation
+  // Récupération du terrain sélectionné depuis localStorage
+  const [selectedTerrain, setSelectedTerrain] = useState(() => {
+    const saved = localStorage.getItem('sama_selected_terrain');
+    return saved ? Number(saved) : 1;
+  });
+
+  const [searchParams, setSearchParams] = useState({});
+  const [reservationData, setReservationData] = useState(null);
+
+  // Synchronisation systématique avec localStorage pour persister la navigation
   const handleNavigate = (page, params = {}) => {
     setCurrentPage(page);
+    localStorage.setItem('sama_current_page', page);
+
+    if (params.terrainId) {
+      setSelectedTerrain(params.terrainId);
+      localStorage.setItem('sama_selected_terrain', params.terrainId);
+    }
     if (params) {
       setSearchParams(params);
     }
@@ -27,26 +44,40 @@ function App() {
         {currentPage === 'accueil' && (
           <Accueil 
             onNavigate={handleNavigate}
-            onSelectTerrain={setSelectedTerrain}
+            onSelectTerrain={(t) => {
+              setSelectedTerrain(t.id);
+              localStorage.setItem('sama_selected_terrain', t.id);
+            }}
           />
         )}
 
         {currentPage === 'terrains' && (
           <RechercheTerrains
             onNavigate={handleNavigate}
-            onSelectTerrain={setSelectedTerrain}
+            onSelectTerrain={(t) => {
+              setSelectedTerrain(t.id);
+              localStorage.setItem('sama_selected_terrain', t.id);
+            }}
             initialSearch={searchParams}
           />
         )}
 
-        {/* Espace pour les pages des prochaines étapes */}
-        {currentPage !== 'accueil' && currentPage !== 'terrains' && (
+        {currentPage === 'detail' && (
+          <DetailTerrain
+            terrainId={selectedTerrain || 1}
+            onNavigate={handleNavigate}
+            onSelectSlot={setReservationData}
+          />
+        )}
+
+        {/* Espace pour les pages à venir */}
+        {currentPage !== 'accueil' && currentPage !== 'terrains' && currentPage !== 'detail' && (
           <div className="max-w-4xl mx-auto py-20 px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Page "{currentPage}" bientôt prête !
             </h2>
             <p className="text-gray-600 mb-6">
-              Cette page sera intégrée à l'étape suivante.
+              Cette étape sera intégrée juste après la validation de la page Détail.
             </p>
             <button
               onClick={() => handleNavigate('accueil')}
