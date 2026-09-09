@@ -2,21 +2,23 @@ import { useState } from 'react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Accueil from './pages/amateur/Accueil';
+import RechercheTerrains from './pages/amateur/RechercheTerrains';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('accueil');
   const [selectedTerrain, setSelectedTerrain] = useState(null);
+  const [searchParams, setSearchParams] = useState({});
 
   // Fonction simple de navigation
   const handleNavigate = (page, params = {}) => {
     setCurrentPage(page);
-    if (params.terrainId) {
-      console.log('Navigation vers le terrain :', params.terrainId);
+    if (params) {
+      setSearchParams(params);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-between bg-gray-50 font-sans">
       {/* Barre de navigation supérieure */}
       <Navbar onNavigate={handleNavigate} currentPage={currentPage} />
 
@@ -29,18 +31,26 @@ function App() {
           />
         )}
 
-        {/* Espace pour les pages à venir dans les prochaines étapes */}
-        {currentPage !== 'accueil' && (
+        {currentPage === 'terrains' && (
+          <RechercheTerrains
+            onNavigate={handleNavigate}
+            onSelectTerrain={setSelectedTerrain}
+            initialSearch={searchParams}
+          />
+        )}
+
+        {/* Espace pour les pages des prochaines étapes */}
+        {currentPage !== 'accueil' && currentPage !== 'terrains' && (
           <div className="max-w-4xl mx-auto py-20 px-4 text-center">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Page "{currentPage}" bientôt prête !
             </h2>
             <p className="text-gray-600 mb-6">
-              Page indisponible pour le moment.
+              Cette page sera intégrée à l'étape suivante.
             </p>
             <button
               onClick={() => handleNavigate('accueil')}
-              className="px-6 py-2.5 bg-[#1b4332] text-white font-bold rounded-xl hover:bg-[#2d6a4f]"
+              className="px-6 py-2.5 bg-[#004030] text-white font-bold rounded-xl hover:bg-[#005943]"
             >
               Retour à l'accueil
             </button>

@@ -1,0 +1,178 @@
+import { Calendar, RotateCcw } from 'lucide-react';
+
+export default function TerrainFilters({ filters, setFilters, onReset }) {
+  const handleTypeChange = (type) => {
+    setFilters((prev) => {
+      const currentTypes = prev.types || [];
+      const newTypes = currentTypes.includes(type)
+        ? currentTypes.filter((t) => t !== type)
+        : [...currentTypes, type];
+      return { ...prev, types: newTypes };
+    });
+  };
+
+  const handleSurfaceChange = (surface) => {
+    setFilters((prev) => {
+      const currentSurfaces = prev.surfaces || [];
+      const newSurfaces = currentSurfaces.includes(surface)
+        ? currentSurfaces.filter((s) => s !== surface)
+        : [...currentSurfaces, surface];
+      return { ...prev, surfaces: newSurfaces };
+    });
+  };
+
+  const handleEquipementChange = (eq) => {
+    setFilters((prev) => {
+      const currentEqs = prev.equipements || [];
+      const newEqs = currentEqs.includes(eq)
+        ? currentEqs.filter((item) => item !== eq)
+        : [...currentEqs, eq];
+      return { ...prev, equipements: newEqs };
+    });
+  };
+
+  return (
+    <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-6 text-left">
+      
+      {/* En-tête Filtres */}
+      <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+        <h3 className="text-lg font-extrabold text-gray-900">Filtres</h3>
+        <button
+          onClick={onReset}
+          className="text-xs font-bold text-[#D4AF37] hover:text-[#b08d25] transition-colors cursor-pointer flex items-center gap-1"
+        >
+          <RotateCcw size={12} />
+          <span>Effacer</span>
+        </button>
+      </div>
+
+      {/* 1. Localisation */}
+      <div className="space-y-2">
+        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+          Localisation
+        </label>
+        <select
+          value={filters.localisation || 'Tous les quartiers'}
+          onChange={(e) => setFilters((prev) => ({ ...prev, localisation: e.target.value }))}
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
+        >
+          <option value="Tous les quartiers">Tous les quartiers</option>
+          <option value="Almadies">Almadies</option>
+          <option value="Fann">Fann</option>
+          <option value="Mermoz">Mermoz</option>
+          <option value="Ngor">Ngor</option>
+          <option value="Yoff">Yoff</option>
+          <option value="Zone B">Zone B</option>
+          <option value="Guédiawaye">Guédiawaye</option>
+        </select>
+      </div>
+
+      {/* 2. Date */}
+      <div className="space-y-2">
+        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+          Date
+        </label>
+        <div className="relative">
+          <input
+            type="text"
+            value={filters.date || 'Dim. 24 Novembre'}
+            onChange={(e) => setFilters((prev) => ({ ...prev, date: e.target.value }))}
+            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030]"
+          />
+          <Calendar size={15} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* 3. Type de terrain */}
+      <div className="space-y-2.5 pt-2 border-t border-gray-100">
+        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide block">
+          Type de terrain
+        </label>
+        <div className="space-y-2 text-xs font-semibold text-gray-700">
+          {[
+            { id: '5v5', label: '5 contre 5' },
+            { id: '6v6', label: '6 contre 6' },
+            { id: '7v7', label: '7 contre 7' }
+          ].map((item) => (
+            <label key={item.id} className="flex items-center space-x-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={(filters.types || []).includes(item.id)}
+                onChange={() => handleTypeChange(item.id)}
+                className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
+              />
+              <span>{item.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* 4. Surface */}
+      <div className="space-y-2.5 pt-2 border-t border-gray-100">
+        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide block">
+          Surface
+        </label>
+        <div className="space-y-2 text-xs font-semibold text-gray-700">
+          {['Synthétique', 'Gazon Naturel', 'Sable'].map((surf) => (
+            <label key={surf} className="flex items-center space-x-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={(filters.surfaces || []).includes(surf)}
+                onChange={() => handleSurfaceChange(surf)}
+                className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
+              />
+              <span>{surf}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. Tarif Max (FCFA / H) */}
+      <div className="space-y-3 pt-2 border-t border-gray-100">
+        <div className="flex justify-between items-center">
+          <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+            Tarif Max (FCFA / H)
+          </label>
+        </div>
+        
+        {/* Curseur de prix */}
+        <input
+          type="range"
+          min="5000"
+          max="35000"
+          step="1000"
+          value={filters.maxPrix || 20000}
+          onChange={(e) => setFilters((prev) => ({ ...prev, maxPrix: Number(e.target.value) }))}
+          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#004030]"
+        />
+
+        <div className="flex justify-between text-xs font-bold text-gray-600">
+          <span>5 000</span>
+          <span className="text-[#004030] font-black">{(filters.maxPrix || 20000).toLocaleString()}</span>
+          <span>35 000</span>
+        </div>
+      </div>
+
+      {/* 6. Équipements */}
+      <div className="space-y-2.5 pt-2 border-t border-gray-100">
+        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide block">
+          Équipements
+        </label>
+        <div className="space-y-2 text-xs font-semibold text-gray-700">
+          {['Vestiaires', 'Éclairage nocturne', 'Parking sécurisé'].map((eq) => (
+            <label key={eq} className="flex items-center space-x-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={(filters.equipements || []).includes(eq)}
+                onChange={() => handleEquipementChange(eq)}
+                className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
+              />
+              <span>{eq}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  );
+}
