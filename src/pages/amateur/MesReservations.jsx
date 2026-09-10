@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, ChevronRight, Ticket } from 'lucide-react';
 import { reservationService } from '../../services/reservationService';
+import TicketQR from '../../components/reservation/TicketQR';
 
 export default function MesReservations() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export default function MesReservations() {
         
         {/* EN-TÊTE : TITRE ET BOUTON "RÉSERVER UN NOUVEAU MATCH" */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
             Mes Réservations
           </h1>
 
@@ -216,59 +217,11 @@ export default function MesReservations() {
 
       </div>
 
-      {/* MODAL TICKET DU MATCH */}
-      {ticketModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full space-y-6 relative animate-in zoom-in-95 duration-200 text-left">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-              <div className="flex items-center space-x-2">
-                <Ticket className="text-[#004030]" size={20} />
-                <h3 className="text-base font-extrabold text-gray-900">
-                  Ticket de Réservation #{ticketModal.id}
-                </h3>
-              </div>
-              <button
-                onClick={() => setTicketModal(null)}
-                className="text-gray-400 hover:text-gray-600 p-1"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs text-gray-700">
-              <div className="flex justify-between py-1 border-b border-gray-50">
-                <span className="text-gray-400 font-medium">Terrain</span>
-                <span className="font-bold text-gray-900">{ticketModal.nomTerrain}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-50">
-                <span className="text-gray-400 font-medium">Date & Horaire</span>
-                <span className="font-bold text-gray-900">{ticketModal.dateTexte}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-50">
-                <span className="text-gray-400 font-medium">Acompte réglé</span>
-                <span className="font-bold text-emerald-700">{ticketModal.montantAcompte.toLocaleString()} FCFA</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-gray-50">
-                <span className="text-gray-400 font-medium">Reste sur place</span>
-                <span className="font-bold text-gray-900">{(ticketModal.prixTotal - ticketModal.montantAcompte).toLocaleString()} FCFA</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-gray-400 font-medium">Statut</span>
-                <span className="font-bold text-emerald-700">{ticketModal.status}</span>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={() => setTicketModal(null)}
-                className="w-full py-2.5 bg-[#004030] text-white font-bold text-xs rounded-[8px] hover:bg-[#005943]"
-              >
-                Fermer
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* MODAL TICKET DU MATCH (FIGMA DESIGN) */}
+      <TicketQR
+        ticket={ticketModal}
+        onClose={() => setTicketModal(null)}
+      />
 
     </div>
   );

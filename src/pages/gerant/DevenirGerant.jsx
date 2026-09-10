@@ -47,7 +47,7 @@ export default function DevenirGerant() {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-left">
       
       {/* 1. HERO BANNER SECTION (FARMER / GÉRANT BANNER) */}
-      <section className="relative bg-[#004030] text-white py-16 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200">
+      <section className="relative bg-[#004030] text-white py-16 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200 h-[40vh]">
         <div 
           className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none"
           style={{ backgroundImage: `url(${heroBg})` }}
@@ -55,7 +55,7 @@ export default function DevenirGerant() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#004030]/90 via-[#004030]/80 to-[#004030] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-4">
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight max-w-3xl leading-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight max-w-3xl leading-tight">
             Faites de votre terrain une vraie opportunité
           </h1>
           <p className="text-sm sm:text-base text-gray-200/90 max-w-2xl font-normal leading-relaxed">
@@ -65,7 +65,7 @@ export default function DevenirGerant() {
       </section>
 
       {/* 2. SECTION "POURQUOI NOUS FAIRE CONFIANCE ?" */}
-      <section className="py-16 px-4 sm:px-6 lg:px-20 max-w-7xl mx-auto w-full">
+      <section className="py-16 px-4 sm:px-6 lg:px-10 max-w-7xl mx-auto w-full">
         <h2 className="text-2xl font-extrabold text-gray-900 mb-8">
           Pourquoi nous faire confiance ?
         </h2>
@@ -107,7 +107,7 @@ export default function DevenirGerant() {
       </section>
 
       {/* 3. FORMULAIRE "INSCRIVEZ VOTRE COMPLEXE EN 3 MINUTES" */}
-      <section className="pb-20 px-4 sm:px-6 lg:px-20 max-w-7xl mx-auto w-full">
+      <section className="pb-20 px-4 sm:px-6 lg:px-10 max-w-7xl mx-auto w-full">
         <div className="bg-white rounded-[8px] p-6 sm:p-10 border border-gray-200 space-y-8">
           
           <div>

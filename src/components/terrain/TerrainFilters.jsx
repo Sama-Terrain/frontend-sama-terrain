@@ -73,7 +73,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-6 text-left">
+    <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-6 text-left">
       
       {/* En-tête Filtres */}
       <div className="flex items-center justify-between pb-4 border-b border-gray-100">
@@ -95,7 +95,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
         <select
           value={activeFilters?.localisation || activeFilters?.quartier || 'Tous les quartiers'}
           onChange={(e) => updateFilters((prev) => ({ ...prev, localisation: e.target.value, quartier: e.target.value }))}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
+          className="w-full bg-gray-50 border border-gray-200 rounded-[4px] px-3.5 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
         >
           <option value="Tous les quartiers">Tous les quartiers</option>
           <option value="Almadies">Almadies</option>
@@ -113,14 +113,19 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
         <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
           Date
         </label>
+
         <div className="relative">
           <input
-            type="text"
-            value={activeFilters?.date || 'Dim. 24 Novembre'}
-            onChange={(e) => updateFilters((prev) => ({ ...prev, date: e.target.value }))}
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030]"
+            type="date"
+            value={activeFilters?.date || ''}
+            onChange={(e) =>
+              updateFilters((prev) => ({
+                ...prev,
+                date: e.target.value,
+              }))
+            }
+            className="w-full bg-gray-50 border border-gray-200 rounded-[4px] pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030]"
           />
-          <Calendar size={15} className="absolute right-3 top-3 text-gray-500 pointer-events-none" />
         </div>
       </div>
 

@@ -188,7 +188,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
         </nav>
 
         {/* GALERIE PHOTOS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-2xl overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-[8px] overflow-hidden">
           <div className="md:col-span-2 h-72 sm:h-96 w-full overflow-hidden bg-gray-200">
             <img
               src={terrain?.image}
@@ -222,7 +222,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
           <div className="lg:col-span-2 space-y-8">
             
             {/* EN-TÊTE DU TERRAIN */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-4">
+            <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-4">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                 {terrain?.nom || 'Complexe Keur Madior'}
               </h1>
@@ -264,7 +264,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
             </div>
 
             {/* SELECTION DE DISPONIBILITÉS */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-6">
+            <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-6">
               
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <h3 className="text-sm font-bold text-gray-900">Disponibilités</h3>
@@ -367,7 +367,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
             {/* VOS COORDONNÉES ET AVANCE (ACCESSIBLES SEULEMENT POUR UNE DATE VALIDE + CRÉNEAU SÉLECTIONNÉ) */}
             {hasChosenDateAndSlot && (
               <>
-                <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-4 animate-in fade-in duration-200">
+                <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-4 animate-in fade-in duration-200">
                   <h3 className="text-sm font-bold text-gray-900">Vos coordonnées</h3>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -395,7 +395,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-3 animate-in fade-in duration-200">
+                <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-3 animate-in fade-in duration-200">
                   <h3 className="text-sm font-bold text-gray-900">
                     Montant de l'avance <span className="text-xs text-gray-400 font-normal">(min. 5 000 FCFA)</span>
                   </h3>
@@ -421,7 +421,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
             )}
 
             {/* AVIS DES CLIENTS */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-6">
+            <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-extrabold text-gray-900">Avis des clients</h3>
                 <button
@@ -471,7 +471,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
           {/* COLONNE DROITE : RECAPITULATIF STICKY */}
           <div className="space-y-6 sticky top-24">
             
-            <div className="bg-white rounded-2xl p-4 border border-gray-200 space-y-3">
+            <div className="bg-white rounded-[8px] p-4 border border-gray-200 space-y-3">
               <h4 className="text-xs font-bold text-gray-900 uppercase">Localisation du terrain</h4>
               <div className="h-44 bg-emerald-50 rounded-[8px] border border-emerald-100 relative overflow-hidden flex items-center justify-center text-center p-4">
                 <div className="space-y-2">
@@ -486,7 +486,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 space-y-5">
+            <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-5">
               <h3 className="text-base font-extrabold text-gray-900 border-b border-gray-100 pb-3">
                 Récapitulatif de votre match
               </h3>
