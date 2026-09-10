@@ -14,7 +14,15 @@ import Connexion from '../pages/auth/Connexion';
 import Inscription from '../pages/auth/Inscription';
 import VerificationEmail from '../pages/auth/VerificationEmail';
 
-export default function AppRoutes({ currentUser, setCurrentUser, searchParams, onSelectSlot }) {
+// Pages Admin
+import AdminDashboard from '../pages/admin/Dashboard';
+import Utilisateurs from '../pages/admin/Utilisateurs';
+import ValiderGerants from '../pages/admin/ValiderGerants';
+import ModerationAvis from '../pages/admin/ModerationAvis';
+import Statistiques from '../pages/admin/Statistiques';
+import Parametres from '../pages/admin/Parametres';
+
+export default function AppRoutes({ currentUser, setCurrentUser, searchParams, onSelectSlot, onLogout }) {
   return (
     <Routes>
       {/* Route Accueil */}
@@ -39,6 +47,15 @@ export default function AppRoutes({ currentUser, setCurrentUser, searchParams, o
 
       {/* Route Devenir Gérant */}
       <Route path="/gerant" element={<DevenirGerant />} />
+
+      {/* Routes Administrateur (avec transmission du handler de déconnexion) */}
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard onLogout={onLogout} />} />
+      <Route path="/admin/utilisateurs" element={<Utilisateurs onLogout={onLogout} />} />
+      <Route path="/admin/validation-gerants" element={<ValiderGerants onLogout={onLogout} />} />
+      <Route path="/admin/moderation-avis" element={<ModerationAvis onLogout={onLogout} />} />
+      <Route path="/admin/statistiques" element={<Statistiques onLogout={onLogout} />} />
+      <Route path="/admin/parametres" element={<Parametres onLogout={onLogout} />} />
 
       {/* Routes Authentification */}
       <Route

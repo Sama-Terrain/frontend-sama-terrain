@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import AppRoutes from './routes/AppRoutes';
-import { mockUser } from './data/mockUser';
 
 function AppContent() {
   const location = useLocation();
@@ -27,28 +26,31 @@ function AppContent() {
     localStorage.removeItem('sama_current_user');
   };
 
-  // Masquer Navbar et Footer sur les routes d'authentification
-  const isAuthPage = ['/login', '/register', '/verify-email'].includes(location.pathname);
+  // Masquer la Navbar et le Footer grand public sur les pages auth et admin
+  const isAuthOrAdminPage =
+    ['/login', '/register', '/verify-email'].includes(location.pathname) ||
+    location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gray-50 font-sans">
-      {!isAuthPage && (
-        <Navbar 
-          currentUser={currentUser} 
-          onLogout={handleLogout} 
+      {!isAuthOrAdminPage && (
+        <Navbar
+          currentUser={currentUser}
+          onLogout={handleLogout}
         />
       )}
 
       <main className="flex-1">
-        <AppRoutes 
+        <AppRoutes
           currentUser={currentUser}
           setCurrentUser={handleLoginSuccess}
           searchParams={searchParams}
           onSelectSlot={setReservationData}
+          onLogout={handleLogout}
         />
       </main>
 
-      {!isAuthPage && (
+      {!isAuthOrAdminPage && (
         <Footer />
       )}
     </div>

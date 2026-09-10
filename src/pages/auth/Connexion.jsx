@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import loginBg from '../../assets/terrain-login.png';
-import { mockUser } from '../../data/mockUser';
+import { mockUser, mockAdminUser } from '../../data/mockUser';
 
 export default function Connexion({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -16,13 +16,24 @@ export default function Connexion({ onLoginSuccess }) {
     e.preventDefault();
     setError('');
 
-    // Vérification avec mockUser
-    if (email.trim().toLowerCase() === mockUser.email.toLowerCase() && password === mockUser.password) {
+    const inputEmail = email.trim().toLowerCase();
+
+    // 1. Connexion Administrateur
+    if (inputEmail === mockAdminUser.email.toLowerCase() && password === mockAdminUser.password) {
+      if (onLoginSuccess) onLoginSuccess(mockAdminUser);
+      navigate('/admin/dashboard');
+      return;
+    }
+
+    // 2. Connexion Amateur
+    if (inputEmail === mockUser.email.toLowerCase() && password === mockUser.password) {
       if (onLoginSuccess) onLoginSuccess(mockUser);
       navigate('/verify-email', { state: { email: mockUser.email } });
-    } else {
-      setError('Identifiants incorrects. Indice: mariegodmer@gmail.com / password123');
+      return;
     }
+
+    // Identifiants incorrects
+    setError('Identifiants incorrects. Veuillez utiliser les comptes de test ci-dessus.');
   };
 
   return (
@@ -31,15 +42,24 @@ export default function Connexion({ onLoginSuccess }) {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-left">
           
-          <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-6">
             Connectez-vous
           </h1>
 
-          {/* Indication mock pour l'utilisateur */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-[8px] p-3 text-xs text-emerald-800">
-            💡 <strong>Compte fictif de test :</strong><br />
-            Email : <code className="font-bold">mariegodmer@gmail.com</code><br />
-            Mot de passe : <code className="font-bold">password123</code>
+          {/* Indication mocks pour l'utilisateur (Amateur & Admin) */}
+          <div className="space-y-2">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-[8px] p-3 text-xs text-emerald-800">
+              💡 <strong>Compte Amateur :</strong><br />
+              Email : <code className="font-bold">mariegodmer@gmail.com</code> | Pass : <code className="font-bold">password123</code>
+            </div>
+            
+            <div className="bg-amber-50 border border-amber-200 rounded-[8px] p-3 text-xs text-amber-900 flex items-start gap-2">
+              <ShieldCheck size={16} className="text-[#004030] shrink-0 mt-0.5" />
+              <div>
+                <strong>Compte Super Admin :</strong><br />
+                Email : <code className="font-bold">admin@samaterrain.sn</code> | Pass : <code className="font-bold">admin123</code>
+              </div>
+            </div>
           </div>
 
           {error && (
@@ -101,7 +121,7 @@ export default function Connexion({ onLoginSuccess }) {
             {/* Bouton Se connecter */}
             <button
               type="submit"
-              className="w-full py-3.5 bg-[#004030] hover:bg-[#005943] text-white font-bold rounded-[8px] text-xs transition-colors cursor-pointer mt-4"
+              className="w-full py-3.5 bg-[#004030] hover:bg-[#005943] text-white font-bold rounded-[8px] text-xs transition-colors cursor-pointer mt-4 shadow-xs"
             >
               Se connecter
             </button>
