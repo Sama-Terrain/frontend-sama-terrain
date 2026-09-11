@@ -3,10 +3,12 @@ import React from 'react';
 // Props du composant :
 // - statut : L'état à afficher ('disponible', 'reserve', 'complet', 'en_attente', 'forte_demande')
 // - children : Texte personnalisé optionnel
-export default function Badge({ statut = 'disponible', children }) {
+// - rounded : L'arrondi du badge ('full', '8px')
+// - className : Classes CSS additionnelles pour surcharger
+export default function Badge({ statut = 'disponible', children, rounded = 'full', className = '' }) {
   return (
     <span
-      className={`inline-flex items-center justify-center px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+      className={`inline-flex items-center justify-center px-2.5 py-1 rounded-${rounded} text-xs font-semibold whitespace-nowrap ${
         statut === 'reserve'
           ? 'bg-orange-100 text-orange-700'
           : statut === 'complet'
@@ -14,9 +16,9 @@ export default function Badge({ statut = 'disponible', children }) {
           : statut === 'en_attente'
           ? 'bg-gray-100 text-gray-700'
           : statut === 'forte_demande'
-          ? 'bg-emerald-100 text-emerald-900'
-          : 'bg-emerald-100 text-emerald-700'
-      }`}
+          ? 'bg-vert-clair text-vert-principal'
+          : 'bg-vert-clair text-vert-principal'
+      } ${className}`}
     >
       {children || (
         statut === 'reserve'

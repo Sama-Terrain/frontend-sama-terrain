@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Calendar as CalendarIcon, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Badge from '../../components/ui/Badge';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
 import { MOCK_CRENEAUX } from '../../data/mockCreneaux';
@@ -247,12 +248,13 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
 
               <div className="flex flex-wrap gap-2 pt-2">
                 {['Synthétique', '5v5', 'Éclairage', 'Vestiaires', 'Parking'].map((badge) => (
-                  <span
+                  <Badge
                     key={badge}
-                    className="px-3 py-1 bg-vert-clair text-vert-principal font-semibold text-xs rounded-full"
+                    statut="disponible"
+                    className="px-3 py-1 font-semibold"
                   >
                     {badge}
-                  </span>
+                  </Badge>
                 ))}
               </div>
 

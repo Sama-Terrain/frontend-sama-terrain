@@ -1,5 +1,6 @@
 import { MapPin, Star } from 'lucide-react';
 import Button from '../ui/Button';
+import Badge from '../ui/Badge';
 
 export default function TerrainCard({ terrain, onSelect }) {
   if (!terrain) return null;
@@ -31,12 +32,12 @@ export default function TerrainCard({ terrain, onSelect }) {
         
         {/* Badges : Type (gauche) et Disponibilité (droite) sous l'image */}
         <div className="flex items-center justify-between">
-          <span className="px-3 py-1 bg-vert-clair text-vert-principal font-bold text-xs rounded-full">
+          <Badge statut="disponible" className="px-3 py-1 font-bold">
             {type}
-          </span>
-          <span className="px-3 py-1 bg-vert-clair text-vert-principal font-medium text-xs rounded-full">
+          </Badge>
+          <Badge statut={disponible ? 'disponible' : 'complet'} className="px-3 py-1 font-medium">
             {disponible ? 'Disponible' : 'Indisponible'}
-          </span>
+          </Badge>
         </div>
 
         {/* Nom du terrain */}
