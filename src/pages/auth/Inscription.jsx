@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
 
 export default function Inscription() {
@@ -47,9 +49,7 @@ export default function Inscription() {
           </h1>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-[8px] p-3 text-xs text-red-600 font-semibold">
-              {error}
-            </div>
+            <Alert type="error" message={error} />
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -58,27 +58,27 @@ export default function Inscription() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-800">Prenom</label>
-                <input
+                <Input
                   type="text"
                   name="prenom"
                   required
                   value={formData.prenom}
                   onChange={handleChange}
                   placeholder="Votre prenom"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
+                  className="text-xs font-semibold"
                 />
               </div>
 
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-800">Nom</label>
-                <input
+                <Input
                   type="text"
                   name="nom"
                   required
                   value={formData.nom}
                   onChange={handleChange}
                   placeholder="Votre nom"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
+                  className="text-xs font-semibold"
                 />
               </div>
             </div>
@@ -86,14 +86,14 @@ export default function Inscription() {
             {/* Email */}
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-800">Email</label>
-              <input
+              <Input
                 type="email"
                 name="email"
                 required
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="exemple@gmail.com"
-                className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                className="text-xs font-semibold"
               />
             </div>
 
@@ -101,14 +101,14 @@ export default function Inscription() {
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-800">Mot de passe</label>
               <div className="relative">
-                <input
+                <Input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   required
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="........"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
+                  className="text-xs font-semibold pr-10"
                 />
                 <button
                   type="button"
@@ -124,14 +124,14 @@ export default function Inscription() {
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-800">Confirmer mot de passe</label>
               <div className="relative">
-                <input
+                <Input
                   type={showConfirmPassword ? 'text' : 'password'}
                   name="confirmPassword"
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="........"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
+                  className="text-xs font-semibold pr-10"
                 />
                 <button
                   type="button"

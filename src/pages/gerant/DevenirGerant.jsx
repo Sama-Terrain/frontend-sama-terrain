@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Eye, ShieldCheck, Upload, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 import heroBg from '../../assets/herobg.jpeg';
 
 export default function DevenirGerant() {
@@ -154,27 +155,29 @@ export default function DevenirGerant() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-gray-700">Prénom *</label>
-                      <input
+                      <Input
                         type="text"
                         name="prenom"
                         required
                         value={formData.prenom}
                         onChange={handleChange}
                         placeholder="Moussa"
-                        className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
+                        variant="gray"
+                        className="text-xs font-bold"
                       />
                     </div>
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-gray-700">Nom *</label>
-                      <input
+                      <Input
                         type="text"
                         name="nom"
                         required
                         value={formData.nom}
                         onChange={handleChange}
                         placeholder="Diallo"
-                        className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
+                        variant="gray"
+                        className="text-xs font-bold"
                       />
                     </div>
                   </div>
@@ -182,14 +185,15 @@ export default function DevenirGerant() {
                   {/* Adresse */}
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-gray-700">Adresse *</label>
-                    <input
+                    <Input
                       type="text"
                       name="adresse"
                       required
                       value={formData.adresse}
                       onChange={handleChange}
                       placeholder="Rufisque"
-                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
+                      variant="gray"
+                      className="text-xs font-bold"
                     />
                   </div>
 
@@ -219,14 +223,15 @@ export default function DevenirGerant() {
                     <label className="text-xs font-semibold text-gray-700">
                       Mot de passe d'accès gérant *
                     </label>
-                    <input
+                    <Input
                       type="password"
                       name="password"
                       required
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="8 caractères minimum"
-                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
+                      variant="gray"
+                      className="text-xs font-bold"
                     />
                     <p className="text-[10px] text-gray-400">
                       Ce mot de passe servira à connecter l'application de contrôle à l'accueil.
@@ -244,14 +249,15 @@ export default function DevenirGerant() {
                   {/* Nom officiel du complexe */}
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-gray-700">Nom officiel du complexe *</label>
-                    <input
+                    <Input
                       type="text"
                       name="nomComplexe"
                       required
                       value={formData.nomComplexe}
                       onChange={handleChange}
                       placeholder="ex: Olympique Club Almadies"
-                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
+                      variant="gray"
+                      className="text-xs font-bold"
                     />
                   </div>
 

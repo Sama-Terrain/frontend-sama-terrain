@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
 
 export default function VerificationEmail() {
@@ -63,15 +65,11 @@ export default function VerificationEmail() {
           </p>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-[8px] p-3 text-xs text-red-600 font-semibold">
-              {error}
-            </div>
+            <Alert type="error" message={error} />
           )}
 
           {success && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-[8px] p-3 text-xs text-emerald-700 font-bold">
-              ✓ E-mail vérifié avec succès ! Redirection...
-            </div>
+            <Alert type="success" message="✓ E-mail vérifié avec succès ! Redirection..." />
           )}
 
           <form onSubmit={handleVerify} className="space-y-8">

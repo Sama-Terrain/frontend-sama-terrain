@@ -8,6 +8,8 @@ import React from 'react';
 // - onChange : La fonction appelée quand l'utilisateur tape
 // - errorMessage : Le message d'erreur à afficher sous le champ
 // - state : L'état du champ ('default', 'focus', 'error', 'disabled')
+// - variant : Le style visuel ('default', 'gray')
+// - className : Classes CSS additionnelles pour surcharger
 export default function Input({
   label,
   placeholder = '',
@@ -15,7 +17,9 @@ export default function Input({
   value,
   onChange,
   errorMessage = '',
-  state = 'default'
+  state = 'default',
+  variant = 'default',
+  className = ''
 }) {
   const estDesactive = state === 'disabled';
   const aErreur = state === 'error' || Boolean(errorMessage);
@@ -29,15 +33,19 @@ export default function Input({
         value={value}
         onChange={onChange}
         disabled={estDesactive}
-        className={`w-full px-4 py-2 text-base rounded-md border outline-none transition-colors ${
+        className={`w-full border rounded-[8px] px-4 py-3 text-xs font-semibold outline-none transition-colors ${
           estDesactive
             ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
             : aErreur
             ? 'bg-white text-gray-900 border-red-500 focus:border-red-500'
             : state === 'focus'
-            ? 'bg-white text-gray-900 border-[#1b4332]'
-            : 'bg-white text-gray-900 border-gray-300 focus:border-[#1b4332]'
-        }`}
+            ? variant === 'gray'
+              ? 'bg-gray-50 text-gray-900 border-vert-principal'
+              : 'bg-white text-gray-900 border-vert-principal'
+            : variant === 'gray'
+              ? 'bg-gray-50 text-gray-900 border-gray-200 focus:border-vert-principal'
+              : 'bg-white text-gray-900 border-gray-200 focus:border-vert-principal'
+        } ${className}`}
       />
       {aErreur && errorMessage && <span className="text-sm text-red-600">{errorMessage}</span>}
     </div>

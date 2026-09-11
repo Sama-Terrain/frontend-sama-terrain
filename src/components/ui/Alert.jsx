@@ -4,10 +4,11 @@ import React from 'react';
 // - type : Le type d'alerte ('success', 'error', 'warning', 'info')
 // - message : Le texte du message à afficher
 // - onClose : La fonction optionnelle pour fermer l'alerte
-export default function Alert({ type = 'info', message, onClose }) {
+// - className : Classes CSS additionnelles pour surcharger
+export default function Alert({ type = 'info', message, onClose, className = '' }) {
   return (
     <div
-      className={`p-4 rounded-md border flex items-center justify-between gap-4 text-sm font-medium w-full ${
+      className={`p-3 rounded-[8px] border flex items-center justify-between gap-4 text-xs font-semibold w-full ${
         type === 'success'
           ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
           : type === 'error'
@@ -15,7 +16,7 @@ export default function Alert({ type = 'info', message, onClose }) {
           : type === 'warning'
           ? 'bg-orange-50 text-orange-800 border-orange-300'
           : 'bg-emerald-100 text-emerald-900 border-emerald-300'
-      }`}
+      } ${className}`}
     >
       <span>{message}</span>
       {onClose && (

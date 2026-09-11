@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
 import { mockUser, mockAdminUser } from '../../data/mockUser';
 
@@ -64,22 +66,20 @@ export default function Connexion({ onLoginSuccess }) {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-[8px] p-3 text-xs text-red-600 font-semibold">
-              {error}
-            </div>
+            <Alert type="error" message={error} />
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-800">Email</label>
-              <input
+              <Input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="prenom.nom@exemple.com"
-                className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
+                className="text-xs font-semibold"
               />
             </div>
 
@@ -87,13 +87,13 @@ export default function Connexion({ onLoginSuccess }) {
             <div className="space-y-1">
               <label className="text-xs font-bold text-gray-800">Mot de passe</label>
               <div className="relative">
-                <input
+                <Input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="........"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
+                  className="text-xs font-semibold pr-10"
                 />
                 <button
                   type="button"
