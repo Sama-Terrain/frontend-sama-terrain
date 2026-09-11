@@ -4,7 +4,7 @@ import logoBlanc from '../../assets/sama-logo-clair.png';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#032b1f] text-white pt-16 pb-8 border-t border-[#004030]">
+    <footer className="bg-vert-footer text-white pt-16 pb-8 border-t border-vert-principal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Grille Principale */}
@@ -26,7 +26,7 @@ export default function Footer() {
 
           {/* Colonne 2: Navigation (Titre en #D4AF37) */}
           <div>
-            <h4 className="text-sm font-bold text-[#D4AF37] mb-4 tracking-wide">
+            <h4 className="text-sm font-bold text-dore mb-4 tracking-wide">
               Navigation
             </h4>
             <ul className="space-y-2.5 text-sm text-gray-300">
@@ -55,7 +55,7 @@ export default function Footer() {
 
           {/* Colonne 3: Support & Légal (Titre en #D4AF37) */}
           <div>
-            <h4 className="text-sm font-bold text-[#D4AF37] mb-4 tracking-wide">
+            <h4 className="text-sm font-bold text-dore mb-4 tracking-wide">
               Support & Légal
             </h4>
             <ul className="space-y-2.5 text-sm text-gray-300">

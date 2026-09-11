@@ -14,6 +14,7 @@
   --vert-fonce: #002d22;
   --vert-survol: #005943;
   --vert-clair: #e6f4ea;
+  --vert-footer: #032b1f;
   --dore-principal: #D4AF37;
   --dore-survol: #c29f2f;
 }
@@ -29,6 +30,10 @@
 
 .bg-vert-clair {
   background-color: var(--vert-clair);
+}
+
+.bg-vert-footer {
+  background-color: var(--vert-footer);
 }
 
 .bg-dore {
