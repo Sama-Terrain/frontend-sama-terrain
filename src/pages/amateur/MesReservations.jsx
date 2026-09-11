@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, ChevronRight, Ticket } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import { reservationService } from '../../services/reservationService';
 import TicketQR from '../../components/reservation/TicketQR';
 
@@ -48,12 +49,15 @@ export default function MesReservations() {
             Mes Réservations
           </h1>
 
-          <button
+          <Button
             onClick={() => navigate('/terrains')}
-            className="px-6 py-3.5 bg-[#D4AF37] hover:bg-[#c29f2f] text-gray-900 font-extrabold text-xs rounded-[8px] transition-colors cursor-pointer inline-flex items-center justify-center gap-2 shadow-xs"
+            variant="gold"
+            size="md"
+            rounded="8px"
+            className="font-extrabold shadow-xs inline-flex items-center justify-center gap-2"
           >
             <span>Réserver un nouveau match</span>
-          </button>
+          </Button>
         </div>
 
         {/* ONGLETS : À VENIR | PASSÉES | ANNULÉES */}
@@ -109,7 +113,7 @@ export default function MesReservations() {
             </p>
             <button
               onClick={() => navigate('/terrains')}
-              className="px-5 py-2.5 bg-[#004030] text-white text-xs font-bold rounded-[8px] hover:bg-[#005943]"
+              className="px-5 py-2.5 bg-vert-principal text-white text-xs font-bold rounded-[8px] hover:bg-vert-survol"
             >
               Voir les terrains
             </button>
@@ -138,7 +142,7 @@ export default function MesReservations() {
                       <span className={`px-2.5 py-0.5 text-[11px] font-bold rounded-full ${
                         item.tabCategory === 'annulees'
                           ? 'bg-red-100 text-red-700'
-                          : 'bg-[#e6f4ea] text-[#004030]'
+                          : 'bg-vert-clair text-vert-principal'
                       }`}>
                         {item.status}
                       </span>
@@ -178,7 +182,7 @@ export default function MesReservations() {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={() => setTicketModal(item)}
-                      className="px-4 py-2 bg-[#e6f4ea] hover:bg-[#d5ecd9] text-[#004030] font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
+                      className="px-4 py-2 bg-vert-clair hover:bg-[#d5ecd9] text-vert-principal font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
                     >
                       Voir ticket
                     </button>
@@ -203,7 +207,7 @@ export default function MesReservations() {
         {/* PAGINATION (1 2 >) */}
         {!loading && filteredReservations.length > 0 && (
           <div className="flex justify-center items-center space-x-2 pt-6">
-            <button className="w-8 h-8 rounded-[8px] bg-[#e6f4ea] text-[#004030] font-bold text-xs flex items-center justify-center">
+            <button className="w-8 h-8 rounded-[8px] bg-vert-clair text-vert-principal font-bold text-xs flex items-center justify-center">
               1
             </button>
             <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">

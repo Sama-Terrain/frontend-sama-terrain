@@ -40,8 +40,8 @@ export default function Navbar({ currentUser, onLogout }) {
               to="/"
               className={`text-sm font-semibold transition-colors ${
                 isActive('/')
-                  ? 'text-[#004030] font-bold border-b-2 border-[#004030] pb-1'
-                  : 'text-gray-600 hover:text-[#004030]'
+                  ? 'text-vert-principal font-bold border-b-2 border-vert-principal pb-1'
+                  : 'text-gray-600 hover:text-vert-principal'
               }`}
             >
               Accueil
@@ -51,8 +51,8 @@ export default function Navbar({ currentUser, onLogout }) {
               to="/terrains"
               className={`text-sm font-semibold transition-colors ${
                 isActive('/terrains')
-                  ? 'text-[#004030] font-bold border-b-2 border-[#004030] pb-1'
-                  : 'text-gray-600 hover:text-[#004030]'
+                  ? 'text-vert-principal font-bold border-b-2 border-vert-principal pb-1'
+                  : 'text-gray-600 hover:text-vert-principal'
               }`}
             >
               Terrains
@@ -64,8 +64,8 @@ export default function Navbar({ currentUser, onLogout }) {
                 to="/reservations"
                 className={`text-sm font-semibold transition-colors ${
                   isActive('/reservations')
-                    ? 'text-[#004030] font-bold border-b-2 border-[#004030] pb-1'
-                    : 'text-gray-600 hover:text-[#004030]'
+                    ? 'text-vert-principal font-bold border-b-2 border-vert-principal pb-1'
+                    : 'text-gray-600 hover:text-vert-principal'
                 }`}
               >
                 Mes réservations
@@ -76,8 +76,8 @@ export default function Navbar({ currentUser, onLogout }) {
               to="/gerant"
               className={`text-sm font-semibold transition-colors ${
                 isActive('/gerant')
-                  ? 'text-[#004030] font-bold border-b-2 border-[#004030] pb-1'
-                  : 'text-gray-600 hover:text-[#004030]'
+                  ? 'text-vert-principal font-bold border-b-2 border-vert-principal pb-1'
+                  : 'text-gray-600 hover:text-vert-principal'
               }`}
             >
               Devenir Gérant
@@ -91,7 +91,7 @@ export default function Navbar({ currentUser, onLogout }) {
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center space-x-2.5 hover:opacity-90 transition-opacity cursor-pointer focus:outline-none"
               >
-                <div className="w-9 h-9 rounded-full bg-[#e6f4ea] text-[#004030] font-bold text-xs flex items-center justify-center border border-emerald-100">
+                <div className="w-9 h-9 rounded-full bg-vert-clair text-vert-principal font-bold text-xs flex items-center justify-center border border-emerald-100">
                   {getInitials(currentUser)}
                 </div>
 
@@ -115,7 +115,7 @@ export default function Navbar({ currentUser, onLogout }) {
                       setUserDropdownOpen(false);
                       navigate('/reservations');
                     }}
-                    className="w-full flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-[#004030] text-left"
+                    className="w-full flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-vert-principal text-left"
                   >
                     <Calendar size={14} />
                     <span>Mes réservations</span>
@@ -140,13 +140,13 @@ export default function Navbar({ currentUser, onLogout }) {
             <div className="hidden md:flex items-center space-x-4">
               <Link
                 to="/login"
-                className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-[#004030] transition-colors cursor-pointer"
+                className="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-vert-principal transition-colors cursor-pointer"
               >
                 Se connecter
               </Link>
               <Link
                 to="/register"
-                className="px-5 py-2.5 text-sm font-semibold text-white bg-[#004030] rounded-lg hover:bg-[#005943] transition-all cursor-pointer"
+                className="px-5 py-2.5 text-sm font-semibold text-white bg-vert-principal rounded-lg hover:bg-vert-survol transition-all cursor-pointer"
               >
                 S'inscrire
               </Link>
@@ -157,7 +157,7 @@ export default function Navbar({ currentUser, onLogout }) {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-gray-600 hover:text-[#004030] focus:outline-none"
+              className="p-2 rounded-md text-gray-600 hover:text-vert-principal focus:outline-none"
               aria-label="Ouvrir le menu"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -174,7 +174,7 @@ export default function Navbar({ currentUser, onLogout }) {
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-left py-2 text-base font-semibold text-gray-800 hover:text-[#004030]"
+              className="text-left py-2 text-base font-semibold text-gray-800 hover:text-vert-principal"
             >
               Accueil
             </Link>
@@ -182,7 +182,7 @@ export default function Navbar({ currentUser, onLogout }) {
             <Link
               to="/terrains"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-left py-2 text-base font-semibold text-gray-800 hover:text-[#004030]"
+              className="text-left py-2 text-base font-semibold text-gray-800 hover:text-vert-principal"
             >
               Terrains
             </Link>
@@ -191,7 +191,7 @@ export default function Navbar({ currentUser, onLogout }) {
               <Link
                 to="/reservations"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-left py-2 text-base font-semibold text-gray-800 hover:text-[#004030]"
+                className="text-left py-2 text-base font-semibold text-gray-800 hover:text-vert-principal"
               >
                 Mes réservations
               </Link>
@@ -200,7 +200,7 @@ export default function Navbar({ currentUser, onLogout }) {
             <Link
               to="/gerant"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-left py-2 text-base font-semibold text-gray-800 hover:text-[#004030]"
+              className="text-left py-2 text-base font-semibold text-gray-800 hover:text-vert-principal"
             >
               Devenir Gérant
             </Link>
@@ -209,8 +209,8 @@ export default function Navbar({ currentUser, onLogout }) {
           <div className="pt-4 border-t border-gray-100 flex flex-col space-y-3">
             {currentUser ? (
               <div className="space-y-2">
-                <div className="flex items-center space-x-3 p-2 bg-[#e6f4ea] rounded-[8px]">
-                  <div className="w-8 h-8 rounded-full bg-[#004030] text-white font-bold text-xs flex items-center justify-center">
+                <div className="flex items-center space-x-3 p-2 bg-vert-clair rounded-[8px]">
+                  <div className="w-8 h-8 rounded-full bg-vert-principal text-white font-bold text-xs flex items-center justify-center">
                     {getInitials(currentUser)}
                   </div>
                   <div>
@@ -241,7 +241,7 @@ export default function Navbar({ currentUser, onLogout }) {
                 <Link
                   to="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center text-sm font-semibold text-white bg-[#004030] rounded-lg hover:bg-[#005943] block"
+                  className="w-full py-2.5 text-center text-sm font-semibold text-white bg-vert-principal rounded-lg hover:bg-vert-survol block"
                 >
                   S'inscrire
                 </Link>

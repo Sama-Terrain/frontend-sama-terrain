@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Eye, ShieldCheck, Upload, ArrowRight, CheckCircle2 } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import heroBg from '../../assets/herobg.jpeg';
 
 export default function DevenirGerant() {
@@ -47,7 +48,7 @@ export default function DevenirGerant() {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-left">
       
       {/* 1. HERO BANNER SECTION (FARMER / GÉRANT BANNER) */}
-      <section className="relative bg-[#004030] text-white py-16 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200 h-[40vh]">
+      <section className="relative bg-vert-principal text-white py-16 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200 h-[40vh]">
         <div 
           className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none"
           style={{ backgroundImage: `url(${heroBg})` }}
@@ -73,7 +74,7 @@ export default function DevenirGerant() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Card 1 */}
           <div className="bg-white p-8 rounded-[8px] border border-gray-200 space-y-4">
-            <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
               <Calendar size={22} />
             </div>
             <h3 className="text-base font-bold text-gray-900">Gestion simplifiée</h3>
@@ -84,7 +85,7 @@ export default function DevenirGerant() {
 
           {/* Card 2 */}
           <div className="bg-white p-8 rounded-[8px] border border-gray-200 space-y-4">
-            <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
               <Eye size={22} />
             </div>
             <h3 className="text-base font-bold text-gray-900">Visibilité accrue</h3>
@@ -95,7 +96,7 @@ export default function DevenirGerant() {
 
           {/* Card 3 */}
           <div className="bg-white p-8 rounded-[8px] border border-gray-200 space-y-4">
-            <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
               <ShieldCheck size={22} />
             </div>
             <h3 className="text-base font-bold text-gray-900">Paiements sécurisés</h3>
@@ -128,12 +129,14 @@ export default function DevenirGerant() {
               <p className="text-xs text-gray-700 max-w-md mx-auto">
                 Merci {formData.prenom} ! Notre équipe d'intégration valide votre dossier pour le complexe <strong>{formData.nomComplexe || 'sportif'}</strong> et vous contactera sous 24h.
               </p>
-              <button
+              <Button
                 onClick={() => navigate('/')}
-                className="px-6 py-2.5 bg-[#004030] text-white font-bold text-xs rounded-[8px] hover:bg-[#005943]"
+                variant="primary"
+                size="sm"
+                rounded="8px"
               >
                 Retour à l'accueil
-              </button>
+              </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -143,7 +146,7 @@ export default function DevenirGerant() {
                 {/* COLONNE 1 : VOS COORDONNÉES PROFESSIONNELLES */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 text-[#004030] font-bold text-sm">
-                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] flex items-center justify-center text-xs">1</span>
+                    <span className="w-6 h-6 rounded-full bg-vert-clair flex items-center justify-center text-xs">1</span>
                     <span>Vos coordonnées professionnelles</span>
                   </div>
 
@@ -158,7 +161,7 @@ export default function DevenirGerant() {
                         value={formData.prenom}
                         onChange={handleChange}
                         placeholder="Moussa"
-                        className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-[#004030]"
+                        className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
                       />
                     </div>
 
@@ -171,7 +174,7 @@ export default function DevenirGerant() {
                         value={formData.nom}
                         onChange={handleChange}
                         placeholder="Diallo"
-                        className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-[#004030]"
+                        className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
                       />
                     </div>
                   </div>
@@ -186,7 +189,7 @@ export default function DevenirGerant() {
                       value={formData.adresse}
                       onChange={handleChange}
                       placeholder="Rufisque"
-                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-[#004030]"
+                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
                     />
                   </div>
 
@@ -195,7 +198,7 @@ export default function DevenirGerant() {
                     <label className="text-xs font-semibold text-gray-700">
                       Numéro WhatsApp (Notifications réservations) *
                     </label>
-                    <div className="flex items-center bg-[#f3f4f6] rounded-[8px] border border-transparent focus-within:bg-white focus-within:border-[#004030] overflow-hidden">
+                    <div className="flex items-center bg-[#f3f4f6] rounded-[8px] border border-transparent focus-within:bg-white focus-within:border-vert-principal overflow-hidden">
                       <span className="px-3.5 py-3 text-xs font-bold text-gray-500 bg-gray-200/60 border-r border-gray-300">
                         +221
                       </span>
@@ -223,7 +226,7 @@ export default function DevenirGerant() {
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="8 caractères minimum"
-                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-[#004030]"
+                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
                     />
                     <p className="text-[10px] text-gray-400">
                       Ce mot de passe servira à connecter l'application de contrôle à l'accueil.
@@ -234,7 +237,7 @@ export default function DevenirGerant() {
                 {/* COLONNE 2 : VOTRE COMPLEXE SPORTIF */}
                 <div className="space-y-4">
                   <div className="flex items-center space-x-2 text-[#004030] font-bold text-sm">
-                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] flex items-center justify-center text-xs">2</span>
+                    <span className="w-6 h-6 rounded-full bg-vert-clair flex items-center justify-center text-xs">2</span>
                     <span>Votre complexe sportif</span>
                   </div>
 
@@ -248,7 +251,7 @@ export default function DevenirGerant() {
                       value={formData.nomComplexe}
                       onChange={handleChange}
                       placeholder="ex: Olympique Club Almadies"
-                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-[#004030]"
+                      className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-vert-principal"
                     />
                   </div>
 
@@ -320,18 +323,17 @@ export default function DevenirGerant() {
 
                 return (
                   <div className="pt-4 text-left">
-                    <button
+                    <Button
                       type="submit"
                       disabled={!isFormComplete}
-                      className={`py-3.5 px-8 font-extrabold rounded-[8px] transition-colors inline-flex items-center gap-2 text-xs ${
-                        isFormComplete
-                          ? 'bg-[#D4AF37] hover:bg-[#c29f2f] text-gray-900 cursor-pointer'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      }`}
+                      variant="gold"
+                      size="md"
+                      rounded="8px"
+                      className="py-3.5 px-8 font-extrabold inline-flex items-center gap-2"
                     >
                       <span>Envoyer ma demande d'adhésion</span>
                       <ArrowRight size={16} />
-                    </button>
+                    </Button>
                   </div>
                 );
               })()}

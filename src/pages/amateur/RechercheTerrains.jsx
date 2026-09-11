@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import TerrainFilters from '../../components/terrain/TerrainFilters';
 import TerrainCard from '../../components/terrain/TerrainCard';
+import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
 
 export default function RechercheTerrains() {
@@ -141,12 +142,14 @@ export default function RechercheTerrains() {
               <div className="bg-white rounded-2xl p-12 text-center border border-gray-200 space-y-3">
                 <p className="text-base font-bold text-gray-700">Aucun terrain ne correspond à vos critères</p>
                 <p className="text-xs text-gray-500">Essayez d'élargir le prix max ou d'effacer les filtres.</p>
-                <button
+                <Button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-[#004030] text-white font-bold text-xs rounded-[8px] hover:bg-[#005943]"
+                  variant="primary"
+                  size="sm"
+                  rounded="8px"
                 >
                   Réinitialiser les filtres
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

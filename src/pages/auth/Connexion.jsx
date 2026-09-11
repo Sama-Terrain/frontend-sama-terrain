@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import loginBg from '../../assets/terrain-login.png';
 import { mockUser, mockAdminUser } from '../../data/mockUser';
 
@@ -78,7 +79,7 @@ export default function Connexion({ onLoginSuccess }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="prenom.nom@exemple.com"
-                className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
               />
             </div>
 
@@ -92,7 +93,7 @@ export default function Connexion({ onLoginSuccess }) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="........"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
                 />
                 <button
                   type="button"
@@ -111,7 +112,7 @@ export default function Connexion({ onLoginSuccess }) {
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-[#004030] focus:ring-[#004030] cursor-pointer"
+                className="w-4 h-4 rounded border-gray-300 text-vert-principal focus:ring-vert-principal cursor-pointer"
               />
               <label htmlFor="remember" className="text-xs text-gray-700 font-semibold cursor-pointer">
                 Se souvenir de moi
@@ -119,12 +120,16 @@ export default function Connexion({ onLoginSuccess }) {
             </div>
 
             {/* Bouton Se connecter */}
-            <button
+            <Button
               type="submit"
-              className="w-full py-3.5 bg-[#004030] hover:bg-[#005943] text-white font-bold rounded-[8px] text-xs transition-colors cursor-pointer mt-4 shadow-xs"
+              variant="primary"
+              size="md"
+              rounded="8px"
+              fullWidth
+              className="mt-4 shadow-xs"
             >
               Se connecter
-            </button>
+            </Button>
           </form>
 
           {/* Diviseur OR */}

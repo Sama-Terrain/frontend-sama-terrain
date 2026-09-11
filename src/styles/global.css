@@ -4,11 +4,65 @@
   --color-vert-principal: #004030;
   --color-vert-fonce: #002d22;
   --color-vert-survol: #005943;
+  --color-vert-clair: #e6f4ea;
   --color-dore: #D4AF37;
   --color-dore-survol: #c29f2f;
 }
 
 :root {
   --vert-principal: #004030;
+  --vert-fonce: #002d22;
+  --vert-survol: #005943;
+  --vert-clair: #e6f4ea;
   --dore-principal: #D4AF37;
+  --dore-survol: #c29f2f;
+}
+
+/* Classes utilitaires pour les couleurs Sama-Terrain */
+.bg-vert-principal {
+  background-color: var(--vert-principal);
+}
+
+.bg-vert-survol {
+  background-color: var(--vert-survol);
+}
+
+.bg-vert-clair {
+  background-color: var(--vert-clair);
+}
+
+.bg-dore {
+  background-color: var(--dore-principal);
+}
+
+.bg-dore-survol {
+  background-color: var(--dore-survol);
+}
+
+.text-vert-principal {
+  color: var(--vert-principal);
+}
+
+.text-dore {
+  color: var(--dore-principal);
+}
+
+.border-vert-principal {
+  border-color: var(--vert-principal);
+}
+
+.border-dore {
+  border-color: var(--dore-principal);
+}
+
+.hover\:bg-vert-survol:hover {
+  background-color: var(--vert-survol);
+}
+
+.hover\:bg-dore-survol:hover {
+  background-color: var(--dore-survol);
+}
+
+.hover\:text-vert-principal:hover {
+  color: var(--vert-principal);
 }

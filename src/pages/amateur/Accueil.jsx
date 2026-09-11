@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, CheckCircle2, Bot, X } from 'lucide-react';
 import TerrainCard from '../../components/terrain/TerrainCard';
+import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
-import { avisService } from '../../services/avisService'; 
+import { avisService } from '../../services/avisService';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
@@ -79,14 +80,14 @@ export default function Accueil() {
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
       
       {/* 1. HERO BANNER SECTION */}
-      <section className="relative bg-[#004030] text-white py-25 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200">
+      <section className="relative bg-vert-principal text-white py-25 px-4 sm:px-6 lg:px-20 overflow-hidden border-b border-gray-200">
         
         {/* Fond d'écran Football */}
         <div 
           className="absolute inset-0 opacity-90 bg-cover bg-center pointer-events-none"
           style={{ backgroundImage: `url(${heroBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#004030]/90 via-[#004030]/80 to-[#004030] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-vert-principal/90 via-vert-principal/80 to-vert-principal pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 text-left">
           
@@ -113,14 +114,14 @@ export default function Accueil() {
             {/* Champ 1: Zone / Quartier */}
             <div className="flex flex-col space-y-1.5 text-left">
               <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5 pl-1">
-                <MapPin size={15} className="text-[#004030]" />
+                <MapPin size={15} className="text-vert-principal" />
                 <span>Zone / Quartier</span>
               </label>
-              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-[#004030] transition-colors">
+              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
                 <select
                   value={searchZone}
                   onChange={(e) => setSearchZone(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-[#004030] focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
                 >
                   <option value="Yoff Plage & Virage">Yoff Plage & Virage</option>
                   <option value="Almadies">Almadies</option>
@@ -134,14 +135,14 @@ export default function Accueil() {
             {/* Champ 2: Date de match */}
             <div className="flex flex-col space-y-1.5 text-left">
               <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5 pl-1">
-                <Calendar size={15} className="text-[#004030]" />
+                <Calendar size={15} className="text-vert-principal" />
                 <span>Date de match</span>
               </label>
-              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-[#004030] transition-colors">
+              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
                 <select
                   value={searchDate}
                   onChange={(e) => setSearchDate(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-[#004030] focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
                 >
                   <option value="Aujourd'hui">Aujourd'hui</option>
                   <option value="Demain">Demain</option>
@@ -154,14 +155,14 @@ export default function Accueil() {
             {/* Champ 3: Créneau horaire */}
             <div className="flex flex-col space-y-1.5 text-left">
               <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5 pl-1">
-                <Clock size={15} className="text-[#004030]" />
+                <Clock size={15} className="text-vert-principal" />
                 <span>Créneau horaire</span>
               </label>
-              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-[#004030] transition-colors">
+              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
                 <select
                   value={searchCreneau}
                   onChange={(e) => setSearchCreneau(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-[#004030] focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
                 >
                   <option value="19:00 - Plein jeu">19:00 - Plein jeu</option>
                   <option value="20:00 - Plein jeu">20:00 - Plein jeu</option>
@@ -173,13 +174,16 @@ export default function Accueil() {
 
             {/* Bouton 4: Rechercher un terrain */}
             <div className="flex flex-col justify-end">
-              <button
+              <Button
                 type="submit"
-                className="w-full py-3.5 px-6 bg-[#D4AF37] hover:bg-[#c29f2f] text-gray-900 font-bold rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm"
+                variant="gold"
+                size="md"
+                rounded="xl"
+                fullWidth
               >
                 <Search size={18} className="stroke-[2.5]" />
                 <span>Rechercher un terrain</span>
-              </button>
+              </Button>
             </div>
           </form>
 
@@ -200,9 +204,9 @@ export default function Accueil() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Étape 1 */}
-          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
+          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-vert-principal transition-colors">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
                 <Search size={24} />
               </div>
               <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
@@ -216,9 +220,9 @@ export default function Accueil() {
           </div>
 
           {/* Étape 2 */}
-          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
+          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-vert-principal transition-colors">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
                 <Calendar size={24} />
               </div>
               <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
@@ -232,9 +236,9 @@ export default function Accueil() {
           </div>
 
           {/* Étape 3 */}
-          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-[#004030] transition-colors">
+          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-vert-principal transition-colors">
             <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-full bg-[#e6f4ea] text-[#004030] flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
                 <CheckCircle2 size={24} />
               </div>
               <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
@@ -264,12 +268,14 @@ export default function Accueil() {
               </p>
             </div>
 
-            <button
+            <Button
               onClick={() => navigate('/terrains')}
-              className="px-5 py-2.5 bg-[#e6f4ea] text-[#004030] font-bold text-xs rounded-[8px] hover:bg-[#004030] hover:text-white transition-colors cursor-pointer border border-[#004030]/10 self-start sm:self-auto"
+              variant="secondary"
+              size="sm"
+              className="self-start sm:self-auto"
             >
               Voir tous les terrains
-            </button>
+            </Button>
           </div>
 
           {/* Grille des Terrains Vedettes */}
@@ -297,7 +303,7 @@ export default function Accueil() {
       </section>
 
       {/* 4. BANNIÈRE CALL TO ACTION POUR LES GÉRANTS (PLEINE LARGEUR SUR TOUTE LA LIGNE / FULL WIDTH) */}
-      <section className="w-full bg-[#004030] text-white py-16 px-4 sm:px-6 lg:px-20 relative overflow-hidden">
+      <section className="w-full bg-vert-principal text-white py-16 px-4 sm:px-6 lg:px-20 relative overflow-hidden">
         {/* Motif du terrain de football en arrière-plan */}
         <div 
           className="absolute inset-0 opacity-90 bg-cover bg-center pointer-events-none"
@@ -314,12 +320,14 @@ export default function Accueil() {
             </p>
           </div>
 
-          <button
+          <Button
             onClick={() => navigate('/gerant')}
-            className="px-6 py-3.5 bg-white text-[#004030] font-bold rounded-[8px] hover:bg-emerald-50 transition-colors shrink-0 cursor-pointer text-sm"
+            variant="outline"
+            size="md"
+            rounded="8px"
           >
             Devenir Gérant
-          </button>
+          </Button>
         </div>
       </section>
 
@@ -337,15 +345,15 @@ export default function Accueil() {
 
             <ul className="mt-6 space-y-3 text-sm font-medium text-gray-700">
               <li className="flex items-center gap-3">
-                <ShieldCheck className="text-[#004030]" size={20} />
+                <ShieldCheck className="text-vert-principal" size={20} />
                 <span>Mise à jour en direct des disponibilités</span>
               </li>
               <li className="flex items-center gap-3">
-                <ShieldCheck className="text-[#004030]" size={20} />
+                <ShieldCheck className="text-vert-principal" size={20} />
                 <span>Paiement sécurisé par Wave, Orange Money & Carte</span>
               </li>
               <li className="flex items-center gap-3">
-                <ShieldCheck className="text-[#004030]" size={20} />
+                <ShieldCheck className="text-vert-principal" size={20} />
                 <span>Confirmation instantanée par SMS / QR Code</span>
               </li>
             </ul>
@@ -359,7 +367,7 @@ export default function Accueil() {
             </div>
             
             <div className="space-y-3">
-              <div className="w-16 h-16 bg-[#004030] text-white rounded-full mx-auto flex items-center justify-center">
+              <div className="w-16 h-16 bg-vert-principal text-white rounded-full mx-auto flex items-center justify-center">
                 <MapPin size={32} />
               </div>
               <p className="text-sm font-bold text-gray-800">
@@ -367,7 +375,7 @@ export default function Accueil() {
               </p>
               <button
                 onClick={() => onNavigate && onNavigate('terrains')}
-                className="text-xs font-bold text-[#004030] hover:underline cursor-pointer"
+                className="text-xs font-bold text-vert-principal hover:underline cursor-pointer"
               >
                 Explorer la carte interactive →
               </button>
@@ -396,7 +404,7 @@ export default function Accueil() {
             >
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-[#004030] text-white flex items-center justify-center font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-vert-principal text-white flex items-center justify-center font-bold text-sm">
                     {avis.initiales}
                   </div>
                   <div>
@@ -436,7 +444,7 @@ export default function Accueil() {
           </button>
         ) : (
           <div className="w-80 sm:w-96 bg-white rounded-2xl border border-gray-300 overflow-hidden">
-            <div className="bg-[#004030] text-white p-4 flex items-center justify-between">
+            <div className="bg-vert-principal text-white p-4 flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Bot size={20} className="text-emerald-300" />
                 <span className="font-bold text-sm">Assistant Sama-Terrain</span>
@@ -461,7 +469,7 @@ export default function Accueil() {
                   <div
                     className={`max-w-[80%] p-3 rounded-xl ${
                       msg.sender === 'user'
-                        ? 'bg-[#004030] text-white rounded-br-none'
+                        ? 'bg-vert-principal text-white rounded-br-none'
                         : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none'
                     }`}
                   >
@@ -483,12 +491,13 @@ export default function Accueil() {
                 className="flex-1 bg-gray-100 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#004030]"
               />
 
-              <button
+              <Button
                 type="submit"
-                className="px-3 py-2 bg-[#004030] text-white font-bold rounded-lg text-xs hover:bg-[#005943]"
+                variant="primary"
+                size="sm"
               >
                 Envoyer
-              </button>
+              </Button>
             </form>
           </div>
         )}

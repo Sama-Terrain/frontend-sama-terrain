@@ -124,7 +124,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
                 date: e.target.value,
               }))
             }
-            className="w-full bg-gray-50 border border-gray-200 rounded-[4px] pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030]"
+            className="w-full bg-gray-50 border border-gray-200 rounded-[4px] pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-vert-principal"
           />
         </div>
       </div>
@@ -145,7 +145,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
                 type="checkbox"
                 checked={(activeFilters?.types || []).includes(item.id)}
                 onChange={() => handleTypeChange(item.id)}
-                className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
+                className="w-4 h-4 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
               />
               <span>{item.label}</span>
             </label>
@@ -165,7 +165,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
                 type="checkbox"
                 checked={(activeFilters?.surfaces || []).includes(surf)}
                 onChange={() => handleSurfaceChange(surf)}
-                className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
+                className="w-4 h-4 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
               />
               <span>{surf}</span>
             </label>
@@ -211,7 +211,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
                 type="checkbox"
                 checked={(activeFilters?.equipements || []).includes(eq)}
                 onChange={() => handleEquipementChange(eq)}
-                className="w-4 h-4 rounded text-[#004030] focus:ring-[#004030] border-gray-300 accent-[#004030]"
+                className="w-4 h-4 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
               />
               <span>{eq}</span>
             </label>

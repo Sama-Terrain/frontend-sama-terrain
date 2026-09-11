@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Calendar as CalendarIcon, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
 import { MOCK_CRENEAUX } from '../../data/mockCreneaux';
@@ -248,7 +249,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                 {['Synthétique', '5v5', 'Éclairage', 'Vestiaires', 'Parking'].map((badge) => (
                   <span
                     key={badge}
-                    className="px-3 py-1 bg-[#e6f4ea] text-[#004030] font-semibold text-xs rounded-full"
+                    className="px-3 py-1 bg-vert-clair text-vert-principal font-semibold text-xs rounded-full"
                   >
                     {badge}
                   </span>
@@ -279,7 +280,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                       setSelectedDate(e.target.value);
                       setSelectedCreneau(null);
                     }}
-                    className="bg-gray-50 border border-gray-200 rounded-[8px] px-3 py-1.5 text-xs font-bold text-[#004030] focus:outline-none focus:border-[#004030] cursor-pointer"
+                    className="bg-gray-50 border border-gray-200 rounded-[8px] px-3 py-1.5 text-xs font-bold text-vert-principal focus:outline-none focus:border-vert-principal cursor-pointer"
                   />
                 </div>
               </div>
@@ -297,7 +298,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                       }}
                       className={`p-3 rounded-[8px] text-center flex flex-col items-center justify-center transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-[#004030] text-white font-bold shadow-sm'
+                          ? 'bg-vert-principal text-white font-bold shadow-sm'
                           : 'bg-gray-50 hover:bg-gray-100 text-gray-700 font-medium'
                       }`}
                     >
@@ -347,8 +348,8 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                           onClick={() => setSelectedCreneau(slot)}
                           className={`p-3 rounded-[8px] text-center border transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-[#004030] text-white border-[#004030] font-bold shadow-sm'
-                              : 'bg-white text-gray-800 border-gray-200 hover:border-[#004030]'
+                              ? 'bg-vert-principal text-white border-vert-principal font-bold shadow-sm'
+                              : 'bg-white text-gray-800 border-gray-200 hover:border-vert-principal'
                           }`}
                         >
                           <p className="text-xs font-extrabold">{slot.heure}</p>
@@ -378,7 +379,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                         value={nomComplet}
                         onChange={(e) => setNomComplet(e.target.value)}
                         placeholder="Assane Ndong FALL"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-[#004030]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-vert-principal"
                       />
                     </div>
 
@@ -389,7 +390,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                         value={telephone}
                         onChange={(e) => setTelephone(e.target.value)}
                         placeholder="77 777 00 00"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-[#004030]"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-vert-principal"
                       />
                     </div>
                   </div>
@@ -406,7 +407,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                       value={avance}
                       onChange={(e) => setAvance(e.target.value)}
                       placeholder="10 000 (FCFA)"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-[#004030]"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-vert-principal"
                     />
                     <span className="absolute right-4 top-2.5 text-xs font-bold text-gray-400">FCFA</span>
                   </div>
@@ -424,7 +425,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
             <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-extrabold text-gray-900">Avis des clients</h3>
-                <button
+                <Button
                   onClick={() => {
                     if (!currentUser) {
                       navigate('/login');
@@ -432,10 +433,12 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                       setShowAvisModal(true);
                     }
                   }}
-                  className="px-4 py-2 bg-[#004030] hover:bg-[#005943] text-white font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
+                  variant="primary"
+                  size="sm"
+                  rounded="8px"
                 >
                   Laisser un avis
-                </button>
+                </Button>
               </div>
 
               <div className="space-y-4">
@@ -443,7 +446,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                   <div key={avis.id} className="p-4 bg-gray-50 rounded-[8px] border border-gray-100 space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 rounded-full bg-[#004030] text-white font-bold text-xs flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-vert-principal text-white font-bold text-xs flex items-center justify-center">
                           {avis.initiales}
                         </div>
                         <div>
@@ -493,12 +496,12 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
 
               <div className="space-y-3 text-xs">
                 <div className="flex items-center space-x-2 text-gray-700">
-                  <CheckCircle2 size={16} className="text-[#004030] shrink-0" />
+                  <CheckCircle2 size={16} className="text-vert-principal shrink-0" />
                   <span className="font-bold">{terrain?.nom || 'Complexe Keur Madior'}</span>
                 </div>
 
                 <div className="flex items-center space-x-2 text-gray-700">
-                  <CalendarIcon size={16} className="text-[#004030] shrink-0" />
+                  <CalendarIcon size={16} className="text-vert-principal shrink-0" />
                   <span>
                     {isPastDate
                       ? 'Date passée non valide'
@@ -509,7 +512,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                 </div>
 
                 <div className="flex items-center space-x-2 text-gray-700">
-                  <Clock size={16} className="text-[#004030] shrink-0" />
+                  <Clock size={16} className="text-vert-principal shrink-0" />
                   <span>{selectedCreneau ? `${selectedCreneau.heure} (1 Heure)` : 'Veuillez choisir un créneau'}</span>
                 </div>
               </div>
@@ -521,7 +524,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                 </div>
 
                 {avanceNum > 0 && (
-                  <div className="flex justify-between items-center p-2.5 bg-[#e6f4ea] rounded-[8px] text-[#004030] font-bold">
+                  <div className="flex justify-between items-center p-2.5 bg-vert-clair rounded-[8px] text-vert-principal font-bold">
                     <span>Avance à payer</span>
                     <span>{avanceNum.toLocaleString()} FCFA</span>
                   </div>
@@ -529,25 +532,25 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
 
                 <div className="flex justify-between pt-2 text-sm font-extrabold text-gray-900">
                   <span>Total à payer sur place</span>
-                  <span className="text-[#004030]">{resteAPayer.toLocaleString()} FCFA</span>
+                  <span className="text-vert-principal">{resteAPayer.toLocaleString()} FCFA</span>
                 </div>
               </div>
 
-              <button
+              <Button
                 onClick={handleReserverSlot}
                 disabled={!isFormComplete}
-                className={`w-full py-3.5 px-4 font-extrabold text-sm rounded-[8px] transition-all text-center ${
-                  isFormComplete
-                    ? 'bg-[#D4AF37] hover:bg-[#c29f2f] text-gray-900 cursor-pointer shadow-xs'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'
-                }`}
+                variant="gold"
+                size="md"
+                rounded="8px"
+                fullWidth
+                className="font-extrabold"
               >
                 {isFormComplete
                   ? 'Réserver ce créneau'
                   : isPastDate
                   ? 'Réservation impossible pour date passée'
                   : 'Complétez les informations pour réserver'}
-              </button>
+              </Button>
             </div>
 
           </div>
@@ -626,19 +629,24 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
 
               {/* BOUTONS D'ACTION (ANNULER CONTOUR VERT & PUBLIER SOLIDE VERT) */}
               <div className="flex items-center justify-end space-x-3 pt-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowAvisModal(false)}
-                  className="px-6 py-2.5 bg-white border border-[#004030] text-[#004030] hover:bg-emerald-50 font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
+                  variant="outline"
+                  size="sm"
+                  rounded="8px"
                 >
                   Annuler
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
-                  className="px-6 py-2.5 bg-[#004030] hover:bg-[#005943] text-white font-bold text-xs rounded-[8px] transition-colors cursor-pointer shadow-xs"
+                  variant="primary"
+                  size="sm"
+                  rounded="8px"
+                  className="shadow-xs"
                 >
                   Publier mon avis
-                </button>
+                </Button>
               </div>
 
             </form>

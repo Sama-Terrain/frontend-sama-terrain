@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import Button from '../../components/ui/Button';
 import loginBg from '../../assets/terrain-login.png';
 
 export default function Inscription() {
@@ -64,7 +65,7 @@ export default function Inscription() {
                   value={formData.prenom}
                   onChange={handleChange}
                   placeholder="Votre prenom"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
                 />
               </div>
 
@@ -77,7 +78,7 @@ export default function Inscription() {
                   value={formData.nom}
                   onChange={handleChange}
                   placeholder="Votre nom"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
                 />
               </div>
             </div>
@@ -107,7 +108,7 @@ export default function Inscription() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="........"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
                 />
                 <button
                   type="button"
@@ -130,7 +131,7 @@ export default function Inscription() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="........"
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-[#004030]"
+                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 pr-10 text-xs font-semibold text-gray-900 focus:outline-none focus:border-vert-principal"
                 />
                 <button
                   type="button"
@@ -143,12 +144,16 @@ export default function Inscription() {
             </div>
 
             {/* Bouton S'inscrire */}
-            <button
+            <Button
               type="submit"
-              className="w-full py-3.5 bg-[#004030] hover:bg-[#005943] text-white font-bold rounded-[8px] text-xs transition-colors cursor-pointer mt-4"
+              variant="primary"
+              size="md"
+              rounded="8px"
+              fullWidth
+              className="mt-4"
             >
               S'inscrire
-            </button>
+            </Button>
           </form>
 
           {/* Diviseur OR */}

@@ -1,4 +1,5 @@
 import { MapPin, Star } from 'lucide-react';
+import Button from '../ui/Button';
 
 export default function TerrainCard({ terrain, onSelect }) {
   if (!terrain) return null;
@@ -30,10 +31,10 @@ export default function TerrainCard({ terrain, onSelect }) {
         
         {/* Badges : Type (gauche) et Disponibilité (droite) sous l'image */}
         <div className="flex items-center justify-between">
-          <span className="px-3 py-1 bg-[#e6f4ea] text-[#004030] font-bold text-xs rounded-full">
+          <span className="px-3 py-1 bg-vert-clair text-vert-principal font-bold text-xs rounded-full">
             {type}
           </span>
-          <span className="px-3 py-1 bg-[#e6f4ea] text-[#004030] font-medium text-xs rounded-full">
+          <span className="px-3 py-1 bg-vert-clair text-vert-principal font-medium text-xs rounded-full">
             {disponible ? 'Disponible' : 'Indisponible'}
           </span>
         </div>
@@ -62,12 +63,14 @@ export default function TerrainCard({ terrain, onSelect }) {
         </div>
 
         {/* Bouton "Voir détails" pleine largeur en vert clair */}
-        <button
+        <Button
           onClick={() => onSelect && onSelect(terrain)}
-          className="w-full py-2.5 px-4 bg-[#e6f4ea] hover:bg-[#004030] text-[#004030] hover:text-white font-bold text-xs rounded-[8px] transition-colors duration-200 cursor-pointer text-center"
+          variant="secondary"
+          size="sm"
+          fullWidth
         >
           Voir détails
-        </button>
+        </Button>
 
       </div>
 

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Button from '../../components/ui/Button';
 import loginBg from '../../assets/terrain-login.png';
 
 export default function VerificationEmail() {
@@ -84,17 +85,21 @@ export default function VerificationEmail() {
                   value={digit}
                   onChange={(e) => handleChange(idx, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(idx, e)}
-                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-extrabold text-gray-900 bg-white border border-gray-200 rounded-[8px] focus:outline-none focus:border-[#004030] focus:ring-1 focus:ring-[#004030] shadow-sm"
+                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-extrabold text-gray-900 bg-white border border-gray-200 rounded-[8px] focus:outline-none focus:border-vert-principal focus:ring-1 focus:ring-vert-principal shadow-sm"
                 />
               ))}
             </div>
 
-            <button
+            <Button
               type="submit"
-              className="w-full py-3.5 bg-[#004030] hover:bg-[#005943] text-white font-bold rounded-[8px] text-xs uppercase tracking-wider transition-colors cursor-pointer"
+              variant="primary"
+              size="md"
+              rounded="8px"
+              fullWidth
+              className="uppercase tracking-wider"
             >
               VÉRIFIER
-            </button>
+            </Button>
           </form>
 
           <div className="space-y-2 pt-2">
