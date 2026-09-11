@@ -57,7 +57,7 @@ export default function AdminDashboard({ onLogout }) {
     return (
       <AdminLayout title="Tableau de Bord Admin" profile={profile} onLogout={onLogout}>
         <div className="py-24 text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-[#004030] border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-gray-500 font-bold">Chargement du tableau de bord admin...</p>
         </div>
       </AdminLayout>

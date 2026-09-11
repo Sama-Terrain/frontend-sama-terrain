@@ -1,5 +1,7 @@
 import React from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
 import { Save } from 'lucide-react';
 
 export default function Parametres() {
@@ -11,27 +13,32 @@ export default function Parametres() {
         <div className="space-y-5 text-xs sm:text-sm">
           <div className="space-y-1.5">
             <label className="font-extrabold text-gray-800">Nom de la Plateforme</label>
-            <input
+            <Input
               type="text"
               defaultValue="SAMA-TERRAIN"
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 focus:outline-none focus:border-[#004030]"
+              className="w-full px-4 py-2.5 bg-gray-50 rounded-xl font-bold text-gray-900"
             />
           </div>
 
           <div className="space-y-1.5">
             <label className="font-extrabold text-gray-800">Pourcentage de Commission (%)</label>
-            <input
+            <Input
               type="number"
               defaultValue={10}
-              className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-900 focus:outline-none focus:border-[#004030]"
+              className="w-full px-4 py-2.5 bg-gray-50 rounded-xl font-bold text-gray-900"
             />
           </div>
 
           <div className="pt-3">
-            <button className="px-6 py-3 bg-[#004030] hover:bg-[#005943] text-white font-bold text-xs rounded-xl flex items-center gap-2 cursor-pointer shadow-xs transition-colors">
+            <Button
+              variant="primary"
+              size="md"
+              rounded="xl"
+              className="shadow-xs"
+            >
               <Save size={16} />
               <span>Enregistrer les paramètres</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -11,7 +11,7 @@ export default function ActiviteRecenteList({ items }) {
       time: 'Il y a 5 min',
       description: "Nouveau terrain 'Saly Foot Arena' créé par le gérant Ibrahima Fall",
       category: 'Terrain',
-      badgeClass: 'bg-[#e6f4ea] text-[#004030]',
+      badgeClass: 'bg-vert-clair text-vert-principal',
     },
     {
       id: 2,
@@ -49,7 +49,7 @@ export default function ActiviteRecenteList({ items }) {
     <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200/80 shadow-2xs text-left space-y-6">
       
       {/* TITRE DE LA SECTION */}
-      <h2 className="text-lg sm:text-xl font-black text-[#004030] tracking-tight">
+      <h2 className="text-lg sm:text-xl font-black text-vert-principal tracking-tight">
         Activité Récente du Système
       </h2>
 

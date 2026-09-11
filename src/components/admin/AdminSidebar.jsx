@@ -75,7 +75,7 @@ export default function AdminSidebar({ onLogout }) {
   };
 
   return (
-    <aside className="w-64 bg-[#004030] text-white flex flex-col justify-between h-screen sticky top-0 left-0 p-6 shrink-0 shadow-lg select-none overflow-y-auto z-40">
+    <aside className="w-64 bg-vert-principal text-white flex flex-col justify-between h-screen sticky top-0 left-0 p-6 shrink-0 shadow-lg select-none overflow-y-auto z-40">
       <div className="space-y-8">
         
         {/* LOGO OFFICIEL SAMA-TERRAIN */}
@@ -104,8 +104,8 @@ export default function AdminSidebar({ onLogout }) {
                 onClick={() => navigate(item.path)}
                 className={`w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#D4AF37] text-gray-900 shadow-md font-black'
-                    : 'text-gray-200 hover:bg-[#005943] hover:text-white'
+                    ? 'bg-dore text-gray-900 shadow-md font-black'
+                    : 'text-gray-200 hover:bg-vert-survol hover:text-white'
                 }`}
               >
                 <Icon size={18} className={isActive ? 'text-gray-900' : 'text-gray-300'} />
@@ -118,7 +118,7 @@ export default function AdminSidebar({ onLogout }) {
       </div>
 
       {/* BOUTON DÉCONNEXION EN BAS */}
-      <div className="pt-6 border-t border-[#005943]">
+      <div className="pt-6 border-t border-vert-survol">
         <button
           onClick={handleLogoutClick}
           className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-red-900/30 rounded-xl transition-all cursor-pointer text-xs sm:text-sm font-semibold"

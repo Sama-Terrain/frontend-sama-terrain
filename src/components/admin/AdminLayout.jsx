@@ -11,7 +11,7 @@ import AdminHeader from './AdminHeader';
  */
 export default function AdminLayout({ children, title, profile, onLogout }) {
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex font-sans antialiased text-gray-900">
+    <div className="min-h-screen bg-gray-50 flex font-sans antialiased text-gray-900">
       
       {/* BARRE LATÉRALE VERT FONCÉ */}
       <AdminSidebar onLogout={onLogout} />

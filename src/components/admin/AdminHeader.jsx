@@ -14,7 +14,7 @@ export default function AdminHeader({ title = 'Tableau de Bord Admin', profile }
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/70 backdrop-blur-xs px-8 py-6 border-b border-gray-200/60 sticky top-0 z-30">
       
       {/* TITRE DE LA PAGE */}
-      <h1 className="text-2xl sm:text-2xl font-extrabold text-[#004030] tracking-tight">
+      <h1 className="text-2xl sm:text-2xl font-extrabold text-vert-principal tracking-tight">
         {title}
       </h1>
 
@@ -32,7 +32,7 @@ export default function AdminHeader({ title = 'Tableau de Bord Admin', profile }
 
         {/* PROFIL SUPER ADMIN */}
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-[#D4AF37] flex items-center justify-center font-black text-[#004030] text-xs shadow-xs border border-[#b8952b]">
+          <div className="w-10 h-10 rounded-full bg-dore flex items-center justify-center font-black text-vert-principal text-xs shadow-xs border border-[#b8952b]">
             {initials}
           </div>
 
