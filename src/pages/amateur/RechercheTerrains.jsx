@@ -166,7 +166,7 @@ export default function RechercheTerrains() {
             {/* Pagination (1 2 3 >) identique Figma */}
             {!loading && sortedTerrains.length > 0 && (
               <div className="flex justify-center items-center space-x-2 pt-6">
-                <button className="w-8 h-8 rounded-[8px] bg-[#004030] text-white font-bold text-xs flex items-center justify-center">
+                <button className="w-8 h-8 rounded-[8px] bg-vert-principal text-white font-bold text-xs flex items-center justify-center">
                   1
                 </button>
                 <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">

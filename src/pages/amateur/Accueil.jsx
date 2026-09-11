@@ -181,8 +181,8 @@ export default function Accueil() {
                 rounded="xl"
                 fullWidth
               >
-                <Search size={18} className="stroke-[2.5]" />
-                <span>Rechercher un terrain</span>
+                <Search size={18} className="stroke-[2.5] text-vert-principal" />
+                <span className='text-vert-principal'>Rechercher un terrain</span>
               </Button>
             </div>
           </form>
@@ -193,7 +193,7 @@ export default function Accueil() {
       {/* 2. SECTION "COMMENT ÇA MARCHE ?" */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-vert-principal">
             Comment ça marche ?
           </h2>
           <p className="text-gray-600 mt-2 text-sm sm:text-base">
@@ -260,7 +260,7 @@ export default function Accueil() {
           
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-vert-principal">
                 Terrains vedettes à la une
               </h2>
               <p className="text-gray-600 mt-1 text-sm sm:text-base">
@@ -336,7 +336,7 @@ export default function Accueil() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           
           <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-vert-principal leading-tight">
               Des complexes proches de chez vous à tout moment
             </h2>
             <p className="mt-4 text-gray-600 text-sm sm:text-base leading-relaxed">
@@ -388,7 +388,7 @@ export default function Accueil() {
       {/* 6. SECTION "CE QUE DISENT NOS JOUEURS" */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-vert-principal">
             Ce que disent nos joueurs
           </h2>
           <p className="text-gray-600 mt-2 text-sm sm:text-base">

@@ -45,7 +45,7 @@ export default function MesReservations() {
         
         {/* EN-TÊTE : TITRE ET BOUTON "RÉSERVER UN NOUVEAU MATCH" */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-vert-principal tracking-tight">
             Mes Réservations
           </h1>
 
@@ -53,8 +53,8 @@ export default function MesReservations() {
             onClick={() => navigate('/terrains')}
             variant="gold"
             size="md"
-            rounded="8px"
-            className="font-extrabold shadow-xs inline-flex items-center justify-center gap-2"
+            rounded="12px"
+            className="rounded-[8px] font-extrabold shadow-xs inline-flex items-center justify-center gap-2 text-vert-principal"
           >
             <span>Réserver un nouveau match</span>
           </Button>
@@ -67,7 +67,7 @@ export default function MesReservations() {
               onClick={() => setActiveTab('a-venir')}
               className={`pb-4 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'a-venir'
-                  ? 'text-[#004030] border-b-2 border-[#004030]'
+                  ? 'text-vert-principal border-b-2 border-[#004030]'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -78,7 +78,7 @@ export default function MesReservations() {
               onClick={() => setActiveTab('passees')}
               className={`pb-4 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'passees'
-                  ? 'text-[#004030] border-b-2 border-[#004030]'
+                  ? 'text-vert-principal border-b-2 border-[#004030]'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -89,7 +89,7 @@ export default function MesReservations() {
               onClick={() => setActiveTab('annulees')}
               className={`pb-4 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'annulees'
-                  ? 'text-[#004030] border-b-2 border-[#004030]'
+                  ? 'text-vert-principal border-b-2 border-[#004030]'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >

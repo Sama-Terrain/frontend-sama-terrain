@@ -31,10 +31,10 @@ export default function CroissanceChart({ data, totalMois = '+342 ce mois-ci' })
       
       {/* EN-TÊTE DU GRAPHIQUE */}
       <div className="flex items-center justify-between">
-        <h3 className="text-base sm:text-lg font-black text-[#004030]">
+        <h3 className="text-base sm:text-lg font-black text-vert-principal">
           Croissance des Inscriptions (30j)
         </h3>
-        <span className="text-xs sm:text-sm font-bold text-[#D4AF37]  px-3 py-1 rounded-full">
+        <span className="text-xs sm:text-sm font-bold text-dore  px-3 py-1 rounded-full">
           {totalMois}
         </span>
       </div>

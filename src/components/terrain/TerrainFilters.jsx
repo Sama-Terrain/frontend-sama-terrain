@@ -194,7 +194,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
 
         <div className="flex justify-between text-xs font-bold text-gray-600">
           <span>5 000</span>
-          <span className="text-[#004030] font-black">{(activeFilters?.maxPrix || activeFilters?.prixMax || 35000).toLocaleString()}</span>
+          <span className="text-vert-principal font-black">{(activeFilters?.maxPrix || activeFilters?.prixMax || 35000).toLocaleString()}</span>
           <span>50 000</span>
         </div>
       </div>

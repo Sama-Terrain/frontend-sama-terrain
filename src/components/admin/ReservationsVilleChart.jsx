@@ -24,7 +24,7 @@ export default function ReservationsVilleChart({ data }) {
     <div className="bg-white rounded-[12px] p-6 border border-gray-200/80 shadow-2xs text-left space-y-5 flex flex-col justify-between">
       
       {/* TITRE DU GRAPHIQUE */}
-      <h3 className="text-base sm:text-lg font-black text-[#004030]">
+      <h3 className="text-base sm:text-lg font-black text-vert-principal">
         Réservations par Ville
       </h3>
 

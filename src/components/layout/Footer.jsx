@@ -4,7 +4,7 @@ import logoBlanc from '../../assets/sama-logo-clair.png';
 
 export default function Footer() {
   return (
-    <footer className="bg-vert-footer text-white pt-16 pb-8 border-t border-vert-principal">
+    <footer className="bg-vert-principal text-white pt-16 pb-8 border-t border-vert-principal">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Grille Principale */}
@@ -95,10 +95,10 @@ export default function Footer() {
 
             {/* Icones Réseaux Sociaux Cercle Vert */}
             <div className="flex space-x-3">
-              <a href="#facebook" className="w-9 h-9 rounded-full bg-[#004d3a] flex items-center justify-center text-white hover:bg-emerald-500 transition-colors" title="Facebook">
+              <a href="#facebook" className="w-9 h-9 rounded-full bg-vert-principal flex items-center justify-center text-white hover:bg-emerald-500 transition-colors" title="Facebook">
                 <Globe size={18} />
               </a>
-              <a href="#instagram" className="w-9 h-9 rounded-full bg-[#004d3a] flex items-center justify-center text-white hover:bg-emerald-500 transition-colors" title="Instagram">
+              <a href="#instagram" className="w-9 h-9 rounded-full bg-vert-principal flex items-center justify-center text-white hover:bg-emerald-500 transition-colors" title="Instagram">
                 <Share2 size={18} />
               </a>
             </div>

@@ -55,7 +55,7 @@ export default function VerificationEmail() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-center">
           
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-vert-principal tracking-tight">
             VÉRIFIEZ VOTRE E-MAIL
           </h1>
 

@@ -54,7 +54,7 @@ export default function DevenirGerant() {
           className="absolute inset-0 opacity-20 bg-cover bg-center pointer-events-none"
           style={{ backgroundImage: `url(${heroBg})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#004030]/90 via-[#004030]/80 to-[#004030] pointer-events-none" />
+        <div className="absolute inset-0 from-[#004030]/90 via-[#004030]/80 to-[#004030] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10 space-y-4">
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight max-w-3xl leading-tight">
@@ -68,7 +68,7 @@ export default function DevenirGerant() {
 
       {/* 2. SECTION "POURQUOI NOUS FAIRE CONFIANCE ?" */}
       <section className="py-16 px-4 sm:px-6 lg:px-10 max-w-7xl mx-auto w-full">
-        <h2 className="text-2xl font-extrabold text-gray-900 mb-8">
+        <h2 className="text-2xl font-extrabold text-vert-principal mb-8">
           Pourquoi nous faire confiance ?
         </h2>
 
@@ -113,7 +113,7 @@ export default function DevenirGerant() {
         <div className="bg-white rounded-[8px] p-6 sm:p-10 border border-gray-200 space-y-8">
           
           <div>
-            <h2 className="text-2xl font-extrabold text-gray-900">
+            <h2 className="text-2xl font-extrabold text-vert-principal">
               Inscrivez votre complexe en 3 minutes
             </h2>
             <p className="text-xs text-gray-600 mt-2 max-w-3xl leading-relaxed">
@@ -146,7 +146,7 @@ export default function DevenirGerant() {
                 
                 {/* COLONNE 1 : VOS COORDONNÉES PROFESSIONNELLES */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2 text-[#004030] font-bold text-sm">
+                  <div className="flex items-center space-x-2 text-vert-principal font-bold text-sm">
                     <span className="w-6 h-6 rounded-full bg-vert-clair flex items-center justify-center text-xs">1</span>
                     <span>Vos coordonnées professionnelles</span>
                   </div>
@@ -241,7 +241,7 @@ export default function DevenirGerant() {
 
                 {/* COLONNE 2 : VOTRE COMPLEXE SPORTIF */}
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-2 text-[#004030] font-bold text-sm">
+                  <div className="flex items-center space-x-2 text-vert-principal font-bold text-sm">
                     <span className="w-6 h-6 rounded-full bg-vert-clair flex items-center justify-center text-xs">2</span>
                     <span>Votre complexe sportif</span>
                   </div>

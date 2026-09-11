@@ -15,7 +15,7 @@ export default function AdminKpiCard({ label, value, trend }) {
       </span>
 
       {/* VALEUR DE L'INDICATEUR */}
-      <div className="text-2xl sm:text-3xl font-black text-[#004030] tracking-tight">
+      <div className="text-2xl sm:text-3xl font-black text-vert-principal tracking-tight">
         {value}
       </div>
 

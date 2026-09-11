@@ -45,7 +45,7 @@ export default function Connexion({ onLoginSuccess }) {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-left">
           
-          <h1 className="text-3xl font-extrabold text-gray-900 text-center mb-6">
+          <h1 className="text-3xl font-extrabold text-vert-principal text-center mb-6">
             Connectez-vous
           </h1>
 

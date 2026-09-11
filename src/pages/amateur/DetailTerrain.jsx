@@ -166,7 +166,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto py-20 px-4 text-center">
-        <div className="w-12 h-12 border-4 border-[#004030] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-gray-600 font-semibold text-sm">Chargement du terrain...</p>
       </div>
     );
@@ -178,15 +178,15 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
         
         {/* BREADCRUMB */}
         <nav className="flex items-center space-x-2 text-xs text-gray-500 font-medium">
-          <button onClick={() => navigate('/')} className="hover:text-[#004030]">
+          <button onClick={() => navigate('/')} className="hover:text-vert-principal cursor-pointer">
             Accueil
           </button>
           <span>/</span>
-          <button onClick={() => navigate('/terrains')} className="hover:text-[#004030]">
+          <button onClick={() => navigate('/terrains')} className="hover:text-vert-principal cursor-pointer">
             Terrains
           </button>
           <span>/</span>
-          <span className="font-bold text-[#004030]">{terrain?.nom || 'Complexe Keur Madior'}</span>
+          <span className="font-bold text-vert-principal">{terrain?.nom || 'Complexe Keur Madior'}</span>
         </nav>
 
         {/* GALERIE PHOTOS */}
@@ -416,7 +416,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
 
                   {avanceNum > 0 && (
                     <p className="text-xs font-semibold text-gray-500">
-                      Reste à payer sur place : <span className="text-[#004030] font-bold">{resteAPayer.toLocaleString()} FCFA</span>
+                      Reste à payer sur place : <span className="text-vert-principal font-bold">{resteAPayer.toLocaleString()} FCFA</span>
                     </p>
                   )}
                 </div>
@@ -620,7 +620,7 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
                   value={newAvisTexte}
                   onChange={(e) => setNewAvisTexte(e.target.value)}
                   placeholder="Terrain en excellent état, équipe d'accueil chaleureuse ! Idéal pour un match amical entre collègues..."
-                  className="w-full bg-[#f4f7f6] border border-gray-200/80 rounded-2xl p-4 text-xs font-medium text-gray-800 focus:outline-none focus:border-[#004030] placeholder-gray-400"
+                  className="w-full bg-[#f4f7f6] border border-gray-200/80 rounded-2xl p-4 text-xs font-medium text-gray-800 focus:outline-none focus:border-vert-principal placeholder-gray-400"
                 ></textarea>
 
                 {/* Compteur de caractères */}

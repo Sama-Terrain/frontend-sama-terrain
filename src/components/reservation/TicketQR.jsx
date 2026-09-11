@@ -56,14 +56,14 @@ export default function TicketQR({ ticket, onClose }) {
                     <div className="flex justify-center mb-1.5 sm:mb-3">
                         <div className="w-8 h-8 sm:w-14 sm:h-14 rounded-full bg-[#E6F4EA] flex items-center justify-center">
                             <Check
-                                className="w-4 h-4 sm:w-8 sm:h-8 text-[#004030]"
+                                className="w-4 h-4 sm:w-8 sm:h-8 text-vert-principal"
                                 strokeWidth={2.5}
                             />
                         </div>
                     </div>
 
                     {/* TITRE */}
-                    <h2 className="text-[0.75rem] sm:text-xl font-black text-[#004030] text-center mb-0.5 tracking-tight">
+                    <h2 className="text-[0.75rem] sm:text-xl font-black text-vert-principal text-center mb-0.5 tracking-tight">
                         Réservation confirmée !
                     </h2>
 
@@ -170,7 +170,7 @@ export default function TicketQR({ ticket, onClose }) {
 
                         <div className="flex justify-between items-center py-0.5 gap-2">
                             <span className="text-gray-500 font-medium">Montant acompte payé</span>
-                            <span className="font-extrabold text-[#004030] text-right">
+                            <span className="font-extrabold text-vert-principal text-right">
                                 {acompte.toLocaleString()} FCFA (via {moyenPaiement})
                             </span>
                         </div>
@@ -187,7 +187,7 @@ export default function TicketQR({ ticket, onClose }) {
 
                         <button
                             onClick={handleDownload}
-                            className="flex items-center justify-center gap-1 sm:gap-2 bg-[#004030] hover:bg-[#005943] text-white font-bold text-[8px] sm:text-xs py-1.5 sm:py-2.5 px-2 sm:px-3 rounded-md sm:rounded-xl transition-all cursor-pointer shadow-xs"
+                            className="flex items-center justify-center gap-1 sm:gap-2 bg-vert-principal hover:bg-[#005943] text-white font-bold text-[8px] sm:text-xs py-1.5 sm:py-2.5 px-2 sm:px-3 rounded-md sm:rounded-xl transition-all cursor-pointer shadow-xs"
                         >
                             <span>Télécharger</span>
                             <Download size={10} className="sm:w-4 sm:h-4" />
@@ -195,7 +195,7 @@ export default function TicketQR({ ticket, onClose }) {
 
                         <button
                             onClick={handleShare}
-                            className="flex items-center justify-center gap-1 sm:gap-2 bg-white border border-[#004030] text-[#004030] hover:bg-[#004030]/5 font-bold text-[8px] sm:text-xs py-1.5 sm:py-2.5 px-2 sm:px-3 rounded-md sm:rounded-xl transition-all cursor-pointer"
+                            className="flex items-center justify-center gap-1 sm:gap-2 bg-white border border-vert-principal text-vert-principal hover:bg-vert-principal/5 font-bold text-[8px] sm:text-xs py-1.5 sm:py-2.5 px-2 sm:px-3 rounded-md sm:rounded-xl transition-all cursor-pointer"
                         >
                             <span>Partager</span>
                             <Share2 size={10} className="sm:w-4 sm:h-4" />
