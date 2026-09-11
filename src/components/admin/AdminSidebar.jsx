@@ -8,6 +8,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  X,
 } from 'lucide-react';
 import logoSamaClair from '../../assets/sama-logo-clair.png';
 
@@ -16,7 +17,7 @@ import logoSamaClair from '../../assets/sama-logo-clair.png';
  * Barre de navigation latérale fixe (h-screen, sticky) de l'administration.
  * Gère la navigation et la déconnexion de la session admin.
  */
-export default function AdminSidebar({ onLogout }) {
+export default function AdminSidebar({ onLogout, onMobileClose }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -75,19 +76,32 @@ export default function AdminSidebar({ onLogout }) {
   };
 
   return (
-    <aside className="w-64 bg-vert-principal text-white flex flex-col justify-between h-screen sticky top-0 left-0 p-6 shrink-0 shadow-lg select-none overflow-y-auto z-40">
+    <aside className="w-[280px] bg-vert-principal text-white flex flex-col justify-between h-screen p-6 shrink-0 shadow-lg select-none overflow-y-auto">
       <div className="space-y-8">
         
-        {/* LOGO OFFICIEL SAMA-TERRAIN */}
-        <div
-          className="flex items-center space-x-3 cursor-pointer pt-2"
-          onClick={() => navigate('/admin/dashboard')}
-        >
-          <img
-            src={logoSamaClair}
-            alt="Sama-Terrain Logo"
-            className="h-24 w-80 object-contain cursor-pointer" 
-          />
+        {/* HEADER: LOGO + BOUTON FERMER (MOBILE) */}
+        <div className="flex items-center justify-between pt-2">
+          <div
+            className="flex items-center space-x-3 cursor-pointer"
+            onClick={() => {
+              navigate('/admin/dashboard');
+              if (onMobileClose) onMobileClose();
+            }}
+          >
+            <img
+              src={logoSamaClair}
+              alt="Sama-Terrain Logo"
+              className="h-[54px] w-[169px] object-contain cursor-pointer" 
+            />
+          </div>
+          
+          {/* BOUTON FERMER MOBILE */}
+          <button
+            onClick={onMobileClose}
+            className="lg:hidden w-8 h-8 rounded-lg bg-vert-survol hover:bg-white/20 flex items-center justify-center transition-colors"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* MENU DE NAVIGATION */}
@@ -101,14 +115,17 @@ export default function AdminSidebar({ onLogout }) {
             return (
               <button
                 key={item.id}
-                onClick={() => navigate(item.path)}
-                className={`w-full flex items-center space-x-3.5 px-4 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
+                onClick={() => {
+                  navigate(item.path);
+                  if (onMobileClose) onMobileClose();
+                }}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-[8px] font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                   isActive
                     ? 'bg-dore text-gray-900 shadow-md font-black'
                     : 'text-gray-200 hover:bg-vert-survol hover:text-white'
                 }`}
               >
-                <Icon size={18} className={isActive ? 'text-gray-900' : 'text-gray-300'} />
+                <Icon size={20} className={isActive ? 'text-gray-900' : 'text-gray-300'} />
                 <span>{item.label}</span>
               </button>
             );
@@ -118,13 +135,13 @@ export default function AdminSidebar({ onLogout }) {
       </div>
 
       {/* BOUTON DÉCONNEXION EN BAS */}
-      <div className="pt-6 border-t border-vert-survol">
+      <div className="pt-6 border-t border-white/13">
         <button
           onClick={handleLogoutClick}
-          className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-red-900/30 rounded-xl transition-all cursor-pointer text-xs sm:text-sm font-semibold"
+          className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-red-900/30 rounded-[8px] transition-all cursor-pointer text-xs sm:text-sm font-semibold"
           title="Se déconnecter"
         >
-          <LogOut size={18} className="text-gray-300" />
+          <LogOut size={20} className="text-gray-300" />
           <span>Déconnexion</span>
         </button>
       </div>

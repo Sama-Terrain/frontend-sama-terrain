@@ -11,20 +11,9 @@ import {
  * Composant CroissanceChart
  * Graphique de croissance des inscriptions sur 30 jours utilisant la bibliothèque 'recharts'.
  */
-export default function CroissanceChart({ data, totalMois = '+342 ce mois-ci' }) {
+export default function CroissanceChart({ data, totalMois = '+18% vs mois dernier' }) {
   // Données de secours si aucune donnée n'est passée
-  const chartData = data?.data || [
-    { period: 'J1-3', value: 15 },
-    { period: 'J4-6', value: 25 },
-    { period: 'J7-9', value: 35 },
-    { period: 'J10-12', value: 48 },
-    { period: 'J13-15', value: 42 },
-    { period: 'J16-18', value: 60 },
-    { period: 'J19-21', value: 75 },
-    { period: 'J22-24', value: 88 },
-    { period: 'J25-27', value: 110 },
-    { period: 'J28-30', value: 125 },
-  ];
+  const chartData = data?.data || [];
 
   return (
     <div className="bg-white rounded-[12px] p-6 border border-gray-200/80 shadow-2xs text-left space-y-5 flex flex-col justify-between">
@@ -32,7 +21,7 @@ export default function CroissanceChart({ data, totalMois = '+342 ce mois-ci' })
       {/* EN-TÊTE DU GRAPHIQUE */}
       <div className="flex items-center justify-between">
         <h3 className="text-base sm:text-lg font-black text-vert-principal">
-          Croissance des Inscriptions (30j)
+          Évolution des Réservations
         </h3>
         <span className="text-xs sm:text-sm font-bold text-dore  px-3 py-1 rounded-full">
           {totalMois}
@@ -59,7 +48,7 @@ export default function CroissanceChart({ data, totalMois = '+342 ce mois-ci' })
                 fontSize: '12px',
                 fontWeight: 'bold',
               }}
-              formatter={(val) => [`${val} nouveaux inscrits`, 'Inscriptions']}
+              formatter={(val) => [`${val} réservations`, 'Réservations']}
               labelStyle={{ display: 'none' }}
             />
             <Bar

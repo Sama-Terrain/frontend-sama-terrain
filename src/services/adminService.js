@@ -4,6 +4,7 @@ import {
   mockReservationsVille,
   mockActiviteRecente,
   mockAdminProfile,
+  mockUsers,
 } from '../data/mockAdminData';
 
 export const adminService = {
@@ -30,5 +31,10 @@ export const adminService = {
   async getAdminProfile() {
     await new Promise((resolve) => setTimeout(resolve, 100));
     return mockAdminProfile;
+  },
+
+  async getUsers() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockUsers;
   },
 };

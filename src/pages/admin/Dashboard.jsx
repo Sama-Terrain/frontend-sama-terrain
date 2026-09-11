@@ -8,10 +8,10 @@ import { adminService } from '../../services/adminService';
 
 /**
  * Page AdminDashboard (Tableau de Bord Admin)
- * 
+ *
  * Cette page rassemble :
- * 1. Les 5 cartes de KPI principales (Utilisateurs, Gérants Actifs, Terrains, Réservations, Revenus Global).
- * 2. Le graphique de croissance des inscriptions (30j) basé sur Recharts.
+ * 1. Les 4 cartes de KPI principales (Total Terrains, Total Utilisateurs, Réservations, Revenus).
+ * 2. Le graphique d'évolution des réservations (mensuel) basé sur Recharts.
  * 3. Le graphique de répartition des réservations par ville basé sur Recharts.
  * 4. La liste du flux d'activités récentes du système.
  */
@@ -67,8 +67,8 @@ export default function AdminDashboard({ onLogout }) {
   return (
     <AdminLayout title="Tableau de Bord Admin" profile={profile} onLogout={onLogout}>
       
-      {/* SECTION 1 : CARTES DES 5 KPIs */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+      {/* SECTION 1 : CARTES DES 4 KPIs - Responsive */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
         {stats.map((kpi) => (
           <AdminKpiCard
             key={kpi.id}
@@ -79,13 +79,13 @@ export default function AdminDashboard({ onLogout }) {
         ))}
       </section>
 
-      {/* SECTION 2 : GRAPHIQUES AVEC RECHARTS (CROISSANCE & VILLES) */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* SECTION 2 : GRAPHIQUES AVEC RECHARTS (CROISSANCE & VILLES) - Responsive */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         <CroissanceChart data={croissanceData} totalMois={croissanceData?.totalMois} />
         <ReservationsVilleChart data={villesData} />
       </section>
 
-      {/* SECTION 3 : ACTIVITÉ RÉCENTE DU SYSTÈME */}
+      {/* SECTION 3 : ACTIVITÉ RÉCENTE DU SYSTÈME - Responsive */}
       <section>
         <ActiviteRecenteList items={activites} />
       </section>
