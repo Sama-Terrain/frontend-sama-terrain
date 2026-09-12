@@ -6,8 +6,9 @@ import RechercheTerrains from '../pages/amateur/RechercheTerrains';
 import DetailTerrain from '../pages/amateur/DetailTerrain';
 import MesReservations from '../pages/amateur/MesReservations';
 
-// Page Gérant
+// Pages Gérant
 import DevenirGerant from '../pages/gerant/DevenirGerant';
+import GerantDashboard from '../pages/gerant/Dashboard';
 
 // Pages Authentification
 import Connexion from '../pages/auth/Connexion';
@@ -47,6 +48,9 @@ export default function AppRoutes({ currentUser, setCurrentUser, searchParams, o
 
       {/* Route Devenir Gérant */}
       <Route path="/gerant" element={<DevenirGerant />} />
+
+      {/* Routes Espace Gérant (avec transmission du handler de déconnexion) */}
+      <Route path="/gerant/dashboard" element={<GerantDashboard onLogout={onLogout} />} />
 
       {/* Routes Administrateur (avec transmission du handler de déconnexion) */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

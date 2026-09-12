@@ -19,3 +19,13 @@ export const mockAdminUser = {
   verificationCode: '0000',
   initiales: 'AD'
 };
+
+export const mockGerantUser = {
+  email: 'gerant@samaterrain.sn',
+  password: 'gerant123',
+  prenom: 'Amadou',
+  nom: 'Diouf',
+  role: 'gerant',
+  verificationCode: '1111',
+  initiales: 'AD'
+};

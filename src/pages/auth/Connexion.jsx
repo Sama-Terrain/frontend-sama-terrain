@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
-import { mockUser, mockAdminUser } from '../../data/mockUser';
+import { mockUser, mockAdminUser, mockGerantUser } from '../../data/mockUser';
 
 export default function Connexion({ onLoginSuccess }) {
   const navigate = useNavigate();
@@ -28,7 +28,14 @@ export default function Connexion({ onLoginSuccess }) {
       return;
     }
 
-    // 2. Connexion Amateur
+    // 2. Connexion Gérant
+    if (inputEmail === mockGerantUser.email.toLowerCase() && password === mockGerantUser.password) {
+      if (onLoginSuccess) onLoginSuccess(mockGerantUser);
+      navigate('/gerant/dashboard');
+      return;
+    }
+
+    // 3. Connexion Amateur
     if (inputEmail === mockUser.email.toLowerCase() && password === mockUser.password) {
       if (onLoginSuccess) onLoginSuccess(mockUser);
       navigate('/verify-email', { state: { email: mockUser.email } });
@@ -56,6 +63,11 @@ export default function Connexion({ onLoginSuccess }) {
               Email : <code className="font-bold">mariegodmer@gmail.com</code> | Pass : <code className="font-bold">password123</code>
             </div>
             
+            <div className="bg-sky-50 border border-sky-200 rounded-[8px] p-3 text-xs text-sky-900">
+              💡 <strong>Compte Gérant :</strong><br />
+              Email : <code className="font-bold">gerant@samaterrain.sn</code> | Pass : <code className="font-bold">gerant123</code>
+            </div>
+
             <div className="bg-amber-50 border border-amber-200 rounded-[8px] p-3 text-xs text-amber-900 flex items-start gap-2">
               <ShieldCheck size={16} className="text-[#004030] shrink-0 mt-0.5" />
               <div>

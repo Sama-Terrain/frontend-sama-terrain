@@ -26,10 +26,12 @@ function AppContent() {
     localStorage.removeItem('sama_current_user');
   };
 
-  // Masquer la Navbar et le Footer grand public sur les pages auth et admin
+  // Masquer la Navbar et le Footer grand public sur les pages auth, admin et l'espace gérant (dashboard)
+  // Note : '/gerant' (page publique "Devenir Gérant") garde la Navbar ; seul '/gerant/...' (espace connecté) la masque.
   const isAuthOrAdminPage =
     ['/login', '/register', '/verify-email'].includes(location.pathname) ||
-    location.pathname.startsWith('/admin');
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/gerant/');
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gray-50 font-sans">
