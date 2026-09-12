@@ -1,133 +1,138 @@
+import { MOCK_GERANT_PROFILE, MOCK_TERRAINS_GERANT, MOCK_TERRAIN_DETAILS_GERANT } from '../mocks/gerants';
 import {
-  mockGerantProfile,
-  mockGerantStats,
-  mockRevenus30Jours,
-  mockReservationsRecentes,
-  mockMesTerrains,
-  mockTerrainDetails,
-  mockProchainesReservations,
-  mockAvisRecents,
-  mockCreneauxConfig,
-  mockReservationsGerant,
-  mockReservationsActivite,
-  mockRevenusStats,
-  mockRevenusEvolution,
-  mockHistoriquePaiements,
-  mockTicketsScannables,
-  mockDernieresValidations,
-  mockStatistiquesKpis,
-  mockReservationsParJour,
-  mockModesPaiementStats,
-  mockRecommandationsIA,
-} from '../data/mockGerantData';
+  MOCK_RESERVATIONS_RECENTES_GERANT,
+  MOCK_RESERVATIONS_GERANT,
+  MOCK_RESERVATIONS_ACTIVITE,
+  MOCK_PROCHAINES_RESERVATIONS,
+} from '../mocks/reservations';
+import { MOCK_AVIS_GERANT } from '../mocks/avis';
+import { MOCK_CRENEAUX_CONFIG } from '../mocks/creneaux';
+import { MOCK_HISTORIQUE_PAIEMENTS, MOCK_TICKETS_SCANNABLES, MOCK_DERNIERES_VALIDATIONS } from '../mocks/paiements';
+import {
+  MOCK_GERANT_STATS,
+  MOCK_REVENUS_30_JOURS,
+  MOCK_REVENUS_STATS,
+  MOCK_REVENUS_EVOLUTION,
+  MOCK_STATISTIQUES_KPIS_GERANT,
+  MOCK_RESERVATIONS_PAR_JOUR,
+  MOCK_MODES_PAIEMENT_STATS,
+  MOCK_RECOMMANDATIONS_IA,
+} from '../mocks/statistiques';
+import { delaiReseau } from '../utils/delaiReseau';
 
-// Couche service de l'espace Gérant.
-// Aujourd'hui : renvoie les données mock (avec un léger délai simulant un appel réseau).
-// Demain : chaque méthode sera remplacée par un appel à l'API REST Django, sans changer les pages qui les consomment.
+/**
+ * Service de l'espace Gérant.
+ * Aujourd'hui : renvoie les données mockées de src/mocks/.
+ * Demain : chaque méthode appellera l'API Django correspondante, sans que les
+ * pages qui les consomment n'aient à changer.
+ *
+ * NB : la gestion de l'abonnement (essai, expiration, renouvellement) est dans
+ * un service séparé, cf. src/services/abonnementService.js.
+ */
 export const gerantService = {
   async getGerantProfile() {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    return mockGerantProfile;
+    await delaiReseau();
+    return MOCK_GERANT_PROFILE;
   },
 
   async getGerantStats() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockGerantStats;
+    await delaiReseau();
+    return MOCK_GERANT_STATS;
   },
 
   async getRevenus30Jours() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockRevenus30Jours;
+    await delaiReseau();
+    return MOCK_REVENUS_30_JOURS;
   },
 
   async getReservationsRecentes() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockReservationsRecentes;
+    await delaiReseau();
+    return MOCK_RESERVATIONS_RECENTES_GERANT;
   },
 
   async getMesTerrains() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockMesTerrains;
+    await delaiReseau();
+    return MOCK_TERRAINS_GERANT;
   },
 
   async getTerrainDetail(terrainId) {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockTerrainDetails[terrainId] || null;
+    await delaiReseau();
+    return MOCK_TERRAIN_DETAILS_GERANT[terrainId] || null;
   },
 
   async getProchainesReservations() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockProchainesReservations;
+    await delaiReseau();
+    return MOCK_PROCHAINES_RESERVATIONS;
   },
 
   async getAvisRecents() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockAvisRecents;
+    await delaiReseau();
+    return MOCK_AVIS_GERANT;
   },
 
   async getCreneauxConfigs() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return Object.values(mockCreneauxConfig);
+    await delaiReseau();
+    return Object.values(MOCK_CRENEAUX_CONFIG);
   },
 
   async getCreneauxConfig(terrainId) {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockCreneauxConfig[terrainId] || null;
+    await delaiReseau();
+    return MOCK_CRENEAUX_CONFIG[terrainId] || null;
   },
 
   async getReservationsGerant() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockReservationsGerant;
+    await delaiReseau();
+    return MOCK_RESERVATIONS_GERANT;
   },
 
   async getReservationsActivite() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockReservationsActivite;
+    await delaiReseau();
+    return MOCK_RESERVATIONS_ACTIVITE;
   },
 
   async getRevenusStats() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockRevenusStats;
+    await delaiReseau();
+    return MOCK_REVENUS_STATS;
   },
 
   async getRevenusEvolution() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockRevenusEvolution;
+    await delaiReseau();
+    return MOCK_REVENUS_EVOLUTION;
   },
 
   async getHistoriquePaiements() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockHistoriquePaiements;
+    await delaiReseau();
+    return MOCK_HISTORIQUE_PAIEMENTS;
   },
 
   async getDernieresValidations() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockDernieresValidations;
+    await delaiReseau();
+    return MOCK_DERNIERES_VALIDATIONS;
   },
 
   // Recherche un ticket par son code (scan caméra ou saisie manuelle)
   async verifierTicket(code) {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    return mockTicketsScannables[code.trim().toUpperCase()] || null;
+    await delaiReseau();
+    return MOCK_TICKETS_SCANNABLES[code.trim().toUpperCase()] || null;
   },
 
   async getStatistiquesKpis() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockStatistiquesKpis;
+    await delaiReseau();
+    return MOCK_STATISTIQUES_KPIS_GERANT;
   },
 
   async getReservationsParJour() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockReservationsParJour;
+    await delaiReseau();
+    return MOCK_RESERVATIONS_PAR_JOUR;
   },
 
   async getModesPaiementStats() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockModesPaiementStats;
+    await delaiReseau();
+    return MOCK_MODES_PAIEMENT_STATS;
   },
 
   async getRecommandationsIA() {
-    await new Promise((resolve) => setTimeout(resolve, 150));
-    return mockRecommandationsIA;
+    await delaiReseau();
+    return MOCK_RECOMMANDATIONS_IA;
   },
 };

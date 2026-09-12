@@ -5,7 +5,7 @@ import CreneauxGrid from '../../components/gerant/CreneauxGrid';
 import ConfigurerCreneauxPanel from '../../components/gerant/ConfigurerCreneauxPanel';
 import { gerantService } from '../../services/gerantService';
 import { generateCreneaux } from '../../utils/generateCreneaux';
-import { JOURS_SEMAINE, JOURS_WEEKEND } from '../../data/mockGerantData';
+import { JOURS_SEMAINE, JOURS_WEEKEND } from '../../mocks/creneaux';
 
 const JOURS_SEMAINE_OUVRABLE = JOURS_SEMAINE.filter((jour) => !JOURS_WEEKEND.includes(jour));
 

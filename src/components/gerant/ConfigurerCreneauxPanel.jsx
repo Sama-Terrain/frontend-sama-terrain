@@ -2,7 +2,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import Button from '../ui/Button';
 import JourToggle from './JourToggle';
-import { JOURS_SEMAINE } from '../../data/mockGerantData';
+import { JOURS_SEMAINE } from '../../mocks/creneaux';
 
 /**
  * Composant ConfigurerCreneauxPanel

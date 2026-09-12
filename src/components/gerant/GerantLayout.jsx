@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import GerantSidebar from './GerantSidebar';
 import GerantHeader from './GerantHeader';
+import AbonnementTrialBanner from './AbonnementTrialBanner';
 
 /**
  * Composant GerantLayout
@@ -38,6 +39,7 @@ export default function GerantLayout({ children, title, profile, onLogout }) {
         <GerantHeader title={title} profile={profile} onMenuToggle={handleMenuToggle} />
 
         <main className="flex-1 p-4 sm:p-6 lg:px-10 lg:py-8 space-y-6 lg:space-y-8 max-w-7xl w-full mx-auto overflow-y-auto">
+          <AbonnementTrialBanner />
           {children}
         </main>
 

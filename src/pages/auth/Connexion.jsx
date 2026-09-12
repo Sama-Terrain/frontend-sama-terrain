@@ -5,45 +5,44 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
-import { mockUser, mockAdminUser, mockGerantUser } from '../../data/mockUser';
+import { authService } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
+import { getHomeRouteForRole, ROLES } from '../../utils/roles';
 
-export default function Connexion({ onLoginSuccess }) {
+export default function Connexion() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [chargement, setChargement] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setChargement(true);
 
-    const inputEmail = email.trim().toLowerCase();
+    const resultat = await authService.login(email, password);
+    setChargement(false);
 
-    // 1. Connexion Administrateur
-    if (inputEmail === mockAdminUser.email.toLowerCase() && password === mockAdminUser.password) {
-      if (onLoginSuccess) onLoginSuccess(mockAdminUser);
-      navigate('/admin/dashboard');
+    if (!resultat.success) {
+      setError('Identifiants incorrects. Veuillez utiliser les comptes de test ci-dessous.');
       return;
     }
 
-    // 2. Connexion Gérant
-    if (inputEmail === mockGerantUser.email.toLowerCase() && password === mockGerantUser.password) {
-      if (onLoginSuccess) onLoginSuccess(mockGerantUser);
-      navigate('/gerant/dashboard');
+    const user = resultat.user;
+    login(user);
+
+    // L'amateur doit d'abord confirmer son code de vérification par email
+    if (user.role === ROLES.AMATEUR) {
+      navigate('/verify-email', { state: { email: user.email } });
       return;
     }
 
-    // 3. Connexion Amateur
-    if (inputEmail === mockUser.email.toLowerCase() && password === mockUser.password) {
-      if (onLoginSuccess) onLoginSuccess(mockUser);
-      navigate('/verify-email', { state: { email: mockUser.email } });
-      return;
-    }
-
-    // Identifiants incorrects
-    setError('Identifiants incorrects. Veuillez utiliser les comptes de test ci-dessus.');
+    // Admin et gérant sont redirigés directement vers leur tableau de bord
+    navigate(getHomeRouteForRole(user.role));
   };
 
   return (
@@ -51,18 +50,18 @@ export default function Connexion({ onLoginSuccess }) {
       {/* Colonne Gauche - Formulaire */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-left">
-          
+
           <h1 className="text-3xl font-extrabold text-vert-principal text-center mb-6">
             Connectez-vous
           </h1>
 
-          {/* Indication mocks pour l'utilisateur (Amateur & Admin) */}
+          {/* Indication mocks pour l'utilisateur (Amateur, Gérant & Admin) */}
           <div className="space-y-2">
             <div className="bg-emerald-50 border border-emerald-200 rounded-[8px] p-3 text-xs text-emerald-800">
               💡 <strong>Compte Amateur :</strong><br />
               Email : <code className="font-bold">mariegodmer@gmail.com</code> | Pass : <code className="font-bold">password123</code>
             </div>
-            
+
             <div className="bg-sky-50 border border-sky-200 rounded-[8px] p-3 text-xs text-sky-900">
               💡 <strong>Compte Gérant :</strong><br />
               Email : <code className="font-bold">gerant@samaterrain.sn</code> | Pass : <code className="font-bold">gerant123</code>
@@ -138,9 +137,10 @@ export default function Connexion({ onLoginSuccess }) {
               size="md"
               rounded="8px"
               fullWidth
+              disabled={chargement}
               className="mt-4 shadow-xs"
             >
-              Se connecter
+              {chargement ? 'Connexion...' : 'Se connecter'}
             </Button>
           </form>
 

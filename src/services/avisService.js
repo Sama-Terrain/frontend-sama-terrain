@@ -1,11 +1,12 @@
-import { MOCK_AVIS } from '../data/mockAvis';
+import { MOCK_AVIS } from '../mocks/avis';
+import { delaiReseau } from '../utils/delaiReseau';
 
 /**
- * Service pour la gestion des avis joueurs.
+ * Service pour la gestion des avis joueurs (affichage public sur une fiche terrain).
  */
 export const avisService = {
   async getAvisJoueurs() {
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await delaiReseau();
     return MOCK_AVIS;
   }
 };

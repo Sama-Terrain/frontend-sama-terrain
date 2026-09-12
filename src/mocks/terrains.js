@@ -1,3 +1,4 @@
+// Mock : catalogue public des terrains (recherche amateur, page d'accueil, détail terrain).
 import keurMadiorImg from '../assets/keur_madior.jpg';
 import samaStadiumImg from '../assets/sama_stadium.jpg';
 import dakarFootImg from '../assets/dakar_foot.jpg';
@@ -38,7 +39,7 @@ export const MOCK_TERRAINS = [
   },
   {
     id: 3,
-    nom: 'Foot d\'Or',
+    nom: "Foot d'Or",
     localisation: 'Zone B, Dakar',
     type: '5v5',
     prixHeure: 20000,

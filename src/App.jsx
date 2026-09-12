@@ -1,33 +1,21 @@
 import { useState } from 'react';
-import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
 
 function AppContent() {
   const location = useLocation();
-  const navigate = useNavigate();
-
-  const [currentUser, setCurrentUser] = useState(() => {
-    const savedUser = localStorage.getItem('sama_current_user');
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const { currentUser, logout } = useAuth();
 
   const [searchParams, setSearchParams] = useState({});
-  const [reservationData, setReservationData] = useState(null);
 
-  const handleLoginSuccess = (user) => {
-    setCurrentUser(user);
-    localStorage.setItem('sama_current_user', JSON.stringify(user));
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('sama_current_user');
-  };
-
-  // Masquer la Navbar et le Footer grand public sur les pages auth, admin et l'espace gérant (dashboard)
-  // Note : '/gerant' (page publique "Devenir Gérant") garde la Navbar ; seul '/gerant/...' (espace connecté) la masque.
+  // Masquer la Navbar et le Footer grand public sur les pages auth et les espaces
+  // admin / gérant connectés (qui ont leur propre sidebar + header dédiés).
+  // Note : '/gerant' seul (page publique "Devenir Gérant") garde la Navbar ;
+  // seul '/gerant/...' (espace connecté) la masque.
   const isAuthOrAdminPage =
     ['/login', '/register', '/verify-email'].includes(location.pathname) ||
     location.pathname.startsWith('/admin') ||
@@ -38,18 +26,12 @@ function AppContent() {
       {!isAuthOrAdminPage && (
         <Navbar
           currentUser={currentUser}
-          onLogout={handleLogout}
+          onLogout={logout}
         />
       )}
 
       <main className="flex-1">
-        <AppRoutes
-          currentUser={currentUser}
-          setCurrentUser={handleLoginSuccess}
-          searchParams={searchParams}
-          onSelectSlot={setReservationData}
-          onLogout={handleLogout}
-        />
+        <AppRoutes searchParams={searchParams} />
       </main>
 
       {!isAuthOrAdminPage && (
@@ -62,7 +44,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

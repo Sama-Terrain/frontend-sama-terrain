@@ -5,9 +5,9 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
-import { MOCK_CRENEAUX } from '../../data/mockCreneaux';
+import { MOCK_CRENEAUX } from '../../mocks/creneaux';
 
-export default function DetailTerrain({ onSelectSlot, currentUser }) {
+export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
   const terrainId = Number(id) || 1;
   const navigate = useNavigate();
@@ -159,8 +159,10 @@ export default function DetailTerrain({ onSelectSlot, currentUser }) {
       resteSurPlace: resteAPayer
     };
 
-    if (onSelectSlot) onSelectSlot(reservationData);
-    navigate('/reservations');
+    // On transmet les infos de la réservation à la page de paiement via la
+    // navigation (state), sans passer par un state global : la page Paiement
+    // les lira avec useLocation().
+    navigate('/paiement', { state: reservationData });
   };
 
   if (loading) {

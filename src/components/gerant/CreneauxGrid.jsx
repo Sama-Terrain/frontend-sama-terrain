@@ -1,5 +1,5 @@
 import React from 'react';
-import { JOURS_SEMAINE } from '../../data/mockGerantData';
+import { JOURS_SEMAINE } from '../../mocks/creneaux';
 
 const formatPrix = (value) => `${value.toLocaleString('fr-FR')} F`;
 

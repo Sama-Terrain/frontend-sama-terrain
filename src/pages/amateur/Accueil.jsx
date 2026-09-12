@@ -5,6 +5,8 @@ import TerrainCard from '../../components/terrain/TerrainCard';
 import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
+import { iaService } from '../../services/iaService';
+import { MESSAGE_ACCUEIL_CHATBOT } from '../../mocks/chatbot';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
@@ -25,9 +27,10 @@ export default function Accueil() {
   // État du Widget Assistant IA (Panneau flottant)
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [aiMessages, setAiMessages] = useState([
-    { id: 1, sender: 'bot', text: 'Bonjour ! Je suis l’assistant Sama-Terrain. Quel quartier ou créneau cherchez-vous à Dakar ?' }
+    { id: 1, sender: 'bot', text: MESSAGE_ACCUEIL_CHATBOT }
   ]);
   const [aiInput, setAiInput] = useState('');
+  const [aiEnAttente, setAiEnAttente] = useState(false);
 
   // Chargement des données mockées au montage du composant
   useEffect(() => {
@@ -55,25 +58,27 @@ export default function Accueil() {
     navigate('/terrains', { state: { searchZone, searchDate, searchCreneau } });
   };
 
-  // Handler d'envoi de message à l'assistant IA
-  const handleSendAiMessage = (e) => {
+  // Handler d'envoi de message à l'assistant IA.
+  // Pas de vrai LLM branché pour le moment : iaService renvoie une réponse
+  // mockée (cf. src/mocks/chatbot.js), avec un délai réseau simulé pour que
+  // l'indicateur "en train d'écrire" ait le temps de s'afficher.
+  const handleSendAiMessage = async (e) => {
     e.preventDefault();
-    if (!aiInput.trim()) return;
+    const messageEnvoye = aiInput.trim();
+    if (!messageEnvoye || aiEnAttente) return;
 
-    const userMsg = { id: Date.now(), sender: 'user', text: aiInput };
+    const userMsg = { id: Date.now(), sender: 'user', text: messageEnvoye };
     setAiMessages((prev) => [...prev, userMsg]);
     setAiInput('');
+    setAiEnAttente(true);
 
-    setTimeout(() => {
-      setAiMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now() + 1,
-          sender: 'bot',
-          text: `Je recherche des créneaux disponibles pour "${aiInput}". Le Complexe Keur Madior a un créneau disponible ce soir !`
-        }
-      ]);
-    }, 600);
+    const reponse = await iaService.envoyerMessageChatbot(messageEnvoye);
+
+    setAiMessages((prev) => [
+      ...prev,
+      { id: Date.now() + 1, sender: 'bot', text: reponse.texte }
+    ]);
+    setAiEnAttente(false);
   };
 
   return (
@@ -477,6 +482,15 @@ export default function Accueil() {
                   </div>
                 </div>
               ))}
+
+              {/* INDICATEUR "EN TRAIN D'ÉCRIRE" pendant l'attente de la réponse mockée */}
+              {aiEnAttente && (
+                <div className="flex justify-start">
+                  <div className="bg-white border border-gray-200 text-gray-400 rounded-xl rounded-bl-none p-3">
+                    <span className="animate-pulse">L'assistant écrit...</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <form
@@ -488,13 +502,15 @@ export default function Accueil() {
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
                 placeholder="Ex: Terrain disponible à Yoff..."
-                className="flex-1 bg-gray-100 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#004030]"
+                disabled={aiEnAttente}
+                className="flex-1 bg-gray-100 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#004030] disabled:opacity-60"
               />
 
               <Button
                 type="submit"
                 variant="primary"
                 size="sm"
+                disabled={aiEnAttente}
               >
                 Envoyer
               </Button>
