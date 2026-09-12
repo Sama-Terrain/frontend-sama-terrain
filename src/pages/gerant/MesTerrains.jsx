@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import GerantTerrainCard from '../../components/gerant/GerantTerrainCard';
@@ -12,6 +13,7 @@ import { gerantService } from '../../services/gerantService';
  * ses statistiques du mois et des actions rapides (modifier, créneaux, activer/désactiver).
  */
 export default function MesTerrains({ onLogout }) {
+  const navigate = useNavigate();
   const [terrains, setTerrains] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,13 @@ export default function MesTerrains({ onLogout }) {
         <h2 className="text-lg sm:text-xl font-black text-vert-principal">
           Liste des Terrains ({terrains.length})
         </h2>
-        <Button variant="gold" size="sm" rounded="8px" className="gap-2">
+        <Button
+          variant="gold"
+          size="sm"
+          rounded="8px"
+          className="gap-2"
+          onClick={() => navigate('/gerant/terrains/ajouter')}
+        >
           <Plus size={16} />
           <span>Ajouter un terrain</span>
         </Button>
