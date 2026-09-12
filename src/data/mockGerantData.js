@@ -1,4 +1,7 @@
 // Données Mock pour l'Espace Gérant (Tableau de bord)
+import samaStadiumImg from '../assets/sama_stadium.jpg';
+import ngorArenaImg from '../assets/ngor_arena.jpg';
+import keurMadiorImg from '../assets/keur_madior.jpg';
 
 export const mockGerantProfile = {
   name: 'Amadou Diouf',
@@ -53,6 +56,40 @@ export const mockRevenus30Jours = {
     { jour: 'J28', montant: 122000 }, { jour: 'J29', montant: 128000 }, { jour: 'J30', montant: 125000 },
   ],
 };
+
+// Liste des terrains gérés par le gérant connecté (page "Mes terrains")
+export const mockMesTerrains = [
+  {
+    id: 1,
+    nom: 'Terrain A - Elite Arena',
+    localisation: "Mermoz, Dakar (Derrière l'école de police)",
+    image: samaStadiumImg,
+    actif: true,
+    reservationsMois: 48,
+    revenusMois: '720 000 FCFA',
+    note: 4.8,
+  },
+  {
+    id: 2,
+    nom: 'Terrain B - Classic Grass',
+    localisation: "Mermoz, Dakar (Derrière l'école de police)",
+    image: ngorArenaImg,
+    actif: true,
+    reservationsMois: 32,
+    revenusMois: '480 000 FCFA',
+    note: 4.4,
+  },
+  {
+    id: 3,
+    nom: 'Terrain C - Saly Beach',
+    localisation: 'Saly Carrefour, Mbour',
+    image: keurMadiorImg,
+    actif: false,
+    reservationsMois: 0,
+    revenusMois: '0 FCFA',
+    note: null,
+  },
+];
 
 // Statuts possibles : 'Confirmé', 'Annulé', 'Terminé' (mêmes classes que le pattern déjà utilisé côté amateur)
 export const mockReservationsRecentes = [
