@@ -20,3 +20,9 @@ export function combinerDateEtHeureDebut(dateStr, heureLabel) {
   const heureDebut = heureLabel.split(' - ')[0]; // "18:00"
   return new Date(`${dateStr}T${heureDebut}:00`).toISOString();
 }
+
+// Formate une date ISO en date courte lisible en français, ex: "24 Mai 2024"
+export function formatDateCourte(dateIso) {
+  const date = new Date(dateIso);
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+}

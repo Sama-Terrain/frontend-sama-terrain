@@ -1,84 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Wallet } from 'lucide-react';
-import Button from '../../components/ui/Button';
+import AbonnementActivationCard from '../../components/gerant/abonnement/AbonnementActivationCard';
+import AbonnementExpireCard from '../../components/gerant/abonnement/AbonnementExpireCard';
+import AbonnementActiveCard from '../../components/gerant/abonnement/AbonnementActiveCard';
 import { abonnementService } from '../../services/abonnementService';
-import { PRIX_ABONNEMENT_MENSUEL } from '../../mocks/abonnements';
+import { formatDateCourte } from '../../utils/formatDate';
 
 /**
  * Page Abonnement (Espace Gérant)
  *
- * Affichée quand l'essai gratuit de 7 jours est terminé et qu'aucun abonnement
- * n'est actif : le gérant doit payer 7 500 FCFA/mois (via PayDunya, qui agrège
- * Wave et Orange Money) pour retrouver l'accès à son tableau de bord.
- * Tant qu'il n'a pas payé, il ne peut voir aucune autre page de l'espace gérant
- * (cf. src/routes/RequireAbonnementActif.jsx).
+ * Affiche l'un des 3 écrans selon la situation du gérant :
+ * - 'essai'  : période d'essai gratuite en cours -> propose d'activer tout de suite
+ * - 'expire' : essai ou abonnement terminé -> bloque et demande de renouveler
+ * - après paiement : écran de confirmation avec le reçu
+ *
+ * Tant que le paiement n'est pas fait, RequireAbonnementActif (cf. routes/)
+ * empêche l'accès à tout le reste de l'espace gérant.
  */
 export default function Abonnement() {
   const navigate = useNavigate();
-  const [paiementEnCours, setPaiementEnCours] = useState(null); // 'Wave' | 'Orange Money' | null
+  const [abonnement, setAbonnement] = useState(null);
+  const [chargement, setChargement] = useState(false);
+  const [recuPaiement, setRecuPaiement] = useState(null); // rempli une fois le paiement réussi
+
+  useEffect(() => {
+    abonnementService.getAbonnement().then(setAbonnement);
+  }, []);
 
   const payer = async (moyenPaiement) => {
-    setPaiementEnCours(moyenPaiement);
-    await abonnementService.renouvelerAbonnement(moyenPaiement);
-    setPaiementEnCours(null);
-    navigate('/gerant/dashboard');
+    setChargement(true);
+    const resultat = await abonnementService.renouvelerAbonnement(moyenPaiement);
+    setChargement(false);
+
+    setRecuPaiement({
+      dateActivation: formatDateCourte(new Date().toISOString()),
+      dateFin: formatDateCourte(resultat.abonnement.dateFinAbonnement),
+      montant: resultat.abonnement.prixMensuel,
+      moyenPaiement: resultat.abonnement.moyenPaiement,
+    });
   };
+
+  if (!abonnement) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f6f5]">
+        <div className="w-10 h-10 border-4 border-vert-principal border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f4f6f5] flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-8 text-center space-y-6">
-
-        <div className="w-14 h-14 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
-          <Lock size={24} />
-        </div>
-
-        <div className="space-y-2">
-          <h1 className="text-lg font-black text-gray-900">Abonnement requis</h1>
-          <p className="text-sm text-gray-500 leading-relaxed">
-            Votre période d'essai gratuite est terminée. Pour continuer à utiliser votre
-            tableau de bord Sama-Terrain, activez votre abonnement mensuel.
-          </p>
-        </div>
-
-        <div className="bg-vert-clair/40 rounded-[10px] p-4">
-          <p className="text-2xl font-black text-vert-principal">
-            {PRIX_ABONNEMENT_MENSUEL.toLocaleString('fr-FR')} FCFA
-            <span className="text-sm font-bold text-gray-500"> / mois</span>
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          <p className="text-xs font-semibold text-gray-500">Payer via PayDunya avec :</p>
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            rounded="8px"
-            fullWidth
-            disabled={paiementEnCours !== null}
-            onClick={() => payer('Wave')}
-            className="gap-2"
-          >
-            <Wallet size={16} />
-            <span>{paiementEnCours === 'Wave' ? 'Paiement en cours...' : 'Payer avec Wave'}</span>
-          </Button>
-          <Button
-            type="button"
-            variant="gold"
-            size="md"
-            rounded="8px"
-            fullWidth
-            disabled={paiementEnCours !== null}
-            onClick={() => payer('Orange Money')}
-            className="gap-2"
-          >
-            <Wallet size={16} />
-            <span>{paiementEnCours === 'Orange Money' ? 'Paiement en cours...' : 'Payer avec Orange Money'}</span>
-          </Button>
-        </div>
-
-      </div>
+      {recuPaiement ? (
+        <AbonnementActiveCard
+          abonnement={recuPaiement}
+          onAccederDashboard={() => navigate('/gerant/dashboard')}
+        />
+      ) : abonnement.statutEffectif === 'expire' ? (
+        <AbonnementExpireCard
+          dateSuspension={formatDateCourte(abonnement.dateFinEssai)}
+          chargement={chargement}
+          onPayer={() => payer('Wave')}
+        />
+      ) : (
+        <AbonnementActivationCard
+          chargement={chargement}
+          onPayer={() => payer('Wave')}
+        />
+      )}
     </div>
   );
 }
