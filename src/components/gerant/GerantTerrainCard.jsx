@@ -25,15 +25,24 @@ export default function GerantTerrainCard({ terrain, onToggleActif }) {
     <div className="bg-white rounded-[12px] overflow-hidden border border-gray-200/80 shadow-2xs flex flex-col">
 
       {/* IMAGE */}
-      <div className="relative h-44 w-full overflow-hidden bg-gray-100">
+      <button
+        type="button"
+        onClick={() => navigate(`/gerant/terrains/${id}`)}
+        className="relative h-44 w-full overflow-hidden bg-gray-100 cursor-pointer"
+      >
         <img src={image} alt={nom} className="w-full h-full object-cover" />
-      </div>
+      </button>
 
       <div className="p-5 flex-1 flex flex-col gap-4">
 
         {/* NOM + STATUT */}
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-extrabold text-gray-900">{nom}</h3>
+          <h3
+            className="text-base font-extrabold text-gray-900 hover:text-vert-principal cursor-pointer"
+            onClick={() => navigate(`/gerant/terrains/${id}`)}
+          >
+            {nom}
+          </h3>
           <span
             className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold whitespace-nowrap ${
               actif ? 'bg-emerald-100 text-emerald-700' : 'bg-red-50 text-red-500'

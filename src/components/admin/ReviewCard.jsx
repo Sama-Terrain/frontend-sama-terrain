@@ -1,27 +1,5 @@
 import React from 'react';
-import { Star } from 'lucide-react';
-
-/**
- * Composant RatingStars
- * Affiche les étoiles de notation
- */
-function RatingStars({ rating }) {
-  return (
-    <div className="flex items-center gap-[4px]">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <div
-          key={star}
-          className="flex h-[14px] w-[14px] items-center justify-center"
-        >
-          <Star
-            size={14}
-            className={star <= rating ? "fill-dore text-dore" : "text-gray-300"}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
+import RatingStars from '../ui/RatingStars';
 
 /**
  * Composant ReviewCard

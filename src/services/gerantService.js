@@ -4,6 +4,9 @@ import {
   mockRevenus30Jours,
   mockReservationsRecentes,
   mockMesTerrains,
+  mockTerrainDetails,
+  mockProchainesReservations,
+  mockAvisRecents,
 } from '../data/mockGerantData';
 
 // Couche service de l'espace Gérant.
@@ -33,5 +36,20 @@ export const gerantService = {
   async getMesTerrains() {
     await new Promise((resolve) => setTimeout(resolve, 150));
     return mockMesTerrains;
+  },
+
+  async getTerrainDetail(terrainId) {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockTerrainDetails[terrainId] || null;
+  },
+
+  async getProchainesReservations() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockProchainesReservations;
+  },
+
+  async getAvisRecents() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockAvisRecents;
   },
 };
