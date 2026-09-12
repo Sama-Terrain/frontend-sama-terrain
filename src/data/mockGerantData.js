@@ -240,6 +240,24 @@ export const mockAvisRecents = [
   },
 ];
 
+// Réservations de la page "Réservations" (vue complète, tous terrains confondus)
+export const mockReservationsGerant = [
+  { id: 'RES-9421', client: 'Moustapha Ndiaye', terrain: 'Terrain A (Elite Arena)', date: '29 Nov 2026', creneau: '18:00 - 20:00', montant: 30000, statut: 'Confirmée', statutBadgeClass: 'bg-emerald-100 text-emerald-700' },
+  { id: 'RES-9420', client: 'Fatoumata Diop', terrain: 'Terrain B (Classic Grass)', date: '29 Nov 2026', creneau: '20:00 - 21:00', montant: 15000, statut: 'Annulée', statutBadgeClass: 'bg-red-100 text-red-700' },
+  { id: 'RES-9419', client: 'Abdoulaye Diallo', terrain: 'Terrain A (Elite Arena)', date: '28 Nov 2026', creneau: '17:00 - 18:00', montant: 15000, statut: 'Confirmée', statutBadgeClass: 'bg-emerald-100 text-emerald-700' },
+  { id: 'RES-9418', client: 'Khady Sène', terrain: 'Terrain C (Saly Beach)', date: '28 Nov 2026', creneau: '16:00 - 18:00', montant: 30000, statut: 'Annulée', statutBadgeClass: 'bg-red-100 text-red-700' },
+  { id: 'RES-9417', client: 'Cheikh Tidiane Sy', terrain: 'Terrain A (Elite Arena)', date: '27 Nov 2026', creneau: '19:00 - 21:00', montant: 30000, statut: 'Confirmée', statutBadgeClass: 'bg-emerald-100 text-emerald-700' },
+  { id: 'RES-9416', client: 'Awa Gueye', terrain: 'Terrain B (Classic Grass)', date: '27 Nov 2026', creneau: '18:00 - 19:00', montant: 15000, statut: 'Confirmée', statutBadgeClass: 'bg-emerald-100 text-emerald-700' },
+  { id: 'RES-9415', client: 'Ousmane Sonko', terrain: 'Terrain A (Elite Arena)', date: '26 Nov 2026', creneau: '20:00 - 22:00', montant: 30000, statut: 'Annulée', statutBadgeClass: 'bg-red-100 text-red-700' },
+  { id: 'RES-9414', client: 'Babacar Faye', terrain: 'Terrain C (Saly Beach)', date: '25 Nov 2026', creneau: '15:00 - 16:00', montant: 15000, statut: 'Confirmée', statutBadgeClass: 'bg-emerald-100 text-emerald-700' },
+];
+
+export const mockReservationsActivite = {
+  totalMois: 156,
+  tauxValidation: 94,
+  periodeLabel: '25 Nov - 01 Déc 2026',
+};
+
 // Statuts possibles : 'Confirmé', 'Annulé', 'Terminé' (mêmes classes que le pattern déjà utilisé côté amateur)
 export const mockReservationsRecentes = [
   {
