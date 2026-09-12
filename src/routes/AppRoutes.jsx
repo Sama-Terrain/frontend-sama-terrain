@@ -12,6 +12,7 @@ import GerantDashboard from '../pages/gerant/Dashboard';
 import MesTerrains from '../pages/gerant/MesTerrains';
 import AjouterTerrain from '../pages/gerant/AjouterTerrain';
 import TerrainDetail from '../pages/gerant/TerrainDetail';
+import GererCreneaux from '../pages/gerant/GererCreneaux';
 
 // Pages Authentification
 import Connexion from '../pages/auth/Connexion';
@@ -57,6 +58,7 @@ export default function AppRoutes({ currentUser, setCurrentUser, searchParams, o
       <Route path="/gerant/terrains" element={<MesTerrains onLogout={onLogout} />} />
       <Route path="/gerant/terrains/ajouter" element={<AjouterTerrain onLogout={onLogout} />} />
       <Route path="/gerant/terrains/:id" element={<TerrainDetail onLogout={onLogout} />} />
+      <Route path="/gerant/creneaux" element={<GererCreneaux onLogout={onLogout} />} />
 
       {/* Routes Administrateur (avec transmission du handler de déconnexion) */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />

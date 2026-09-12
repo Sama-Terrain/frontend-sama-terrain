@@ -60,6 +60,44 @@ export const mockRevenus30Jours = {
   ],
 };
 
+// Jours de la semaine utilisés pour la grille des créneaux (ordre d'affichage)
+export const JOURS_SEMAINE = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+export const JOURS_WEEKEND = ['Sam', 'Dim'];
+
+// Configuration des créneaux & tarifs par terrain (page "Créneaux & tarifs").
+// Les créneaux horaires sont générés automatiquement à partir de l'heure d'ouverture/fermeture
+// renseignée à la création du terrain (cf. AjouterTerrain) ; seuls les tarifs semaine/week-end
+// sont propres à chaque terrain.
+export const mockCreneauxConfig = {
+  1: {
+    terrainId: 1,
+    terrainNom: 'Elite Arena',
+    terrainType: '5v5',
+    ouverture: '08:00',
+    fermeture: '23:00',
+    prixSemaine: 10000,
+    prixWeekend: 15000,
+  },
+  2: {
+    terrainId: 2,
+    terrainNom: 'Classic Grass',
+    terrainType: '6v6',
+    ouverture: '08:00',
+    fermeture: '22:00',
+    prixSemaine: 8000,
+    prixWeekend: 12000,
+  },
+  3: {
+    terrainId: 3,
+    terrainNom: 'Saly Beach',
+    terrainType: '5v5',
+    ouverture: '09:00',
+    fermeture: '21:00',
+    prixSemaine: 9000,
+    prixWeekend: 13000,
+  },
+};
+
 // Liste des terrains gérés par le gérant connecté (page "Mes terrains")
 export const mockMesTerrains = [
   {

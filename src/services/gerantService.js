@@ -7,6 +7,7 @@ import {
   mockTerrainDetails,
   mockProchainesReservations,
   mockAvisRecents,
+  mockCreneauxConfig,
 } from '../data/mockGerantData';
 
 // Couche service de l'espace Gérant.
@@ -51,5 +52,15 @@ export const gerantService = {
   async getAvisRecents() {
     await new Promise((resolve) => setTimeout(resolve, 150));
     return mockAvisRecents;
+  },
+
+  async getCreneauxConfigs() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return Object.values(mockCreneauxConfig);
+  },
+
+  async getCreneauxConfig(terrainId) {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockCreneauxConfig[terrainId] || null;
   },
 };
