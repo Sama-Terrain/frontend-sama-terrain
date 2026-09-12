@@ -15,6 +15,10 @@ import {
   mockHistoriquePaiements,
   mockTicketsScannables,
   mockDernieresValidations,
+  mockStatistiquesKpis,
+  mockReservationsParJour,
+  mockModesPaiementStats,
+  mockRecommandationsIA,
 } from '../data/mockGerantData';
 
 // Couche service de l'espace Gérant.
@@ -105,5 +109,25 @@ export const gerantService = {
   async verifierTicket(code) {
     await new Promise((resolve) => setTimeout(resolve, 300));
     return mockTicketsScannables[code.trim().toUpperCase()] || null;
+  },
+
+  async getStatistiquesKpis() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockStatistiquesKpis;
+  },
+
+  async getReservationsParJour() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockReservationsParJour;
+  },
+
+  async getModesPaiementStats() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockModesPaiementStats;
+  },
+
+  async getRecommandationsIA() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockRecommandationsIA;
   },
 };

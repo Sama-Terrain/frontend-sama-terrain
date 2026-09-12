@@ -311,6 +311,36 @@ export const mockDernieresValidations = [
   { id: 5, nom: 'Soda Mama', sousTitre: 'Terrain A • 10h-12h • Il y a 2h', statut: 'Validé', statutBadgeClass: 'bg-emerald-100 text-emerald-700' },
 ];
 
+// Page "Statistiques & Recommandations IA"
+export const mockStatistiquesKpis = [
+  { id: 'taux-occupation', label: "Taux d'occupation moyen", value: '78%', trend: '+4% vs mois dernier', trendDirection: 'up' },
+  { id: 'terrain-demande', label: 'Terrain le plus demandé', value: 'Parcelles', trend: '48 Réservations', trendDirection: 'up' },
+  { id: 'creneau-populaire', label: 'Créneau le plus populaire', value: '18h - 20h', trend: "88% de taux d'occupation", trendDirection: 'up' },
+  { id: 'clients-uniques', label: 'Clients uniques', value: '234', trend: '+32 nouveaux cette semaine', trendDirection: 'up' },
+];
+
+export const mockReservationsParJour = [
+  { jour: 'Lun', valeur: 18 },
+  { jour: 'Mar', valeur: 22 },
+  { jour: 'Mer', valeur: 28 },
+  { jour: 'Jeu', valeur: 25 },
+  { jour: 'Ven', valeur: 42 },
+  { jour: 'Sam', valeur: 48 },
+  { jour: 'Dim', valeur: 45 },
+];
+
+export const mockModesPaiementStats = [
+  { name: 'Orange Money', value: 45, color: '#F59E0B' },
+  { name: 'Wave', value: 35, color: '#0EA5E9' },
+  { name: 'Carte Bancaire', value: 20, color: '#004030' },
+];
+
+export const mockRecommandationsIA = [
+  "Augmentez vos créneaux le samedi matin — la demande de réservations à Dakar dépasse actuellement l'offre disponible de 40%.",
+  'Proposez un tarif réduit en semaine entre 10h et 14h pour attirer des étudiants et améliorer votre taux d\'occupation de 15%.',
+  'Les joueurs recherchent fréquemment des terrains avec vestiaires — activez l\'affichage de cet équipement pour booster votre attractivité.',
+];
+
 // Statuts possibles : 'Confirmé', 'Annulé', 'Terminé' (mêmes classes que le pattern déjà utilisé côté amateur)
 export const mockReservationsRecentes = [
   {

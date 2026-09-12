@@ -16,6 +16,7 @@ import GererCreneaux from '../pages/gerant/GererCreneaux';
 import Reservations from '../pages/gerant/Reservations';
 import Revenus from '../pages/gerant/Revenus';
 import ScannerTicket from '../pages/gerant/ScannerTicket';
+import GerantStatistiques from '../pages/gerant/Statistiques';
 
 // Pages Authentification
 import Connexion from '../pages/auth/Connexion';
@@ -65,6 +66,7 @@ export default function AppRoutes({ currentUser, setCurrentUser, searchParams, o
       <Route path="/gerant/reservations" element={<Reservations onLogout={onLogout} />} />
       <Route path="/gerant/revenus" element={<Revenus onLogout={onLogout} />} />
       <Route path="/gerant/scanner" element={<ScannerTicket onLogout={onLogout} />} />
+      <Route path="/gerant/statistiques" element={<GerantStatistiques onLogout={onLogout} />} />
 
       {/* Routes Administrateur (avec transmission du handler de déconnexion) */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
