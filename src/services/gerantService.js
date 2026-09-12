@@ -10,6 +10,11 @@ import {
   mockCreneauxConfig,
   mockReservationsGerant,
   mockReservationsActivite,
+  mockRevenusStats,
+  mockRevenusEvolution,
+  mockHistoriquePaiements,
+  mockTicketsScannables,
+  mockDernieresValidations,
 } from '../data/mockGerantData';
 
 // Couche service de l'espace Gérant.
@@ -74,5 +79,31 @@ export const gerantService = {
   async getReservationsActivite() {
     await new Promise((resolve) => setTimeout(resolve, 150));
     return mockReservationsActivite;
+  },
+
+  async getRevenusStats() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockRevenusStats;
+  },
+
+  async getRevenusEvolution() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockRevenusEvolution;
+  },
+
+  async getHistoriquePaiements() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockHistoriquePaiements;
+  },
+
+  async getDernieresValidations() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockDernieresValidations;
+  },
+
+  // Recherche un ticket par son code (scan caméra ou saisie manuelle)
+  async verifierTicket(code) {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return mockTicketsScannables[code.trim().toUpperCase()] || null;
   },
 };

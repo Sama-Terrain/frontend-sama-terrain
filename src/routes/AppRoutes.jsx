@@ -14,6 +14,8 @@ import AjouterTerrain from '../pages/gerant/AjouterTerrain';
 import TerrainDetail from '../pages/gerant/TerrainDetail';
 import GererCreneaux from '../pages/gerant/GererCreneaux';
 import Reservations from '../pages/gerant/Reservations';
+import Revenus from '../pages/gerant/Revenus';
+import ScannerTicket from '../pages/gerant/ScannerTicket';
 
 // Pages Authentification
 import Connexion from '../pages/auth/Connexion';
@@ -61,6 +63,8 @@ export default function AppRoutes({ currentUser, setCurrentUser, searchParams, o
       <Route path="/gerant/terrains/:id" element={<TerrainDetail onLogout={onLogout} />} />
       <Route path="/gerant/creneaux" element={<GererCreneaux onLogout={onLogout} />} />
       <Route path="/gerant/reservations" element={<Reservations onLogout={onLogout} />} />
+      <Route path="/gerant/revenus" element={<Revenus onLogout={onLogout} />} />
+      <Route path="/gerant/scanner" element={<ScannerTicket onLogout={onLogout} />} />
 
       {/* Routes Administrateur (avec transmission du handler de déconnexion) */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
