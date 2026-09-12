@@ -371,3 +371,91 @@ export const mockReviews = [
     status: 'pending',
   },
 ];
+
+export const mockStatsKpi = [
+  {
+    title: "Taux de Conversion",
+    value: "23%",
+    trend: "+2% vs trimestre dernier",
+  },
+  {
+    title: "Temps Moyen Réservation",
+    value: "3m 42s",
+    trend: "-45 secondes",
+  },
+  {
+    title: "Taux d'Annulation",
+    value: "8%",
+    trend: "-1.5% d'amélioration",
+  },
+  {
+    title: "Net Promoter Score (NPS)",
+    value: "72",
+    trend: "Excellent (Basé sur 1.2k avis)",
+  },
+];
+
+export const mockStatsPayment = [
+  {
+    name: "Paiements",
+    Wave: 55,
+    OrangeMoney: 30,
+    Free: 15,
+  },
+];
+
+export const mockStatsCity = [
+  {
+    name: "Dakar",
+    value: 60,
+    color: "var(--color-vert-principal, #004030)",
+  },
+  {
+    name: "Thiès",
+    value: 25,
+    color: "var(--color-dore, #D4AF37)",
+  },
+  {
+    name: "Mbour & Saly",
+    value: 15,
+    color: "#DEF7EC",
+  },
+];
+
+export const mockStatsTopTerrains = [
+  {
+    rank: 1,
+    terrain: "Elite Arena (Dakar)",
+    ville: "Dakar",
+    reservations: "342 matches",
+    chiffre: "10 260 000 FCFA",
+  },
+  {
+    rank: 2,
+    terrain: "Classic Grass (Thiès)",
+    ville: "Thiès",
+    reservations: "289 matches",
+    chiffre: "4 335 000 FCFA",
+  },
+  {
+    rank: 3,
+    terrain: "Saly Beach Club (Mbour)",
+    ville: "Mbour",
+    reservations: "254 matches",
+    chiffre: "7 620 000 FCFA",
+  },
+  {
+    rank: 4,
+    terrain: "Galaxy Foot (Dakar)",
+    ville: "Dakar",
+    reservations: "198 matches",
+    chiffre: "5 940 000 FCFA",
+  },
+  {
+    rank: 5,
+    terrain: "Saint-Louis Stadium",
+    ville: "Saint-Louis",
+    reservations: "145 matches",
+    chiffre: "2 175 000 FCFA",
+  },
+];

@@ -7,6 +7,10 @@ import {
   mockUsers,
   mockValidationRequests,
   mockReviews,
+  mockStatsKpi,
+  mockStatsPayment,
+  mockStatsCity,
+  mockStatsTopTerrains,
 } from '../data/mockAdminData';
 
 export const adminService = {
@@ -48,5 +52,25 @@ export const adminService = {
   async getReviews() {
     await new Promise((resolve) => setTimeout(resolve, 150));
     return mockReviews;
+  },
+
+  async getStatsKpi() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockStatsKpi;
+  },
+
+  async getStatsPayment() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockStatsPayment;
+  },
+
+  async getStatsCity() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockStatsCity;
+  },
+
+  async getStatsTopTerrains() {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    return mockStatsTopTerrains;
   },
 };
