@@ -14,7 +14,7 @@ export default function Badge({ statut = 'disponible', children, rounded = 'full
           : statut === 'complet'
           ? 'bg-red-100 text-red-700'
           : statut === 'en_attente'
-          ? 'bg-gray-100 text-gray-700'
+          ? 'bg-[#fed7aa] text-[#92400e]'
           : statut === 'forte_demande'
           ? 'bg-vert-clair text-vert-principal'
           : statut === 'actif'

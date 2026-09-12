@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/adminService';
-import Input from '../../components/ui/Input';
-import Button from '../../components/ui/Button';
-import Badge from '../../components/ui/Badge';
 import { Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
@@ -18,10 +15,10 @@ import { Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-rea
 export default function Utilisateurs({ onLogout }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('joueurs');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCity, setFilterCity] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activeTab, setActiveTab] = useState('Joueurs');
+  const [search, setSearch] = useState('');
+  const [city, setCity] = useState('Toutes les villes');
+  const [page, setPage] = useState(1);
   const usersPerPage = 8;
 
   // Effet pour charger les données mockées
@@ -43,44 +40,57 @@ export default function Utilisateurs({ onLogout }) {
 
   // Filtrage des utilisateurs par rôle
   const usersByRole = users.filter(user => {
-    if (activeTab === 'joueurs') return user.role === 'Amateur';
-    if (activeTab === 'gerants') return user.role === 'Gérant';
-    if (activeTab === 'admins') return user.role === 'Admin';
+    if (activeTab === 'Joueurs') return user.role === 'Amateur';
+    if (activeTab === 'Gérants') return user.role === 'Gérant';
+    if (activeTab === 'Admins') return user.role === 'Admin';
     return true;
   });
 
   // Filtrage par recherche et ville
   const filteredUsers = usersByRole.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          (user.phone && user.phone.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCity = filterCity === 'all' || user.city === filterCity;
+    const searchValue = search.toLowerCase();
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchValue) ||
+      user.email.toLowerCase().includes(searchValue) ||
+      (user.phone && user.phone.toLowerCase().includes(searchValue));
+    const matchesCity = city === 'Toutes les villes' || user.city === city;
     return matchesSearch && matchesCity;
   });
 
   // Pagination
-  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfLastUser = page * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   // Réinitialiser la page quand les filtres changent
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterCity, activeTab]);
+    setPage(1);
+  }, [search, city, activeTab]);
+
+  // Fonction pour obtenir l'initiale
+  const getInitial = (name) => {
+    return name.charAt(0).toUpperCase();
+  };
 
   // Fonction pour obtenir le badge de statut
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'actif':
-        return <Badge statut="disponible">{status}</Badge>;
-      case 'inactif':
-        return <Badge statut="complet">{status}</Badge>;
-      case 'suspendu':
-        return <Badge statut="en_attente">{status}</Badge>;
-      default:
-        return <Badge statut="disponible">{status}</Badge>;
-    }
+    const statusStyles = {
+      actif: "bg-[#def7ec] text-[#10b981]",
+      suspendu: "bg-[#fee2e2] text-[#ef4444]",
+      inactif: "bg-[#e5e7eb] text-[#4b5563]",
+    };
+
+    const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+    return (
+      <span
+        className={`inline-flex rounded-[4px] px-[8px] py-[4px] text-[11px] font-bold whitespace-nowrap ${
+          statusStyles[status.toLowerCase()]
+        }`}
+      >
+        {statusLabel}
+      </span>
+    );
   };
 
   // Affichage pendant le chargement
@@ -95,238 +105,199 @@ export default function Utilisateurs({ onLogout }) {
     );
   }
 
+  const tabs = ["Joueurs", "Gérants", "Admins"];
+
   return (
     <AdminLayout title="Gestion des Utilisateurs" onLogout={onLogout}>
       
-      {/* SECTION FILTRES - UNIE */}
-      <section className="bg-white rounded-[12px] p-4 sm:p-6 border border-gray-200/80 shadow-2xs">
-        
-        <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-          
-          {/* ONGETS - GAUCHE */}
-          <div className="flex gap-2 shrink-0">
+      {/* SECTION FILTRES */}
+      <div className="flex w-full items-center gap-[20px] rounded-[12px] border border-[#e5e7eb] bg-white p-[20px]">
+        {/* Tabs */}
+        <div className="flex flex-1 gap-[8px] rounded-[8px] bg-[#f4f6f5] p-[4px]">
+          {tabs.map((tab) => (
             <button
-              onClick={() => setActiveTab('joueurs')}
-              className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-colors ${
-                activeTab === 'joueurs'
-                  ? 'bg-vert-principal text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab)}
+              className={`flex flex-1 items-center justify-center rounded-[6px] px-[16px] py-[8px] text-[12px] transition ${
+                activeTab === tab
+                  ? "bg-vert-principal font-bold text-white"
+                  : "font-semibold text-[#4b5563]"
               }`}
             >
-              Joueurs
+              {tab}
             </button>
-            <button
-              onClick={() => setActiveTab('gerants')}
-              className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-colors ${
-                activeTab === 'gerants'
-                  ? 'bg-vert-principal text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Gérants
-            </button>
-            <button
-              onClick={() => setActiveTab('admins')}
-              className={`px-4 py-2 rounded-[8px] text-xs font-bold transition-colors ${
-                activeTab === 'admins'
-                  ? 'bg-vert-principal text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Admins
-            </button>
-          </div>
-
-          {/* BARRE DE RECHERCHE - CENTRE */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <Input
-              placeholder="Rechercher par nom, email, téléphone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* FILTRE VILLE - DROITE */}
-          <div className="flex gap-2 shrink-0">
-            <select
-              value={filterCity}
-              onChange={(e) => setFilterCity(e.target.value)}
-              className="border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-bold focus:outline-none focus:border-vert-principal bg-white"
-            >
-              <option value="all">Toutes les villes</option>
-              <option value="Dakar">Dakar</option>
-              <option value="Mermoz">Mermoz</option>
-              <option value="Guédiawaye">Guédiawaye</option>
-              <option value="Almadies">Almadies</option>
-              <option value="Yoff">Yoff</option>
-            </select>
-
-          </div>
-
+          ))}
         </div>
 
-      </section>
+        {/* Search */}
+        <div className="flex flex-1 items-center gap-[8px] rounded-[8px] border border-[#e5e7eb] px-[14px] py-[10px]">
+          <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center">
+            <Search size={16} className="text-gray-400" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Rechercher par nom, email, téléphone..."
+            className="w-full bg-transparent text-[14px] text-[#111827] outline-none placeholder:text-[#9ca3af]"
+          />
+        </div>
+
+        {/* City */}
+        <div className="relative flex flex-1 items-center">
+          <select
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            className="w-full appearance-none rounded-[8px] border border-[#e5e7eb] bg-white px-[14px] py-[10px] text-[14px] text-[#111827] outline-none"
+          >
+            <option>Toutes les villes</option>
+            <option>Dakar</option>
+            <option>Mermoz</option>
+            <option>Guédiawaye</option>
+            <option>Almadies</option>
+            <option>Yoff</option>
+          </select>
+          <ChevronLeft size={14} className="pointer-events-none absolute right-[14px] h-[14px] w-[14px] text-gray-400" />
+        </div>
+      </div>
 
       {/* TABLEAU DES UTILISATEURS */}
-      <section className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs overflow-hidden">
-        
-        {/* EN-TÊTE DU TABLEAU */}
-        <div className="hidden sm:grid grid-cols-8 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 items-center">
-          <div className="col-span-1 text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Nom
-          </div>
-          <div className="col-span-2 text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Email
-          </div>
-          <div className="col-span-1 text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Téléphone
-          </div>
-          <div className="col-span-1 text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Ville
-          </div>
-          <div className="col-span-1 text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Date Inscr.
-          </div>
-          <div className="col-span-1 text-xs font-bold text-gray-500 uppercase tracking-wide">
-            Statut
-          </div>
-          <div className="col-span-1 text-xs font-bold text-gray-500 uppercase tracking-wide text-right">
-            Actions
-          </div>
-        </div>
-
-        {/* LISTE DES UTILISATEURS */}
-        <div className="divide-y divide-gray-100">
-          {currentUsers.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <p className="text-sm text-gray-500 font-semibold">
-                Aucun utilisateur trouvé
-              </p>
+      <div className="w-full rounded-[12px] border border-[#e5e7eb] bg-white p-[24px]">
+        <div className="w-full overflow-x-auto">
+          <div className="min-w-[1000px]">
+            {/* HEADER */}
+            <div className="flex items-center gap-[16px] rounded-[6px] bg-[#ebf5f1] px-[16px] py-[12px] text-[13px] font-bold text-vert-principal">
+              <div className="w-[180px] shrink-0">Nom</div>
+              <div className="min-w-0 flex-1">Email</div>
+              <div className="w-[150px] shrink-0">Téléphone</div>
+              <div className="w-[120px] shrink-0">Ville</div>
+              <div className="w-[120px] shrink-0">Date Inscr.</div>
+              <div className="w-[100px] shrink-0">Statut</div>
+              <div className="w-[100px] shrink-0 text-center">Actions</div>
             </div>
-          ) : (
-            currentUsers.map((user) => (
-              <div
-                key={user.id}
-                className="px-6 py-4 hover:bg-gray-50 transition-colors"
-              >
-                {/* MOBILE: CARTE FORMAT */}
-                <div className="sm:hidden space-y-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-bold text-gray-900">{user.name}</p>
-                    {getStatusBadge(user.status)}
-                  </div>
-                  <div className="space-y-1 text-xs text-gray-600 font-semibold">
-                    <p>{user.email}</p>
-                    <p>{user.phone || '-'}</p>
-                    <p>{user.city || '-'}</p>
-                    <p>{user.registeredAt}</p>
-                  </div>
-                  <div className="flex justify-end gap-1 pt-2">
-                    <button className="p-1.5 hover:bg-green-50 rounded transition-colors text-green-600" title="Éditer">
-                      <Edit size={16} />
-                    </button>
-                    <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-red-600" title="Supprimer">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
 
-                {/* DESKTOP: TABLEAU FORMAT */}
-                <div className="hidden sm:grid sm:grid-cols-8 gap-4 items-center">
+            {/* ROWS */}
+            {currentUsers.length === 0 ? (
+              <div className="px-[16px] py-[14px] text-center">
+                <p className="text-sm text-gray-500 font-semibold">
+                  Aucun utilisateur trouvé
+                </p>
+              </div>
+            ) : (
+              currentUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center gap-[16px] border-b border-[#e5e7eb] px-[16px] py-[14px]"
+                >
                   {/* NOM */}
-                  <div className="col-span-1">
-                    <p className="text-sm font-bold text-gray-900">{user.name}</p>
+                  <div className="flex w-[180px] shrink-0 items-center gap-[8px]">
+                    <div className="flex h-[32px] w-[32px] shrink-0 items-center justify-center rounded-full bg-dore text-[12px] font-bold text-vert-principal">
+                      {getInitial(user.name)}
+                    </div>
+                    <span className="whitespace-nowrap text-[14px] font-semibold text-[#111827]">
+                      {user.name}
+                    </span>
                   </div>
 
                   {/* EMAIL */}
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-600 font-semibold truncate">
-                      {user.email}
-                    </p>
+                  <div className="min-w-0 flex-1 break-words text-[14px] font-normal text-[#4b5563]">
+                    {user.email}
                   </div>
 
-                  {/* TÉLÉPHONE */}
-                  <div className="col-span-1">
-                    <p className="text-[12px] text-gray-600 font-semibold">
-                      {user.phone || '-'}
-                    </p>
+                  {/* TELEPHONE */}
+                  <div className="w-[150px] shrink-0 font-mono text-[13px] text-[#4b5563]">
+                    {user.phone || '-'}
                   </div>
 
                   {/* VILLE */}
-                  <div className="col-span-1">
-                    <p className="text-sm text-gray-600 font-semibold">
-                      {user.city || '-'}
-                    </p>
+                  <div className="w-[120px] shrink-0 text-[14px] text-[#111827]">
+                    {user.city || '-'}
                   </div>
 
-                  {/* DATE D'INSCRIPTION */}
-                  <div className="col-span-1">
-                    <p className="text-sm text-gray-600 font-semibold">
-                      {user.registeredAt}
-                    </p>
+                  {/* DATE */}
+                  <div className="w-[120px] shrink-0 text-[13px] text-[#4b5563]">
+                    {user.registeredAt}
                   </div>
 
-                  {/* STATUT */}
-                  <div className="col-span-1">
+                  {/* STATUS */}
+                  <div className="w-[100px] shrink-0">
                     {getStatusBadge(user.status)}
                   </div>
 
                   {/* ACTIONS */}
-                  <div className="col-span-1 flex justify-end gap-1">
-                    <button className="p-1.5 hover:bg-green-50 rounded transition-colors text-green-600" title="Éditer">
-                      <Edit size={16} />
+                  <div className="flex w-[100px] shrink-0 items-center justify-center gap-[8px]">
+                    <button
+                      type="button"
+                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      aria-label={`Voir ${user.name}`}
+                    >
+                      <Eye size={14} className="text-gray-600" />
                     </button>
-                    <button className="p-1.5 hover:bg-red-50 rounded transition-colors text-red-600" title="Supprimer">
-                      <Trash2 size={16} />
+                    <button
+                      type="button"
+                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      aria-label={`Modifier ${user.name}`}
+                    >
+                      <Edit size={14} className="text-green-600" />
+                    </button>
+                    <button
+                      type="button"
+                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      aria-label={`Supprimer ${user.name}`}
+                    >
+                      <Trash2 size={14} className="text-red-600" />
                     </button>
                   </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
         </div>
 
         {/* PAGINATION */}
-        <div className="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <p className="text-xs text-gray-500 font-semibold">
+        <div className="flex items-center justify-between gap-4 pt-[16px]">
+          {/* INFORMATION */}
+          <p className="whitespace-nowrap text-[13px] text-[#4b5563]">
             Affichage de {indexOfFirstUser + 1} à {Math.min(indexOfLastUser, filteredUsers.length)} sur {filteredUsers.length} utilisateurs
           </p>
-          <div className="flex items-center gap-2">
+
+          {/* BUTTONS */}
+          <div className="flex items-center gap-[8px]">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              type="button"
+              disabled={page === 1}
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              className="rounded-[6px] border border-[#e5e7eb] bg-white px-[12px] py-[8px] text-[13px] text-[#4b5563] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <ChevronLeft size={14} />
               Précédent
             </button>
+
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i + 1}
-                onClick={() => setCurrentPage(i + 1)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                  currentPage === i + 1
-                    ? 'bg-vert-principal text-white'
-                    : 'border border-gray-200 hover:bg-gray-50'
+                type="button"
+                onClick={() => setPage(i + 1)}
+                className={`rounded-[6px] px-[12px] py-[8px] text-[13px] ${
+                  page === i + 1
+                    ? "bg-vert-principal font-bold text-white"
+                    : "border border-[#e5e7eb] bg-white text-[#111827] transition hover:bg-[#f9fafb]"
                 }`}
               >
                 {i + 1}
               </button>
             ))}
+
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded-lg text-xs font-bold border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+              type="button"
+              onClick={() => setPage((current) => current + 1)}
+              className="rounded-[6px] border border-[#e5e7eb] bg-white px-[12px] py-[8px] text-[13px] text-[#4b5563] transition hover:bg-[#f9fafb]"
             >
               Suivant
-              <ChevronRight size={14} />
             </button>
           </div>
         </div>
-
-      </section>
+      </div>
 
     </AdminLayout>
   );
