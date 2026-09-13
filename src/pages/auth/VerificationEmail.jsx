@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';

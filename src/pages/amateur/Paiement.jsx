@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PaiementMethode from '../../components/paiement/PaiementMethode';
 import PaiementRecap from '../../components/paiement/PaiementRecap';

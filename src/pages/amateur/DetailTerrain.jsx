@@ -72,10 +72,9 @@ export default function DetailTerrain({ currentUser }) {
   const [reservationPourAvis, setReservationPourAvis] = useState(null);
 
   useEffect(() => {
-    if (!currentUser) {
-      setReservationPourAvis(null);
-      return;
-    }
+    // Rien à chercher si personne n'est connecté : reservationPourAvis
+    // reste à sa valeur initiale (null).
+    if (!currentUser) return;
 
     async function chercherReservationNotable() {
       try {
@@ -105,10 +104,9 @@ export default function DetailTerrain({ currentUser }) {
   const [loadingCreneaux, setLoadingCreneaux] = useState(false);
 
   useEffect(() => {
-    if (!selectedDate) {
-      setCreneauxHoraires([]);
-      return;
-    }
+    // Rien à charger si aucune date n'est sélectionnée (cas rare : le champ
+    // date a toujours une valeur par défaut à l'ouverture de la page).
+    if (!selectedDate) return;
 
     async function chargerCreneaux() {
       try {

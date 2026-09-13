@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, ChevronRight, Ticket } from 'lucide-react';
+import { Calendar, ChevronRight } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import { reservationService } from '../../services/reservationService';
 import TicketQR from '../../components/reservation/TicketQR';

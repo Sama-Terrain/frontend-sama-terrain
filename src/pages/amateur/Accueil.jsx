@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, Clock, ArrowRight, ShieldCheck, CheckCircle2, Bot, X } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, ShieldCheck, CheckCircle2, Bot, X } from 'lucide-react';
 import TerrainCard from '../../components/terrain/TerrainCard';
 import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
-import { avisService } from '../../services/avisService';
 import { iaService } from '../../services/iaService';
 import { MESSAGE_ACCUEIL_CHATBOT } from '../../mocks/chatbot';
+// Témoignages de la section marketing d'accueil : pas liés à un terrain
+// précis, donc pas couverts par l'API (qui n'expose que les avis PAR terrain).
+import { MOCK_AVIS } from '../../mocks/avis';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
@@ -32,17 +34,14 @@ export default function Accueil() {
   const [aiInput, setAiInput] = useState('');
   const [aiEnAttente, setAiEnAttente] = useState(false);
 
-  // Chargement des données mockées au montage du composant
+  // Chargement des terrains vedettes (backend) et des témoignages (mockés)
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const [terrainsData, avisData] = await Promise.all([
-          terrainService.getTerrainsVedettes(),
-          avisService.getAvisJoueurs()
-        ]);
+        const terrainsData = await terrainService.getTerrainsVedettes();
         setTerrainsVedettes(terrainsData);
-        setAvisJoueurs(avisData);
+        setAvisJoueurs(MOCK_AVIS);
       } catch (error) {
         console.error('Erreur lors du chargement des données :', error);
       } finally {
@@ -379,7 +378,7 @@ export default function Accueil() {
                 Almadies • Mermoz • Fann • Yoff • Guédiawaye
               </p>
               <button
-                onClick={() => onNavigate && onNavigate('terrains')}
+                onClick={() => navigate('/terrains')}
                 className="text-xs font-bold text-vert-principal hover:underline cursor-pointer"
               >
                 Explorer la carte interactive →
