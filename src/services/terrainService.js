@@ -42,6 +42,38 @@ function normaliserTerrain(terrain) {
   };
 }
 
+// Transforme un terrain reçu du backend au format attendu par les pages
+// de l'espace gérant (GerantTerrainCard.jsx, TerrainDetail.jsx...).
+function normaliserTerrainGerant(terrain) {
+  return {
+    ...terrain,
+    id: terrain.id,
+    nom: terrain.nom,
+    ville: terrain.ville,
+    adresse: terrain.adresse,
+    localisation: terrain.adresse ? `${terrain.adresse}, ${terrain.ville}` : terrain.ville,
+    type: terrain.type,
+    surface: terrain.surface,
+    capacite: terrain.capacite,
+    prixHeure: `${terrain.prix_heure.toLocaleString()} FCFA`,
+    horaires: `${terrain.heure_ouverture?.slice(0, 5)} - ${terrain.heure_fermeture?.slice(0, 5)}`,
+    equipements: terrain.equipements || [],
+    description: terrain.description,
+    actif: terrain.actif,
+    note: Number(terrain.note_moyenne) || 0,
+    image: terrain.image || undefined,
+    photos: (terrain.photos || []).map((p) => p.image),
+    reservationsMois: terrain.reservations_mois || 0,
+    revenusMois: `${(terrain.revenus_mois || 0).toLocaleString()} FCFA`,
+    stats: {
+      reservationsMois: terrain.reservations_mois || 0,
+      revenusMois: `${(terrain.revenus_mois || 0).toLocaleString()} FCFA`,
+      noteMoyenne: Number(terrain.note_moyenne) || 0,
+      tauxOccupation: terrain.taux_occupation || 0,
+    },
+  };
+}
+
 export const terrainService = {
   // Récupérer la liste de tous les terrains (catalogue public)
   async getTerrains() {
@@ -70,4 +102,81 @@ export const terrainService = {
       throw error;
     }
   },
+
+  // --- Espace gérant ---
+
+  // Terrains du gérant connecté (page "Mes terrains"), y compris inactifs.
+  async getMesTerrains() {
+    const { data } = await api.get('/terrains', { params: { mine: 'true' } });
+    return data.map(normaliserTerrainGerant);
+  },
+
+  // Détail d'un terrain géré (page TerrainDetail.jsx).
+  async getTerrainDetailGerant(id) {
+    const { data } = await api.get(`/terrains/${id}`);
+    return normaliserTerrainGerant(data);
+  },
+
+  // Transforme le formulaire d'AjouterTerrain.jsx en FormData (nécessaire
+  // pour envoyer les photos en même temps que les champs texte).
+  _construireFormData({ nom, type, ville, adresse, capacite, surface, prixHeure, heureOuverture, heureFermeture, equipements, description, photos }) {
+    const formData = new FormData();
+    formData.append('nom', nom);
+    formData.append('type', type);
+    formData.append('ville', ville);
+    formData.append('adresse', adresse);
+    formData.append('capacite', capacite);
+    formData.append('surface', surface);
+    formData.append('prix_heure', prixHeure);
+    formData.append('heure_ouverture', heureOuverture);
+    formData.append('heure_fermeture', heureFermeture);
+    formData.append('description', description);
+    // Le champ "equipements" est un JSONField côté backend : avec du
+    // multipart/form-data, il doit être envoyé comme UNE chaîne JSON
+    // (et non répété plusieurs fois), sinon DRF refuse de le décoder.
+    formData.append('equipements', JSON.stringify(equipements));
+    (photos || []).forEach((photo) => formData.append('photos', photo));
+    return formData;
+  },
+
+  // Crée un nouveau terrain (gérant connecté).
+  async creerTerrain(formulaire) {
+    try {
+      const formData = this._construireFormData(formulaire);
+      const { data } = await api.post('/terrains/', formData);
+      return { success: true, terrain: normaliserTerrainGerant(data) };
+    } catch (error) {
+      return { success: false, error: extraireErreurTerrain(error) };
+    }
+  },
+
+  // Modifie un terrain existant (gérant propriétaire uniquement).
+  async modifierTerrain(id, formulaire) {
+    try {
+      const formData = this._construireFormData(formulaire);
+      const { data } = await api.patch(`/terrains/${id}/`, formData);
+      return { success: true, terrain: normaliserTerrainGerant(data) };
+    } catch (error) {
+      return { success: false, error: extraireErreurTerrain(error) };
+    }
+  },
+
+  // Active/désactive un terrain (bascule visible dans le catalogue public).
+  async changerActif(id, actif) {
+    const formData = new FormData();
+    formData.append('actif', actif ? 'true' : 'false');
+    const { data } = await api.patch(`/terrains/${id}/`, formData);
+    return normaliserTerrainGerant(data);
+  },
+
+  async supprimerTerrain(id) {
+    await api.delete(`/terrains/${id}/`);
+  },
 };
+
+function extraireErreurTerrain(error) {
+  const donnees = error.response?.data;
+  if (!donnees) return 'Une erreur réseau est survenue.';
+  const premierChamp = Object.values(donnees)[0];
+  return Array.isArray(premierChamp) ? premierChamp[0] : "Impossible d'enregistrer ce terrain.";
+}

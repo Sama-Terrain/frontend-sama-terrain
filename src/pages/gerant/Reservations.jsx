@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import ReservationsActiviteBanner from '../../components/gerant/ReservationsActiviteBanner';
 import ReservationsFiltersBar from '../../components/gerant/ReservationsFiltersBar';
@@ -9,10 +9,6 @@ const STATUT_LABEL_TO_VALUE = {
   Confirmées: 'Confirmée',
   Annulées: 'Annulée',
 };
-
-// Le mock ne fournit qu'une page de réservations ; la pagination reste affichée
-// (3 pages, comme sur la maquette) en attendant une vraie pagination côté API.
-const TOTAL_PAGES_MOCK = 3;
 
 /**
  * Page Reservations (Espace Gérant)
@@ -103,7 +99,7 @@ export default function Reservations({ onLogout }) {
         reservations={reservationsFiltrees}
         totalReservations={activite?.totalMois || reservationsFiltrees.length}
         page={page}
-        totalPages={TOTAL_PAGES_MOCK}
+        totalPages={1}
         onPageChange={setPage}
       />
 

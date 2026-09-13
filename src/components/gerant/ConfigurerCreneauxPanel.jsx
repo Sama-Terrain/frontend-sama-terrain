@@ -1,8 +1,7 @@
-import React from 'react';
 import { Check } from 'lucide-react';
 import Button from '../ui/Button';
 import JourToggle from './JourToggle';
-import { JOURS_SEMAINE } from '../../mocks/creneaux';
+import { JOURS_SEMAINE } from '../../utils/jours';
 
 /**
  * Composant ConfigurerCreneauxPanel
@@ -18,6 +17,8 @@ export default function ConfigurerCreneauxPanel({
   prixParCreneau,
   onChangePrix,
   onAppliquer,
+  envoiEnCours = false,
+  message = '',
 }) {
   return (
     <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-6 lg:sticky lg:top-24">
@@ -79,11 +80,16 @@ export default function ConfigurerCreneauxPanel({
         rounded="8px"
         fullWidth
         onClick={onAppliquer}
+        disabled={envoiEnCours}
         className="gap-2"
       >
         <Check size={16} />
-        <span>Appliquer les créneaux</span>
+        <span>{envoiEnCours ? 'Application en cours...' : 'Appliquer les créneaux'}</span>
       </Button>
+
+      {message && (
+        <p className="text-xs font-semibold text-vert-principal text-center">{message}</p>
+      )}
 
     </div>
   );

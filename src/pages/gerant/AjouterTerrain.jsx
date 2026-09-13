@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Info,
   SlidersHorizontal,
@@ -15,6 +15,8 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { VILLES } from '../../utils/villes';
 import { EQUIPEMENTS_DISPONIBLES } from '../../utils/equipements';
+import Alert from '../../components/ui/Alert';
+import { terrainService } from '../../services/terrainService';
 
 const TYPES_TERRAIN = ['Foot à 5', 'Foot à 6', 'Foot à 7', 'Foot à 11'];
 const SURFACES = ['Synthétique', 'Gazon naturel', 'Bitume'];
@@ -51,6 +53,8 @@ function SelectField({ label, value, onChange, options }) {
 
 export default function AjouterTerrain({ onLogout }) {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const modeEdition = Boolean(id);
 
   const [form, setForm] = useState({
     nom: '',
@@ -66,6 +70,36 @@ export default function AjouterTerrain({ onLogout }) {
     description: '',
   });
   const [photos, setPhotos] = useState([]);
+  const [chargementTerrain, setChargementTerrain] = useState(modeEdition);
+
+  // En mode édition, on pré-remplit le formulaire avec le terrain existant.
+  useEffect(() => {
+    if (!modeEdition) return;
+
+    async function chargerTerrain() {
+      try {
+        const terrain = await terrainService.getTerrainDetailGerant(id);
+        setForm({
+          nom: terrain.nom,
+          type: terrain.type,
+          ville: terrain.ville,
+          adresse: terrain.adresse,
+          capacite: terrain.capacite,
+          surface: terrain.surface,
+          prixHeure: terrain.prix_heure,
+          heureOuverture: terrain.heure_ouverture?.slice(0, 5) || '08:00',
+          heureFermeture: terrain.heure_fermeture?.slice(0, 5) || '23:00',
+          equipements: terrain.equipements,
+          description: terrain.description,
+        });
+      } catch (error) {
+        console.error('Erreur chargement terrain à modifier:', error);
+      } finally {
+        setChargementTerrain(false);
+      }
+    }
+    chargerTerrain();
+  }, [id, modeEdition]);
 
   const handleField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -85,11 +119,38 @@ export default function AjouterTerrain({ onLogout }) {
     setPhotos((prev) => [...prev, ...Array.from(fileList)].slice(0, 8));
   };
 
-  const handleSubmit = (e) => {
+  const [erreur, setErreur] = useState('');
+  const [envoiEnCours, setEnvoiEnCours] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Pas d'appel réseau : espace gérant encore en mock, cf. gerantService
-    navigate('/gerant/terrains');
+    setErreur('');
+    setEnvoiEnCours(true);
+
+    const resultat = modeEdition
+      ? await terrainService.modifierTerrain(id, { ...form, photos })
+      : await terrainService.creerTerrain({ ...form, photos });
+
+    setEnvoiEnCours(false);
+
+    if (!resultat.success) {
+      setErreur(resultat.error);
+      return;
+    }
+
+    navigate(modeEdition ? `/gerant/terrains/${id}` : '/gerant/terrains');
   };
+
+  if (chargementTerrain) {
+    return (
+      <GerantLayout title="Mes terrains" onLogout={onLogout}>
+        <div className="py-24 text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-gray-500 font-bold">Chargement du terrain...</p>
+        </div>
+      </GerantLayout>
+    );
+  }
 
   return (
     <GerantLayout title="Mes terrains" onLogout={onLogout}>
@@ -104,7 +165,9 @@ export default function AjouterTerrain({ onLogout }) {
           Terrains
         </button>
         <ChevronRight size={14} className="text-gray-400" />
-        <span className="font-extrabold text-gray-900">Ajouter un terrain</span>
+        <span className="font-extrabold text-gray-900">
+          {modeEdition ? 'Modifier le terrain' : 'Ajouter un terrain'}
+        </span>
       </div>
 
       {/* CARTE FORMULAIRE */}
@@ -274,26 +337,36 @@ export default function AjouterTerrain({ onLogout }) {
         </div>
 
         {/* PIED DE FORMULAIRE */}
-        <div className="p-6 sm:p-8 flex items-center justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            rounded="8px"
-            onClick={() => navigate('/gerant/terrains')}
-          >
-            Annuler
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            size="md"
-            rounded="8px"
-            className="gap-2"
-          >
-            <Check size={16} />
-            <span>Enregistrer le terrain</span>
-          </Button>
+        <div className="p-6 sm:p-8 space-y-4">
+          {erreur && <Alert type="error" message={erreur} />}
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              rounded="8px"
+              onClick={() => navigate('/gerant/terrains')}
+            >
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              rounded="8px"
+              disabled={envoiEnCours}
+              className="gap-2"
+            >
+              <Check size={16} />
+              <span>
+                {envoiEnCours
+                  ? 'Enregistrement...'
+                  : modeEdition
+                  ? 'Enregistrer les modifications'
+                  : 'Enregistrer le terrain'}
+              </span>
+            </Button>
+          </div>
         </div>
 
       </form>

@@ -123,6 +123,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/gerant/terrains" element={pageGerant(<MesTerrains onLogout={logout} />)} />
       <Route path="/gerant/terrains/ajouter" element={pageGerant(<AjouterTerrain onLogout={logout} />)} />
       <Route path="/gerant/terrains/:id" element={pageGerant(<TerrainDetail onLogout={logout} />)} />
+      <Route path="/gerant/terrains/:id/modifier" element={pageGerant(<AjouterTerrain onLogout={logout} />)} />
       <Route path="/gerant/creneaux" element={pageGerant(<GererCreneaux onLogout={logout} />)} />
       <Route path="/gerant/reservations" element={pageGerant(<Reservations onLogout={logout} />)} />
       <Route path="/gerant/revenus" element={pageGerant(<Revenus onLogout={logout} />)} />

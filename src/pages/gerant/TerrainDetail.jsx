@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ChevronRight, Pencil } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
@@ -9,11 +9,6 @@ import ProchainesReservationsTable from '../../components/gerant/ProchainesReser
 import AvisRecentsList from '../../components/gerant/AvisRecentsList';
 import Button from '../../components/ui/Button';
 import { gerantService } from '../../services/gerantService';
-
-// Le mock ne fournit qu'une page de réservations ; la pagination reste affichée
-// (3 pages, comme sur la maquette) mais n'a d'effet réel que sur `page` en attendant l'API.
-const TOTAL_PAGES_MOCK = 3;
-const TOTAL_RESERVATIONS_MOCK = 156;
 
 /**
  * Page TerrainDetail (Espace Gérant)
@@ -38,7 +33,7 @@ export default function TerrainDetail({ onLogout }) {
         setLoading(true);
         const [terrainData, reservationsData, avisData, profileData] = await Promise.all([
           gerantService.getTerrainDetail(Number(id)),
-          gerantService.getProchainesReservations(),
+          gerantService.getProchainesReservations(Number(id)),
           gerantService.getAvisRecents(),
           gerantService.getGerantProfile(),
         ]);
@@ -121,9 +116,9 @@ export default function TerrainDetail({ onLogout }) {
       {/* PROCHAINES RÉSERVATIONS */}
       <ProchainesReservationsTable
         reservations={reservations}
-        totalReservations={TOTAL_RESERVATIONS_MOCK}
+        totalReservations={reservations.length}
         page={page}
-        totalPages={TOTAL_PAGES_MOCK}
+        totalPages={1}
         onPageChange={setPage}
         onVoirTout={() => navigate('/gerant/reservations')}
       />

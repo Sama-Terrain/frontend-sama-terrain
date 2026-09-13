@@ -1,12 +1,8 @@
-import { MOCK_GERANT_PROFILE, MOCK_TERRAINS_GERANT, MOCK_TERRAIN_DETAILS_GERANT } from '../mocks/gerants';
-import {
-  MOCK_RESERVATIONS_RECENTES_GERANT,
-  MOCK_RESERVATIONS_GERANT,
-  MOCK_RESERVATIONS_ACTIVITE,
-  MOCK_PROCHAINES_RESERVATIONS,
-} from '../mocks/reservations';
+import api from './api';
+import { authService } from './authService';
+import { terrainService } from './terrainService';
+import { MOCK_RESERVATIONS_RECENTES_GERANT } from '../mocks/reservations';
 import { MOCK_AVIS_GERANT } from '../mocks/avis';
-import { MOCK_CRENEAUX_CONFIG } from '../mocks/creneaux';
 import { MOCK_HISTORIQUE_PAIEMENTS, MOCK_TICKETS_SCANNABLES, MOCK_DERNIERES_VALIDATIONS } from '../mocks/paiements';
 import {
   MOCK_GERANT_STATS,
@@ -20,6 +16,42 @@ import {
 } from '../mocks/statistiques';
 import { delaiReseau } from '../utils/delaiReseau';
 
+const LABELS_STATUT_RESERVATION = {
+  en_attente: { label: 'En attente', badge: 'bg-amber-100 text-amber-700' },
+  confirmee: { label: 'Confirmée', badge: 'bg-emerald-100 text-emerald-700' },
+  terminee: { label: 'Terminée', badge: 'bg-gray-100 text-gray-700' },
+  annulee: { label: 'Annulée', badge: 'bg-red-100 text-red-700' },
+};
+
+// Transforme une réservation reçue du backend (ReservationSerializer) vers
+// le format attendu par les tableaux de l'espace gérant (ReservationsTable.jsx,
+// ProchainesReservationsTable.jsx...).
+function normaliserReservationGerant(r) {
+  const infosStatut = LABELS_STATUT_RESERVATION[r.statut] || LABELS_STATUT_RESERVATION.en_attente;
+  const initiales = r.nom_complet
+    .split(' ')
+    .map((mot) => mot[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+  return {
+    id: `RES-${r.id}`,
+    client: r.nom_complet,
+    joueur: r.nom_complet,
+    initiales,
+    terrainId: r.terrain_id,
+    terrain: r.terrain_nom,
+    date: new Date(r.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
+    dateIso: r.date,
+    creneau: `${r.heure_debut.slice(0, 5)} - ${r.heure_fin.slice(0, 5)}`,
+    montant: r.montant_total,
+    statut: infosStatut.label,
+    statutBadgeClass: infosStatut.badge,
+    statutBrut: r.statut,
+  };
+}
+
 /**
  * Service de l'espace Gérant.
  * Aujourd'hui : renvoie les données mockées de src/mocks/.
@@ -30,9 +62,13 @@ import { delaiReseau } from '../utils/delaiReseau';
  * un service séparé, cf. src/services/abonnementService.js.
  */
 export const gerantService = {
+  // Profil affiché dans l'en-tête de l'espace gérant (GerantLayout.jsx).
   async getGerantProfile() {
-    await delaiReseau();
-    return MOCK_GERANT_PROFILE;
+    const resultat = await authService.getUtilisateurConnecte();
+    if (!resultat.success) return null;
+
+    const { prenom, nom, initiales } = resultat.user;
+    return { name: `${prenom} ${nom}`, role: 'Gérant', initials: initiales };
   },
 
   async getGerantStats() {
@@ -51,43 +87,56 @@ export const gerantService = {
   },
 
   async getMesTerrains() {
-    await delaiReseau();
-    return MOCK_TERRAINS_GERANT;
+    return terrainService.getMesTerrains();
   },
 
   async getTerrainDetail(terrainId) {
-    await delaiReseau();
-    return MOCK_TERRAIN_DETAILS_GERANT[terrainId] || null;
+    try {
+      return await terrainService.getTerrainDetailGerant(terrainId);
+    } catch (error) {
+      if (error.response?.status === 404) return null;
+      throw error;
+    }
   },
 
-  async getProchainesReservations() {
-    await delaiReseau();
-    return MOCK_PROCHAINES_RESERVATIONS;
+  // Toutes les réservations reçues sur les terrains du gérant connecté.
+  async getReservationsGerant() {
+    const { data } = await api.get('/gerant/reservations/');
+    return data.map(normaliserReservationGerant);
+  },
+
+  // Prochaines réservations à venir, éventuellement filtrées sur un terrain
+  // précis (page TerrainDetail.jsx).
+  async getProchainesReservations(terrainId) {
+    const toutes = await this.getReservationsGerant();
+    const aujourdhui = new Date().toISOString().split('T')[0];
+
+    return toutes
+      .filter((r) => r.statutBrut !== 'annulee' && r.dateIso >= aujourdhui)
+      .filter((r) => !terrainId || r.terrainId === terrainId)
+      .sort((a, b) => a.dateIso.localeCompare(b.dateIso));
+  },
+
+  // Synthèse d'activité affichée en haut de la page "Réservations"
+  // (calculée côté frontend à partir de la liste complète, pas de route dédiée).
+  async getReservationsActivite() {
+    const toutes = await this.getReservationsGerant();
+    const maintenant = new Date();
+    const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1);
+
+    const duMois = toutes.filter((r) => new Date(r.dateIso) >= debutMois);
+    const confirmees = duMois.filter((r) => r.statutBrut === 'confirmee' || r.statutBrut === 'terminee');
+
+    return {
+      totalMois: duMois.length,
+      tauxValidation: duMois.length ? Math.round((confirmees.length / duMois.length) * 100) : 0,
+      periodeLabel: maintenant.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+    };
   },
 
   async getAvisRecents() {
     await delaiReseau();
     return MOCK_AVIS_GERANT;
-  },
-
-  async getCreneauxConfigs() {
-    await delaiReseau();
-    return Object.values(MOCK_CRENEAUX_CONFIG);
-  },
-
-  async getCreneauxConfig(terrainId) {
-    await delaiReseau();
-    return MOCK_CRENEAUX_CONFIG[terrainId] || null;
-  },
-
-  async getReservationsGerant() {
-    await delaiReseau();
-    return MOCK_RESERVATIONS_GERANT;
-  },
-
-  async getReservationsActivite() {
-    await delaiReseau();
-    return MOCK_RESERVATIONS_ACTIVITE;
   },
 
   async getRevenusStats() {

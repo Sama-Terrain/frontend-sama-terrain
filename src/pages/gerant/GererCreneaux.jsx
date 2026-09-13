@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import CreneauxGrid from '../../components/gerant/CreneauxGrid';
 import ConfigurerCreneauxPanel from '../../components/gerant/ConfigurerCreneauxPanel';
 import { gerantService } from '../../services/gerantService';
+import { creneauService } from '../../services/creneauService';
 import { generateCreneaux } from '../../utils/generateCreneaux';
-import { JOURS_SEMAINE, JOURS_WEEKEND } from '../../mocks/creneaux';
+import { JOURS_SEMAINE, JOURS_WEEKEND } from '../../utils/jours';
 
 const JOURS_SEMAINE_OUVRABLE = JOURS_SEMAINE.filter((jour) => !JOURS_WEEKEND.includes(jour));
 
-// Construit la grille initiale {jour: {creneauLabel: prix}} à partir des tarifs
-// semaine/week-end du terrain (logique par défaut : week-end plus cher).
-function buildGrilleInitiale(creneaux, prixSemaine, prixWeekend) {
+// Construit la grille initiale {jour: {creneauLabel: prix}}, avec le prix par
+// défaut du terrain partout (le gérant personnalise ensuite via le panneau).
+function buildGrilleInitiale(creneaux, prixParDefaut) {
   const grille = {};
   JOURS_SEMAINE.forEach((jour) => {
-    const prix = JOURS_WEEKEND.includes(jour) ? prixWeekend : prixSemaine;
     grille[jour] = {};
     creneaux.forEach((creneau) => {
-      grille[jour][creneau.label] = prix;
+      grille[jour][creneau.label] = prixParDefaut;
     });
   });
   return grille;
@@ -40,15 +40,28 @@ export default function GererCreneaux({ onLogout }) {
   const [joursSelectionnes, setJoursSelectionnes] = useState(JOURS_SEMAINE_OUVRABLE);
   const [prixParCreneau, setPrixParCreneau] = useState({});
   const [grille, setGrille] = useState({});
+  const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [messageApplication, setMessageApplication] = useState('');
 
   useEffect(() => {
     async function loadConfigs() {
       try {
         setLoading(true);
-        const [configsData, profileData] = await Promise.all([
-          gerantService.getCreneauxConfigs(),
+        const [terrains, profileData] = await Promise.all([
+          gerantService.getMesTerrains(),
           gerantService.getGerantProfile(),
         ]);
+        // On dérive la "config" de chaque terrain directement depuis ses
+        // horaires d'ouverture/fermeture et son prix par heure (pas de
+        // modèle récurrent séparé côté backend).
+        const configsData = terrains.map((terrain) => ({
+          terrainId: terrain.id,
+          terrainNom: terrain.nom,
+          terrainType: terrain.type,
+          ouverture: terrain.heure_ouverture.slice(0, 5),
+          fermeture: terrain.heure_fermeture.slice(0, 5),
+          prixParDefaut: terrain.prix_heure,
+        }));
         setConfigs(configsData);
         setProfile(profileData);
         if (configsData.length > 0) {
@@ -78,11 +91,11 @@ export default function GererCreneaux({ onLogout }) {
 
     const prixInitiaux = {};
     creneaux.forEach((creneau) => {
-      prixInitiaux[creneau.label] = config.prixSemaine;
+      prixInitiaux[creneau.label] = config.prixParDefaut;
     });
     setPrixParCreneau(prixInitiaux);
     setJoursSelectionnes(JOURS_SEMAINE_OUVRABLE);
-    setGrille(buildGrilleInitiale(creneaux, config.prixSemaine, config.prixWeekend));
+    setGrille(buildGrilleInitiale(creneaux, config.prixParDefaut));
   }, [config, creneaux]);
 
   const handleToggleJour = (jour) => {
@@ -95,8 +108,25 @@ export default function GererCreneaux({ onLogout }) {
     setPrixParCreneau((current) => ({ ...current, [creneauLabel]: prix }));
   };
 
-  // Applique le tarif de chaque créneau configuré aux jours sélectionnés
-  const handleAppliquer = () => {
+  // Applique le tarif de chaque créneau configuré aux jours sélectionnés :
+  // crée/actualise réellement les créneaux datés du backend sur le mois à venir.
+  const handleAppliquer = async () => {
+    setEnvoiEnCours(true);
+    setMessageApplication('');
+
+    const resultat = await creneauService.genererCreneaux({
+      terrainId,
+      creneaux,
+      joursSelectionnes,
+      prixParCreneau,
+    });
+
+    setEnvoiEnCours(false);
+    setMessageApplication(
+      `${resultat.crees} créneau(x) créé(s), ${resultat.misAJour} mis à jour` +
+      (resultat.erreurs > 0 ? `, ${resultat.erreurs} erreur(s).` : '.')
+    );
+
     setGrille((current) => {
       const next = { ...current };
       joursSelectionnes.forEach((jour) => {
@@ -152,6 +182,8 @@ export default function GererCreneaux({ onLogout }) {
             prixParCreneau={prixParCreneau}
             onChangePrix={handleChangePrix}
             onAppliquer={handleAppliquer}
+            envoiEnCours={envoiEnCours}
+            message={messageApplication}
           />
         </section>
       )}

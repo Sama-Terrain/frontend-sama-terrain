@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import GerantTerrainCard from '../../components/gerant/GerantTerrainCard';
 import Button from '../../components/ui/Button';
 import { gerantService } from '../../services/gerantService';
+import { terrainService } from '../../services/terrainService';
 
 /**
  * Page MesTerrains (Espace Gérant)
@@ -38,13 +39,26 @@ export default function MesTerrains({ onLogout }) {
     loadTerrains();
   }, []);
 
-  // Bascule locale de l'état actif/inactif d'un terrain (mock uniquement, pas d'appel réseau)
-  const handleToggleActif = (terrainId, nextActif) => {
+  // Active/désactive un terrain (visible ou non dans le catalogue public).
+  const handleToggleActif = async (terrainId, nextActif) => {
+    // Mise à jour optimiste : on change l'affichage tout de suite, et on
+    // reviendra en arrière si l'appel au backend échoue.
     setTerrains((current) =>
       current.map((terrain) =>
         terrain.id === terrainId ? { ...terrain, actif: nextActif } : terrain
       )
     );
+
+    try {
+      await terrainService.changerActif(terrainId, nextActif);
+    } catch (error) {
+      console.error('Erreur changement statut terrain:', error);
+      setTerrains((current) =>
+        current.map((terrain) =>
+          terrain.id === terrainId ? { ...terrain, actif: !nextActif } : terrain
+        )
+      );
+    }
   };
 
   if (loading) {
