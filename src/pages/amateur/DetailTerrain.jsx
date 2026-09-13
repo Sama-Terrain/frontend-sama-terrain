@@ -59,12 +59,46 @@ export default function DetailTerrain({ currentUser }) {
   const [telephone, setTelephone] = useState('');
   const [avance, setAvance] = useState('');
 
-  // Avis clients chargés via le service mock
+  // Avis clients du terrain
   const [avisList, setAvisList] = useState([]);
   const [showAvisModal, setShowAvisModal] = useState(false);
-  const [newAvisNom, setNewAvisNom] = useState('');
   const [newAvisNote, setNewAvisNote] = useState(5);
   const [newAvisTexte, setNewAvisTexte] = useState('');
+  const [envoiAvisEnCours, setEnvoiAvisEnCours] = useState(false);
+  const [erreurAvis, setErreurAvis] = useState('');
+
+  // Réservation (déjà jouée, confirmée, pas encore notée) permettant à
+  // l'amateur connecté de laisser un avis sur CE terrain, s'il en a une.
+  const [reservationPourAvis, setReservationPourAvis] = useState(null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      setReservationPourAvis(null);
+      return;
+    }
+
+    async function chercherReservationNotable() {
+      try {
+        const mesReservations = await reservationService.getUserReservations();
+        const candidates = mesReservations.filter(
+          (r) => r.terrainId === terrainId && (r.statut === 'confirmee' || r.statut === 'terminee')
+        );
+
+        for (const candidate of candidates) {
+          const possible = await avisService.avisPossible(candidate.id);
+          if (possible) {
+            setReservationPourAvis(candidate);
+            return;
+          }
+        }
+        setReservationPourAvis(null);
+      } catch (error) {
+        console.error('Erreur vérification avis possible :', error);
+        setReservationPourAvis(null);
+      }
+    }
+    chercherReservationNotable();
+  }, [currentUser, terrainId]);
 
   // Créneaux horaires du terrain, rechargés à chaque changement de date.
   const [creneauxHoraires, setCreneauxHoraires] = useState([]);
@@ -98,7 +132,7 @@ export default function DetailTerrain({ currentUser }) {
         setLoading(true);
         const [terrainData, avisData] = await Promise.all([
           terrainService.getTerrainById(terrainId),
-          avisService.getAvisJoueurs()
+          avisService.getAvisJoueurs(terrainId)
         ]);
 
         const terrainFinal = terrainData || {
@@ -126,22 +160,32 @@ export default function DetailTerrain({ currentUser }) {
     loadData();
   }, [terrainId]);
 
-  // Handler d'ajout d'un avis
-  const handleAddAvis = (e) => {
+  // Handler d'ajout d'un avis : lié à la réservation détectée comme éligible.
+  const handleAddAvis = async (e) => {
     e.preventDefault();
-    if (!newAvisNom.trim() || !newAvisTexte.trim()) return;
+    if (!reservationPourAvis) return;
 
-    const newEntry = {
-      id: Date.now(),
-      nom: newAvisNom,
-      initiales: newAvisNom.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2),
-      note: Number(newAvisNote),
-      date: 'Aujourd\'hui',
-      commentaire: newAvisTexte
-    };
+    setErreurAvis('');
+    setEnvoiAvisEnCours(true);
 
-    setAvisList([newEntry, ...avisList]);
-    setNewAvisNom('');
+    const resultat = await avisService.creerAvis({
+      reservationId: reservationPourAvis.id,
+      note: newAvisNote,
+      commentaire: newAvisTexte,
+    });
+
+    setEnvoiAvisEnCours(false);
+
+    if (!resultat.success) {
+      setErreurAvis(resultat.error);
+      return;
+    }
+
+    setAvisList([resultat.avis, ...avisList]);
+    // Un avis par réservation : celle-ci n'est plus disponible pour en
+    // laisser un nouveau sur ce terrain (à moins d'y rejouer un jour).
+    setReservationPourAvis(null);
+    setNewAvisNote(5);
     setNewAvisTexte('');
     setShowAvisModal(false);
   };
@@ -521,7 +565,12 @@ export default function DetailTerrain({ currentUser }) {
                   onClick={() => {
                     if (!currentUser) {
                       navigate('/login');
+                    } else if (!reservationPourAvis) {
+                      setErreurAvis(
+                        "Vous devez avoir joué un match confirmé sur ce terrain (et pas déjà laissé d'avis) pour pouvoir en laisser un."
+                      );
                     } else {
+                      setErreurAvis('');
                       setShowAvisModal(true);
                     }
                   }}
@@ -533,7 +582,16 @@ export default function DetailTerrain({ currentUser }) {
                 </Button>
               </div>
 
+              {erreurAvis && !showAvisModal && (
+                <div className="p-3 bg-amber-50 rounded-[8px] border border-amber-200 text-amber-800 text-xs font-semibold">
+                  {erreurAvis}
+                </div>
+              )}
+
               <div className="space-y-4">
+                {avisList.length === 0 && (
+                  <p className="text-xs text-gray-500">Aucun avis pour le moment.</p>
+                )}
                 {avisList.map((avis) => (
                   <div key={avis.id} className="p-4 bg-gray-50 rounded-[8px] border border-gray-100 space-y-2">
                     <div className="flex items-center justify-between">
@@ -721,6 +779,12 @@ export default function DetailTerrain({ currentUser }) {
                 </div>
               </div>
 
+              {erreurAvis && (
+                <div className="p-3 bg-red-50 rounded-[8px] border border-red-200 text-red-700 text-xs font-bold">
+                  {erreurAvis}
+                </div>
+              )}
+
               {/* BOUTONS D'ACTION (ANNULER CONTOUR VERT & PUBLIER SOLIDE VERT) */}
               <div className="flex items-center justify-end space-x-3 pt-2">
                 <Button
@@ -734,12 +798,13 @@ export default function DetailTerrain({ currentUser }) {
                 </Button>
                 <Button
                   type="submit"
+                  disabled={envoiAvisEnCours}
                   variant="primary"
                   size="sm"
                   rounded="8px"
                   className="shadow-xs"
                 >
-                  Publier mon avis
+                  {envoiAvisEnCours ? 'Envoi...' : 'Publier mon avis'}
                 </Button>
               </div>
 
