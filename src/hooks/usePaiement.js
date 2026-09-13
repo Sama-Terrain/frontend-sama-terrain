@@ -11,17 +11,23 @@ export function usePaiement() {
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState('');
 
-  // Lance le paiement du montant donné avec le moyen de paiement sélectionné
-  async function payer(montant) {
+  // Démarre le paiement PayTech de la réservation donnée : redirige le
+  // navigateur vers la page de paiement externe (Wave/Orange Money réels).
+  async function payer(reservationId) {
     setChargement(true);
     setErreur('');
 
-    const resultat = await paiementService.effectuerPaiement({ montant, moyenPaiement });
+    const resultat = await paiementService.initierPaiement(reservationId);
 
-    setChargement(false);
     if (!resultat.success) {
-      setErreur('Le paiement a échoué. Veuillez réessayer.');
+      setChargement(false);
+      setErreur(resultat.error);
+      return resultat;
     }
+
+    // Vraie sortie du site vers PayTech : pas de setChargement(false) ici,
+    // la page va quitter l'application.
+    window.location.href = resultat.paymentUrl;
     return resultat;
   }
 

@@ -6,6 +6,7 @@ import Badge from '../../components/ui/Badge';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
 import { creneauService } from '../../services/creneauService';
+import { reservationService } from '../../services/reservationService';
 
 export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
@@ -100,7 +101,7 @@ export default function DetailTerrain({ currentUser }) {
           avisService.getAvisJoueurs()
         ]);
 
-        setTerrain(terrainData || {
+        const terrainFinal = terrainData || {
           id: 1,
           nom: 'Complexe Keur Madior',
           localisation: 'Almadies, Dakar',
@@ -112,7 +113,11 @@ export default function DetailTerrain({ currentUser }) {
           disponible: true,
           surface: 'Synthétique',
           description: "Le Complexe Keur Madior propose un terrain de mini-foot haut de gamme en plein cœur des Almadies. Doté d'une pelouse synthétique dernière génération importée, d'un éclairage puissant par projecteurs LED pour les matchs nocturnes et de vestiaires propres et modernes. Un parking sécurisé gratuit est également disponible pour nos clients."
-        });
+        };
+        setTerrain(terrainFinal);
+        // L'avance est fixée par le gérant pour ce terrain (pas modifiable
+        // par l'amateur) : on la pré-remplit directement.
+        setAvance(terrainFinal.avance);
 
         setAvisList(avisData || []);
       } catch (error) {
@@ -163,7 +168,10 @@ export default function DetailTerrain({ currentUser }) {
   const currentPrix = selectedCreneau ? selectedCreneau.prix : (terrain?.prixHeure || 30000);
   const resteAPayer = Math.max(0, currentPrix - avanceNum);
 
-  const handleReserverSlot = () => {
+  const [erreurReservation, setErreurReservation] = useState('');
+  const [creationEnCours, setCreationEnCours] = useState(false);
+
+  const handleReserverSlot = async () => {
     if (!currentUser) {
       navigate('/login');
       return;
@@ -171,20 +179,50 @@ export default function DetailTerrain({ currentUser }) {
 
     if (!isFormComplete) return;
 
-    const reservationData = {
-      terrain: terrain || [],
-      date: selectedDate,
-      creneau: selectedCreneau,
-      nomComplet,
-      telephone,
-      avance: avanceNum,
-      resteSurPlace: resteAPayer
-    };
+    setErreurReservation('');
+    setCreationEnCours(true);
 
-    // On transmet les infos de la réservation à la page de paiement via la
-    // navigation (state), sans passer par un state global : la page Paiement
-    // les lira avec useLocation().
-    navigate('/paiement', { state: reservationData });
+    try {
+      // On crée réellement la réservation en base : ça bloque le créneau
+      // ("en_attente") pour que personne d'autre ne puisse le réserver
+      // pendant que l'amateur va payer son avance sur PayTech.
+      const reservationCreee = await reservationService.creerReservation({
+        creneauId: selectedCreneau.id,
+        nomComplet,
+        telephone,
+      });
+
+      const reservationData = {
+        terrain: terrain || [],
+        date: selectedDate,
+        creneau: selectedCreneau,
+        nomComplet,
+        telephone,
+        avance: avanceNum,
+        resteSurPlace: resteAPayer,
+        // Id de la vraie réservation backend : nécessaire à Paiement.jsx
+        // pour démarrer le paiement PayTech de CETTE réservation précise.
+        reservationId: reservationCreee.id,
+      };
+
+      // On transmet les infos de la réservation à la page de paiement via la
+      // navigation (state), sans passer par un state global : la page Paiement
+      // les lira avec useLocation().
+      navigate('/paiement', { state: reservationData });
+    } catch (error) {
+      setErreurReservation(
+        error.response?.data?.creneau?.[0] ||
+        error.response?.data?.detail ||
+        "Impossible de réserver ce créneau. Il a peut-être déjà été pris, veuillez réessayer."
+      );
+      // Le créneau a peut-être été pris entre-temps par quelqu'un d'autre :
+      // on recharge la liste pour refléter son vrai statut.
+      const data = await creneauService.getCreneauxByTerrainAndDate(terrainId, selectedDate);
+      setCreneauxHoraires(data);
+      setSelectedCreneau(null);
+    } finally {
+      setCreationEnCours(false);
+    }
   };
 
   if (loading) {
@@ -432,16 +470,16 @@ export default function DetailTerrain({ currentUser }) {
 
                 <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-3 animate-in fade-in duration-200">
                   <h3 className="text-sm font-bold text-gray-900">
-                    Montant de l'avance <span className="text-xs text-gray-400 font-normal">(min. 5 000 FCFA)</span>
+                    Montant de l'avance <span className="text-xs text-gray-400 font-normal">(fixé par le gérant du terrain)</span>
                   </h3>
 
                   <div className="relative max-w-md">
                     <input
                       type="number"
                       value={avance}
-                      onChange={(e) => setAvance(e.target.value)}
-                      placeholder="10 000 (FCFA)"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-vert-principal"
+                      readOnly
+                      disabled
+                      className="w-full bg-gray-100 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-500 cursor-not-allowed"
                     />
                     <span className="absolute right-4 top-2.5 text-xs font-bold text-gray-400">FCFA</span>
                   </div>
@@ -450,6 +488,12 @@ export default function DetailTerrain({ currentUser }) {
                     <p className="text-xs font-semibold text-gray-500">
                       Reste à payer sur place : <span className="text-vert-principal font-bold">{resteAPayer.toLocaleString()} FCFA</span>
                     </p>
+                  )}
+
+                  {erreurReservation && (
+                    <div className="p-3 bg-red-50 rounded-[8px] border border-red-200 text-red-700 text-xs font-bold">
+                      {erreurReservation}
+                    </div>
                   )}
                 </div>
               </>
@@ -572,14 +616,16 @@ export default function DetailTerrain({ currentUser }) {
 
               <Button
                 onClick={handleReserverSlot}
-                disabled={!isFormComplete}
+                disabled={!isFormComplete || creationEnCours}
                 variant="gold"
                 size="md"
                 rounded="8px"
                 fullWidth
                 className="font-extrabold"
               >
-                {isFormComplete
+                {creationEnCours
+                  ? 'Réservation en cours...'
+                  : isFormComplete
                   ? 'Réserver ce créneau'
                   : isPastDate
                   ? 'Réservation impossible pour date passée'

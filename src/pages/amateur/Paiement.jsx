@@ -5,7 +5,6 @@ import PaiementRecap from '../../components/paiement/PaiementRecap';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 import { usePaiement } from '../../hooks/usePaiement';
-import { reservationService } from '../../services/reservationService';
 
 /**
  * Page Paiement (Espace Amateur)
@@ -36,17 +35,11 @@ export default function Paiement() {
     return null;
   }
 
+  // La réservation existe déjà en base (créée par DetailTerrain.jsx, ce qui
+  // bloque le créneau) : il ne reste qu'à démarrer le paiement PayTech, qui
+  // va rediriger l'utilisateur hors du site pour payer avec Wave/Orange Money.
   const handlePayer = async () => {
-    const resultatPaiement = await payer(reservationData.avance);
-    if (!resultatPaiement.success) return;
-
-    const reservationCreee = await reservationService.creerReservation({
-      ...reservationData,
-      moyenPaiement: resultatPaiement.moyenPaiement,
-      transactionId: resultatPaiement.transactionId,
-    });
-
-    navigate('/confirmation', { state: { reservation: reservationCreee } });
+    await payer(reservationData.reservationId);
   };
 
   return (

@@ -1,84 +1,97 @@
-import { MOCK_RESERVATIONS_AMATEUR } from '../mocks/reservations';
-import { delaiReseau } from '../utils/delaiReseau';
+import api from './api';
 import { formatDateTexte, combinerDateEtHeureDebut } from '../utils/formatDate';
 
-const HEURES_LIMITE_REMBOURSEMENT_TOTAL = 24;
-
 /**
- * Calcule ce qui est remboursé si on annule maintenant une réservation.
- * Règle métier : remboursement total si l'annulation a lieu plus de 24h avant
- * le créneau, sinon l'avance déjà versée est perdue.
+ * Service pour la gestion des réservations (côté amateur).
+ * Appelle désormais le vrai backend Django (voir backend/reservations/).
  */
-function calculerRemboursement(reservation) {
-  const heuresRestantes =
-    (new Date(reservation.dateHeureCreneau).getTime() - Date.now()) / (1000 * 60 * 60);
 
-  if (heuresRestantes >= HEURES_LIMITE_REMBOURSEMENT_TOTAL) {
-    return { remboursementTotal: true, montantRembourse: reservation.montantAcompte };
-  }
-  return { remboursementTotal: false, montantRembourse: 0 };
+const LABELS_STATUT = {
+  en_attente: { label: 'En attente de paiement', badge: 'bg-amber-100 text-amber-700' },
+  confirmee: { label: 'Confirmée', badge: 'bg-emerald-100 text-emerald-700' },
+  terminee: { label: 'Terminée', badge: 'bg-gray-100 text-gray-700' },
+  annulee: { label: 'Annulée', badge: 'bg-red-100 text-red-700' },
+};
+
+// Détermine l'onglet ("a-venir" / "passees" / "annulees") d'une réservation
+// pour la page "Mes réservations", à partir de son statut et de la date du match.
+function determinerTabCategory(reservationBackend) {
+  if (reservationBackend.statut === 'annulee') return 'annulees';
+
+  const finMatch = new Date(`${reservationBackend.date}T${reservationBackend.heure_fin}`);
+  if (finMatch.getTime() < Date.now()) return 'passees';
+
+  return 'a-venir';
+}
+
+// Transforme une réservation reçue du backend vers le format déjà attendu
+// par les pages/composants (MesReservations.jsx, TicketQR.jsx, ...).
+function normaliserReservation(r) {
+  const infosStatut = LABELS_STATUT[r.statut] || LABELS_STATUT.en_attente;
+  const heureCreneau = `${r.heure_debut.slice(0, 5)} - ${r.heure_fin.slice(0, 5)}`;
+
+  return {
+    ...r,
+    id: r.id,
+    terrainId: r.terrain_id,
+    nomTerrain: r.terrain_nom,
+    status: infosStatut.label,
+    statusBadgeClass: infosStatut.badge,
+    acomptePaye: r.statut !== 'en_attente',
+    dateHeureCreneau: combinerDateEtHeureDebut(r.date, heureCreneau),
+    dateTexte: formatDateTexte(r.date, heureCreneau),
+    montantAcompte: r.montant_avance,
+    prixTotal: r.montant_total,
+    resteAPayer: r.reste_a_payer,
+    moyenPaiement: r.moyen_paiement,
+    transactionId: r.transaction_id,
+    tabCategory: determinerTabCategory(r),
+  };
 }
 
 export const reservationService = {
   getUserReservations: async () => {
-    await delaiReseau();
-    return MOCK_RESERVATIONS_AMATEUR;
+    const { data } = await api.get('/reservations/mes-reservations/');
+    return data.map(normaliserReservation);
+  },
+
+  getReservationById: async (id) => {
+    const { data } = await api.get(`/reservations/${id}/`);
+    return normaliserReservation(data);
   },
 
   // Renvoie ce que verrait l'amateur avant de confirmer son annulation
   // (utilisé pour afficher "vous serez remboursé de X FCFA" avant qu'il ne clique).
   previsualiserAnnulation: async (resId) => {
-    await delaiReseau();
-    const reservation = MOCK_RESERVATIONS_AMATEUR.find((r) => r.id === resId);
-    if (!reservation) return null;
-    return calculerRemboursement(reservation);
+    const { data } = await api.get(`/reservations/${resId}/politique-annulation/`);
+    return {
+      remboursementTotal: data.remboursement_possible,
+      montantRembourse: data.montant_rembourse,
+    };
   },
 
   annulerReservation: async (resId) => {
-    await delaiReseau();
-    const index = MOCK_RESERVATIONS_AMATEUR.findIndex((r) => r.id === resId);
-    if (index === -1) {
-      return { success: false, error: 'Réservation introuvable' };
+    try {
+      const { data } = await api.delete(`/reservations/${resId}/`);
+      return {
+        success: true,
+        remboursementTotal: data.remboursement_possible,
+        montantRembourse: data.montant_rembourse,
+      };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || 'Erreur lors de l\'annulation.' };
     }
-
-    const remboursement = calculerRemboursement(MOCK_RESERVATIONS_AMATEUR[index]);
-
-    MOCK_RESERVATIONS_AMATEUR[index].status = 'Annulée';
-    MOCK_RESERVATIONS_AMATEUR[index].statusBadgeClass = 'bg-red-100 text-red-700';
-    MOCK_RESERVATIONS_AMATEUR[index].tabCategory = 'annulees';
-
-    return { success: true, ...remboursement };
   },
 
-  // Crée une nouvelle réservation une fois l'avance payée (cf. pages/amateur/Paiement.jsx).
-  // `donnees` vient du formulaire de la page détail terrain :
-  // { terrain, date, creneau, nomComplet, telephone, avance, resteSurPlace, moyenPaiement, transactionId }
-  creerReservation: async (donnees) => {
-    await delaiReseau();
-
-    const prixTotal = donnees.creneau?.prix || donnees.terrain?.prixHeure || donnees.avance * 2;
-
-    const nouvelleReservation = {
-      id: `RES-${Math.floor(1000 + Math.random() * 9000)}`,
-      terrainId: donnees.terrain?.id,
-      nomTerrain: donnees.terrain?.nom,
-      image: donnees.terrain?.image,
-      status: 'Confirmée',
-      statusBadgeClass: 'bg-emerald-100 text-emerald-700',
-      acomptePaye: true,
-      dateHeureCreneau: combinerDateEtHeureDebut(donnees.date, donnees.creneau.heure),
-      dateTexte: formatDateTexte(donnees.date, donnees.creneau.heure),
-      montantAcompte: donnees.avance,
-      prixTotal,
-      resteAPayer: donnees.resteSurPlace,
-      moyenPaiement: donnees.moyenPaiement,
-      transactionId: donnees.transactionId,
-      tabCategory: 'a-venir',
-    };
-
-    // On l'ajoute en tête de la liste "Mes réservations" de l'amateur
-    MOCK_RESERVATIONS_AMATEUR.unshift(nouvelleReservation);
-
-    return nouvelleReservation;
+  // Crée une réservation pour le créneau choisi : bloque immédiatement le
+  // créneau (statut "en_attente") en attendant le paiement de l'avance.
+  // Appelé depuis DetailTerrain.jsx, AVANT de rediriger vers /paiement.
+  creerReservation: async ({ creneauId, nomComplet, telephone }) => {
+    const { data } = await api.post('/reservations/', {
+      creneau: creneauId,
+      nom_complet: nomComplet,
+      telephone,
+    });
+    return normaliserReservation(data);
   },
 };

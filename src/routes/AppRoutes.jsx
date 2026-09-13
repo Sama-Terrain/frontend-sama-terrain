@@ -10,6 +10,8 @@ import RechercheTerrains from '../pages/amateur/RechercheTerrains';
 import DetailTerrain from '../pages/amateur/DetailTerrain';
 import MesReservations from '../pages/amateur/MesReservations';
 import Paiement from '../pages/amateur/Paiement';
+import PaiementSucces from '../pages/amateur/PaiementSucces';
+import PaiementAnnule from '../pages/amateur/PaiementAnnule';
 import Confirmation from '../pages/amateur/Confirmation';
 
 // Pages Gérant
@@ -82,6 +84,22 @@ export default function AppRoutes({ searchParams }) {
         element={
           <ProtectedRoute allowedRoles={[ROLES.AMATEUR]}>
             <Confirmation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/paiement/succes"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.AMATEUR]}>
+            <PaiementSucces />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/paiement/annule"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.AMATEUR]}>
+            <PaiementAnnule />
           </ProtectedRoute>
         }
       />
