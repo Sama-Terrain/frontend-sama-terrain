@@ -13,13 +13,16 @@ export default function RechercheTerrains() {
   const [terrains, setTerrains] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // État unique synchronisé pour les filtres
+  // État unique synchronisé pour les filtres. Par défaut on ne filtre rien
+  // (types vide, prix au maximum) pour ne pas cacher de terrains au premier
+  // affichage : seule la recherche depuis le hero de l'accueil pré-remplit
+  // la zone.
   const [filters, setFilters] = useState({
     localisation: initialSearch.searchZone || 'Tous les quartiers',
     date: 'Dim. 24 Novembre',
-    types: ['5v5'],
+    types: [],
     surfaces: [],
-    maxPrix: 20000,
+    maxPrix: 50000,
     equipements: []
   });
 
@@ -46,15 +49,16 @@ export default function RechercheTerrains() {
       date: 'Dim. 24 Novembre',
       types: [],
       surfaces: [],
-      maxPrix: 35000,
+      maxPrix: 50000,
       equipements: []
     });
   };
 
   const filteredTerrains = terrains.filter((terrain) => {
-    // Localisation
+    // Localisation : comparaison exacte sur la vraie ville du terrain
+    // (et pas une recherche de texte fragile dans l'adresse complète).
     if (filters.localisation && filters.localisation !== 'Tous les quartiers') {
-      if (!terrain.localisation.toLowerCase().includes(filters.localisation.toLowerCase())) {
+      if (terrain.ville !== filters.localisation) {
         return false;
       }
     }
@@ -114,7 +118,8 @@ export default function RechercheTerrains() {
             {/* En-tête de la liste avec compteur "12 terrains trouvés à Dakar" & Tri */}
             <div className="bg-white rounded-2xl p-4 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="text-xs font-bold text-gray-800">
-                <span className="text-sm font-black text-gray-900">{filteredTerrains.length}</span> terrains trouvés à Dakar
+                <span className="text-sm font-black text-gray-900">{filteredTerrains.length}</span> terrains trouvés
+                {filters.localisation !== 'Tous les quartiers' && ` à ${filters.localisation}`}
               </div>
 
               <div className="flex items-center space-x-3 text-xs">

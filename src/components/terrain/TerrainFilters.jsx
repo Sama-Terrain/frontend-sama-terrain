@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Calendar, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
+import { VILLES } from '../../utils/villes';
+import { EQUIPEMENTS_DISPONIBLES } from '../../utils/equipements';
 
 export default function TerrainFilters({ filters = {}, setFilters, onReset, initialFilters, onFilterChange }) {
   // Support both (filters, setFilters) and (initialFilters, onFilterChange) props gracefully
@@ -98,13 +100,9 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
           className="w-full bg-gray-50 border border-gray-200 rounded-[4px] px-3.5 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
         >
           <option value="Tous les quartiers">Tous les quartiers</option>
-          <option value="Almadies">Almadies</option>
-          <option value="Fann">Fann</option>
-          <option value="Mermoz">Mermoz</option>
-          <option value="Ngor">Ngor</option>
-          <option value="Yoff">Yoff</option>
-          <option value="Zone B">Zone B</option>
-          <option value="Guédiawaye">Guédiawaye</option>
+          {VILLES.map((ville) => (
+            <option key={ville} value={ville}>{ville}</option>
+          ))}
         </select>
       </div>
 
@@ -159,7 +157,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
           Surface
         </label>
         <div className="space-y-2 text-xs font-semibold text-gray-700">
-          {['Synthétique', 'Gazon Naturel', 'Sable'].map((surf) => (
+          {['Synthétique', 'Gazon naturel', 'Bitume'].map((surf) => (
             <label key={surf} className="flex items-center space-x-2.5 cursor-pointer">
               <input
                 type="checkbox"
@@ -205,7 +203,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
           Équipements
         </label>
         <div className="space-y-2 text-xs font-semibold text-gray-700">
-          {['Vestiaires', 'Éclairage nocturne', 'Parking sécurisé'].map((eq) => (
+          {EQUIPEMENTS_DISPONIBLES.map((eq) => (
             <label key={eq} className="flex items-center space-x-2.5 cursor-pointer">
               <input
                 type="checkbox"

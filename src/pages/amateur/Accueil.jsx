@@ -6,6 +6,7 @@ import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
 import { iaService } from '../../services/iaService';
 import { MESSAGE_ACCUEIL_CHATBOT } from '../../mocks/chatbot';
+import { VILLES } from '../../utils/villes';
 // Témoignages de la section marketing d'accueil : pas liés à un terrain
 // précis, donc pas couverts par l'API (qui n'expose que les avis PAR terrain).
 import { MOCK_AVIS } from '../../mocks/avis';
@@ -22,7 +23,7 @@ export default function Accueil() {
   const [loading, setLoading] = useState(true);
 
   // État du formulaire de recherche rapide
-  const [searchZone, setSearchZone] = useState('Yoff Plage & Virage');
+  const [searchZone, setSearchZone] = useState(VILLES[0]);
   const [searchDate, setSearchDate] = useState("Aujourd'hui");
   const [searchCreneau, setSearchCreneau] = useState('19:00 - Plein jeu');
 
@@ -127,11 +128,9 @@ export default function Accueil() {
                   onChange={(e) => setSearchZone(e.target.value)}
                   className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
                 >
-                  <option value="Yoff Plage & Virage">Yoff Plage & Virage</option>
-                  <option value="Almadies">Almadies</option>
-                  <option value="Mermoz">Mermoz</option>
-                  <option value="Fann">Fann</option>
-                  <option value="Guédiawaye">Guédiawaye</option>
+                  {VILLES.map((ville) => (
+                    <option key={ville} value={ville}>{ville}</option>
+                  ))}
                 </select>
               </div>
             </div>

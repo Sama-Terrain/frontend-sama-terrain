@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Info,
@@ -13,11 +13,11 @@ import {
 import GerantLayout from '../../components/gerant/GerantLayout';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { VILLES } from '../../utils/villes';
+import { EQUIPEMENTS_DISPONIBLES } from '../../utils/equipements';
 
 const TYPES_TERRAIN = ['Foot à 5', 'Foot à 6', 'Foot à 7', 'Foot à 11'];
-const VILLES = ['Dakar', 'Mermoz', 'Guédiawaye', 'Almadies', 'Yoff', 'Thiès', 'Saly', 'Mbour'];
 const SURFACES = ['Synthétique', 'Gazon naturel', 'Bitume'];
-const EQUIPEMENTS_DISPONIBLES = ['Vestiaires', 'Éclairage nocturne', 'Parking', 'Douches', 'Buvette', 'Tribune'];
 
 // En-tête réutilisé pour chaque section du formulaire (icône + titre)
 function SectionTitle({ icon: Icon, children }) {

@@ -6,7 +6,6 @@ export default function TerrainCard({ terrain, onSelect }) {
   if (!terrain) return null;
 
   const {
-    id,
     nom,
     localisation,
     type = '5v5',
