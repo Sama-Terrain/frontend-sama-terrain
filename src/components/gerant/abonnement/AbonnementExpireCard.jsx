@@ -1,6 +1,6 @@
-import React from 'react';
 import { AlertTriangle, Lock } from 'lucide-react';
 import Button from '../../ui/Button';
+import Alert from '../../ui/Alert';
 import AvantagesAbonnement from './AvantagesAbonnement';
 import { PRIX_ABONNEMENT_MENSUEL } from '../../../mocks/abonnements';
 
@@ -8,7 +8,7 @@ import { PRIX_ABONNEMENT_MENSUEL } from '../../../mocks/abonnements';
  * Écran affiché quand l'essai (ou l'abonnement) est terminé : bloque l'accès
  * au tableau de bord tant que le gérant n'a pas renouvelé son abonnement.
  */
-export default function AbonnementExpireCard({ dateSuspension, chargement, onPayer }) {
+export default function AbonnementExpireCard({ dateSuspension, chargement, erreur, onPayer }) {
   return (
     <div className="max-w-md w-full bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-8 space-y-6 text-center">
 
@@ -37,6 +37,7 @@ export default function AbonnementExpireCard({ dateSuspension, chargement, onPay
       </div>
 
       <div className="space-y-3 pt-2 border-t border-gray-100">
+        {erreur && <Alert type="error" message={erreur} />}
         <Button
           type="button"
           variant="primary"

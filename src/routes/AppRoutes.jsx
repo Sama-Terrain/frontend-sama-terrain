@@ -26,6 +26,8 @@ import Revenus from '../pages/gerant/Revenus';
 import ScannerTicket from '../pages/gerant/ScannerTicket';
 import GerantStatistiques from '../pages/gerant/Statistiques';
 import Abonnement from '../pages/gerant/Abonnement';
+import AbonnementSucces from '../pages/gerant/AbonnementSucces';
+import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
 
 // Pages Authentification
 import Connexion from '../pages/auth/Connexion';
@@ -114,6 +116,22 @@ export default function AppRoutes({ searchParams }) {
         element={
           <ProtectedRoute allowedRoles={[ROLES.GERANT]}>
             <Abonnement />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/gerant/abonnement/succes"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.GERANT]}>
+            <AbonnementSucces />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/gerant/abonnement/annule"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.GERANT]}>
+            <AbonnementAnnule />
           </ProtectedRoute>
         }
       />

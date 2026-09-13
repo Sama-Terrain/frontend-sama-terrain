@@ -34,7 +34,7 @@ export default function TerrainDetail({ onLogout }) {
         const [terrainData, reservationsData, avisData, profileData] = await Promise.all([
           gerantService.getTerrainDetail(Number(id)),
           gerantService.getProchainesReservations(Number(id)),
-          gerantService.getAvisRecents(),
+          gerantService.getAvisRecents(Number(id)),
           gerantService.getGerantProfile(),
         ]);
         setTerrain(terrainData);

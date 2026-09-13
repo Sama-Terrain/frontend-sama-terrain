@@ -1,6 +1,6 @@
-import React from 'react';
 import { Lock } from 'lucide-react';
 import Button from '../../ui/Button';
+import Alert from '../../ui/Alert';
 import AvantagesAbonnement from './AvantagesAbonnement';
 import { PRIX_ABONNEMENT_MENSUEL, DUREE_ESSAI_JOURS } from '../../../mocks/abonnements';
 
@@ -8,7 +8,7 @@ import { PRIX_ABONNEMENT_MENSUEL, DUREE_ESSAI_JOURS } from '../../../mocks/abonn
  * Écran affiché pendant la période d'essai gratuite : présente l'offre et
  * permet de payer tout de suite pour activer l'abonnement sans attendre la fin de l'essai.
  */
-export default function AbonnementActivationCard({ chargement, onPayer }) {
+export default function AbonnementActivationCard({ chargement, erreur, onPayer }) {
   return (
     <div className="max-w-md w-full bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-8 space-y-6">
 
@@ -35,6 +35,7 @@ export default function AbonnementActivationCard({ chargement, onPayer }) {
       </div>
 
       <div className="space-y-2 pt-2 border-t border-gray-100">
+        {erreur && <Alert type="error" message={erreur} />}
         <Button
           type="button"
           variant="primary"

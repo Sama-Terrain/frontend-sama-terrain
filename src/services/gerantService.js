@@ -1,10 +1,7 @@
 import api from './api';
 import { authService } from './authService';
 import { terrainService } from './terrainService';
-import { MOCK_RESERVATIONS_RECENTES_GERANT } from '../mocks/reservations';
-import { MOCK_AVIS_GERANT } from '../mocks/avis';
-import { MOCK_GERANT_STATS, MOCK_REVENUS_30_JOURS } from '../mocks/statistiques';
-import { delaiReseau } from '../utils/delaiReseau';
+import { avisService } from './avisService';
 
 // Libellés affichés pour chaque moyen de paiement stocké côté backend.
 const LABELS_MOYEN_PAIEMENT = {
@@ -69,19 +66,36 @@ export const gerantService = {
     return { name: `${prenom} ${nom}`, role: 'Gérant', initials: initiales };
   },
 
+  // 4 KPIs affichés en haut du tableau de bord.
   async getGerantStats() {
-    await delaiReseau();
-    return MOCK_GERANT_STATS;
+    const { data } = await api.get('/gerant/dashboard/');
+    return [
+      { id: 'reservations-jour', label: "Réservations aujourd'hui", value: data.reservations_aujourdhui, trend: 'Confirmées uniquement' },
+      { id: 'revenus-mois', label: 'Revenus ce mois', value: `${data.revenus_mois.toLocaleString('fr-FR')} FCFA`, trend: 'Depuis le 1er du mois' },
+      { id: 'taux-occupation', label: "Taux d'occupation", value: `${data.taux_occupation}%`, trend: 'Créneaux du mois' },
+      { id: 'note-moyenne', label: 'Avis moyen', value: `${data.note_moyenne}/5`, trend: 'Tous terrains confondus' },
+    ];
   },
 
+  // Évolution des revenus sur les 30 derniers jours, pour le graphique du dashboard.
   async getRevenus30Jours() {
-    await delaiReseau();
-    return MOCK_REVENUS_30_JOURS;
+    const { data } = await api.get('/gerant/revenus/');
+    const total = data.evolution_30_jours.reduce((somme, jour) => somme + jour.montant, 0);
+    return {
+      total: `${total.toLocaleString('fr-FR')} FCFA`,
+      data: data.evolution_30_jours.map((jour) => ({
+        jour: new Date(jour.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+        montant: jour.montant,
+      })),
+    };
   },
 
+  // Les 5 réservations les plus récentes, toutes terrains confondus.
   async getReservationsRecentes() {
-    await delaiReseau();
-    return MOCK_RESERVATIONS_RECENTES_GERANT;
+    const toutes = await this.getReservationsGerant();
+    return [...toutes]
+      .sort((a, b) => b.id.localeCompare(a.id, undefined, { numeric: true }))
+      .slice(0, 5);
   },
 
   async getMesTerrains() {
@@ -132,9 +146,10 @@ export const gerantService = {
     };
   },
 
-  async getAvisRecents() {
-    await delaiReseau();
-    return MOCK_AVIS_GERANT;
+  // Avis récents laissés sur un terrain précis (page TerrainDetail.jsx).
+  async getAvisRecents(terrainId) {
+    const avis = await avisService.getAvisJoueurs(terrainId);
+    return avis.map((a) => ({ ...a, rating: a.note }));
   },
 
   async getRevenusStats() {

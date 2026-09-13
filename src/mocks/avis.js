@@ -18,10 +18,3 @@ export const MOCK_AVIS_MODERATION = [
   { id: 7, initial: 'M', name: 'Mariama Ba', terrain: 'Almadies Arena', rating: 2, comment: 'Réservation compliquée et terrain en mauvais état.', date: '23 Nov 2026', status: 'pending' },
   { id: 8, initial: 'P', name: 'Pape Mbaye', terrain: 'Yoff Municipal', rating: 4, comment: 'Très bon rapport qualité-prix, je recommande.', date: '22 Nov 2026', status: 'pending' },
 ];
-
-// Avis reçus par un gérant sur l'un de ses terrains (page "Détail Terrain" gérant)
-export const MOCK_AVIS_GERANT = [
-  { id: 1, nom: 'Aminata Diagne', initiales: 'AD', rating: 5, date: '15 Juin 2024', commentaire: "Excellent terrain, bien entretenu et l'éclairage nocturne est vraiment top. Les vestiaires sont propres. Je recommande vivement !" },
-  { id: 2, nom: 'Fatou Sow', initiales: 'FS', rating: 4, date: '10 Juin 2024', commentaire: 'Belle surface synthétique, agréable pour jouer. Le parking pourrait être un peu plus grand mais sinon très satisfait.' },
-  { id: 3, nom: 'Khadija Mbaye', initiales: 'KM', rating: 5, date: '5 Juin 2024', commentaire: 'Ambiance conviviale, personnel accueillant et terrain toujours impeccable. On y revient chaque semaine avec les amis !' },
-];

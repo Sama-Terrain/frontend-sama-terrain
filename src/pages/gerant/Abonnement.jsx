@@ -1,43 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import AbonnementActivationCard from '../../components/gerant/abonnement/AbonnementActivationCard';
 import AbonnementExpireCard from '../../components/gerant/abonnement/AbonnementExpireCard';
-import AbonnementActiveCard from '../../components/gerant/abonnement/AbonnementActiveCard';
 import { abonnementService } from '../../services/abonnementService';
 import { formatDateCourte } from '../../utils/formatDate';
 
 /**
  * Page Abonnement (Espace Gérant)
  *
- * Affiche l'un des 3 écrans selon la situation du gérant :
+ * Affiche l'un des 2 écrans selon la situation du gérant :
  * - 'essai'  : période d'essai gratuite en cours -> propose d'activer tout de suite
  * - 'expire' : essai ou abonnement terminé -> bloque et demande de renouveler
- * - après paiement : écran de confirmation avec le reçu
  *
- * Tant que le paiement n'est pas fait, RequireAbonnementActif (cf. routes/)
- * empêche l'accès à tout le reste de l'espace gérant.
+ * Le clic sur "Payer" redirige réellement vers PayTech (Wave/Orange Money) ;
+ * la confirmation arrive de façon asynchrone via l'IPN, et l'utilisateur
+ * revient sur /gerant/abonnement/succes une fois le paiement fait (voir
+ * AbonnementSucces.jsx). Tant que le paiement n'est pas fait,
+ * RequireAbonnementActif (cf. routes/) empêche l'accès au reste de l'espace gérant.
  */
 export default function Abonnement() {
-  const navigate = useNavigate();
   const [abonnement, setAbonnement] = useState(null);
   const [chargement, setChargement] = useState(false);
-  const [recuPaiement, setRecuPaiement] = useState(null); // rempli une fois le paiement réussi
+  const [erreur, setErreur] = useState('');
 
   useEffect(() => {
     abonnementService.getAbonnement().then(setAbonnement);
   }, []);
 
-  const payer = async (moyenPaiement) => {
+  const payer = async () => {
+    setErreur('');
     setChargement(true);
-    const resultat = await abonnementService.renouvelerAbonnement(moyenPaiement);
-    setChargement(false);
-
-    setRecuPaiement({
-      dateActivation: formatDateCourte(new Date().toISOString()),
-      dateFin: formatDateCourte(resultat.abonnement.dateFinAbonnement),
-      montant: resultat.abonnement.prixMensuel,
-      moyenPaiement: resultat.abonnement.moyenPaiement,
-    });
+    const resultat = await abonnementService.renouvelerAbonnement();
+    // En cas de succès, la page quitte le site (redirection PayTech) : pas
+    // besoin de remettre chargement à false, ni de faire quoi que ce soit d'autre.
+    if (!resultat.success) {
+      setChargement(false);
+      setErreur(resultat.error);
+    }
   };
 
   if (!abonnement) {
@@ -50,21 +48,18 @@ export default function Abonnement() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f5] flex items-center justify-center p-6">
-      {recuPaiement ? (
-        <AbonnementActiveCard
-          abonnement={recuPaiement}
-          onAccederDashboard={() => navigate('/gerant/dashboard')}
-        />
-      ) : abonnement.statutEffectif === 'expire' ? (
+      {abonnement.statutEffectif === 'expire' ? (
         <AbonnementExpireCard
           dateSuspension={formatDateCourte(abonnement.dateFinEssai)}
           chargement={chargement}
-          onPayer={() => payer('Wave')}
+          erreur={erreur}
+          onPayer={payer}
         />
       ) : (
         <AbonnementActivationCard
           chargement={chargement}
-          onPayer={() => payer('Wave')}
+          erreur={erreur}
+          onPayer={payer}
         />
       )}
     </div>

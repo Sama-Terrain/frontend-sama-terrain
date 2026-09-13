@@ -1,5 +1,4 @@
-import { MOCK_ABONNEMENT_GERANT, MOCK_PAIEMENTS_ABONNEMENT, PRIX_ABONNEMENT_MENSUEL } from '../mocks/abonnements';
-import { delaiReseau } from '../utils/delaiReseau';
+import api from './api';
 
 /**
  * Calcule le statut RÉEL de l'abonnement à l'instant présent, à partir des dates
@@ -18,7 +17,7 @@ export function calculerStatutEffectif(abonnement) {
   }
 
   // Sinon, on regarde si l'essai gratuit de 7 jours est encore en cours
-  if (new Date(abonnement.dateFinEssai).getTime() > maintenant) {
+  if (abonnement.dateFinEssai && new Date(abonnement.dateFinEssai).getTime() > maintenant) {
     return 'essai';
   }
 
@@ -27,45 +26,41 @@ export function calculerStatutEffectif(abonnement) {
 
 // Nombre de jours entiers restants avant la fin de l'essai (0 si déjà terminé)
 export function joursRestantsEssai(abonnement) {
+  if (!abonnement.dateFinEssai) return 0;
   const millisecondesRestantes = new Date(abonnement.dateFinEssai).getTime() - Date.now();
   return Math.max(0, Math.ceil(millisecondesRestantes / (1000 * 60 * 60 * 24)));
 }
 
 /**
  * Service de gestion de l'abonnement gérant.
- * Aujourd'hui : lit/modifie l'objet mock en mémoire.
- * Demain : GET/POST /api/gerant/abonnement, avec le paiement réel géré par PayDunya.
+ * Appelle désormais le vrai backend Django (voir backend/gerant/ et backend/paiements/).
  */
 export const abonnementService = {
   async getAbonnement() {
-    await delaiReseau();
-    return { ...MOCK_ABONNEMENT_GERANT, statutEffectif: calculerStatutEffectif(MOCK_ABONNEMENT_GERANT) };
+    const { data } = await api.get('/gerant/abonnement/');
+    const abonnement = {
+      statut: data.statut,
+      dateFinEssai: data.date_fin_essai,
+      dateFinAbonnement: data.date_fin_abonnement,
+      prixMensuel: data.prix_mensuel,
+    };
+    return { ...abonnement, statutEffectif: calculerStatutEffectif(abonnement) };
   },
 
-  // Simule le paiement de l'abonnement mensuel via PayDunya (Wave ou Orange Money)
-  async renouvelerAbonnement(moyenPaiement) {
-    await delaiReseau();
-
-    const dateFinAbonnement = new Date();
-    dateFinAbonnement.setMonth(dateFinAbonnement.getMonth() + 1);
-
-    MOCK_ABONNEMENT_GERANT.statut = 'actif';
-    MOCK_ABONNEMENT_GERANT.dateFinAbonnement = dateFinAbonnement.toISOString();
-    MOCK_ABONNEMENT_GERANT.moyenPaiement = moyenPaiement;
-
-    MOCK_PAIEMENTS_ABONNEMENT.unshift({
-      id: `AB-${Date.now()}`,
-      date: new Date().toLocaleDateString('fr-FR'),
-      montant: PRIX_ABONNEMENT_MENSUEL,
-      moyenPaiement,
-      statut: 'Payé',
-    });
-
-    return { success: true, abonnement: { ...MOCK_ABONNEMENT_GERANT } };
-  },
-
-  async getHistoriquePaiementsAbonnement() {
-    await delaiReseau();
-    return MOCK_PAIEMENTS_ABONNEMENT;
+  // Démarre le paiement PayTech de l'abonnement mensuel : redirige le
+  // navigateur vers la page de paiement externe (Wave/Orange Money réels).
+  // La confirmation réelle arrivera de façon asynchrone via l'IPN PayTech
+  // (voir AbonnementIPNView), donc on ne marque rien comme "payé" ici.
+  async renouvelerAbonnement() {
+    try {
+      const { data } = await api.post('/paiements/abonnement/initier/');
+      window.location.href = data.payment_url;
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.detail || "Impossible de démarrer le paiement. Réessayez.",
+      };
+    }
   },
 };

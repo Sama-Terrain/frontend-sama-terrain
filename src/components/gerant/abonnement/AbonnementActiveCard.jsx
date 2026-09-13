@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle2, Wallet, FileDown } from 'lucide-react';
 import Button from '../../ui/Button';
 

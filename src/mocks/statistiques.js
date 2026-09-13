@@ -56,28 +56,6 @@ export const MOCK_STATS_TOP_TERRAINS = [
   { rank: 5, terrain: 'Saint-Louis Stadium', ville: 'Saint-Louis', reservations: '145 matches', chiffre: '2 175 000 FCFA' },
 ];
 
-// --- Espace GÉRANT ---
-
-export const MOCK_GERANT_STATS = [
-  { id: 'reservations-jour', label: "Réservations aujourd'hui", value: '12', trend: '+3 match de plus', trendDirection: 'up' },
-  { id: 'revenus-mois', label: 'Revenus du mois', value: '450K FCFA', trend: '+12% vs mois dernier', trendDirection: 'up' },
-  { id: 'taux-occupation', label: "Taux d'occupation", value: '78%', trend: '-2% ce week-end', trendDirection: 'down' },
-  { id: 'avis-moyen', label: 'Avis moyen', value: '4.6 / 5', trend: 'Basé sur 124 retours', trendDirection: 'up' },
-];
-
-export const MOCK_REVENUS_30_JOURS = {
-  total: '2 450 000 FCFA',
-  data: [
-    { jour: 'J1', montant: 62000 }, { jour: 'J2', montant: 65000 }, { jour: 'J3', montant: 70000 },
-    { jour: 'J4', montant: 68000 }, { jour: 'J5', montant: 72000 }, { jour: 'J6', montant: 66000 },
-    { jour: 'J7', montant: 69000 }, { jour: 'J8', montant: 74000 }, { jour: 'J9', montant: 80000 },
-    { jour: 'J10', montant: 78000 }, { jour: 'J11', montant: 82000 }, { jour: 'J12', montant: 79000 },
-    { jour: 'J13', montant: 85000 }, { jour: 'J14', montant: 83000 }, { jour: 'J15', montant: 88000 },
-    { jour: 'J16', montant: 95000 }, { jour: 'J17', montant: 90000 }, { jour: 'J18', montant: 93000 },
-    { jour: 'J19', montant: 97000 }, { jour: 'J20', montant: 100000 }, { jour: 'J21', montant: 98000 },
-    { jour: 'J22', montant: 104000 }, { jour: 'J23', montant: 108000 }, { jour: 'J24', montant: 106000 },
-    { jour: 'J25', montant: 112000 }, { jour: 'J26', montant: 118000 }, { jour: 'J27', montant: 115000 },
-    { jour: 'J28', montant: 122000 }, { jour: 'J29', montant: 128000 }, { jour: 'J30', montant: 125000 },
-  ],
-};
+// L'espace gérant (dashboard, revenus, statistiques, avis récents) est
+// entièrement branché sur le vrai backend, voir services/gerantService.js.
 
