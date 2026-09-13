@@ -3,15 +3,7 @@ import { authService } from './authService';
 import { terrainService } from './terrainService';
 import { MOCK_RESERVATIONS_RECENTES_GERANT } from '../mocks/reservations';
 import { MOCK_AVIS_GERANT } from '../mocks/avis';
-import { MOCK_TICKETS_SCANNABLES, MOCK_DERNIERES_VALIDATIONS } from '../mocks/paiements';
-import {
-  MOCK_GERANT_STATS,
-  MOCK_REVENUS_30_JOURS,
-  MOCK_STATISTIQUES_KPIS_GERANT,
-  MOCK_RESERVATIONS_PAR_JOUR,
-  MOCK_MODES_PAIEMENT_STATS,
-  MOCK_RECOMMANDATIONS_IA,
-} from '../mocks/statistiques';
+import { MOCK_GERANT_STATS, MOCK_REVENUS_30_JOURS } from '../mocks/statistiques';
 import { delaiReseau } from '../utils/delaiReseau';
 
 // Libellés affichés pour chaque moyen de paiement stocké côté backend.
@@ -178,34 +170,92 @@ export const gerantService = {
     }));
   },
 
+  // Aucune route backend ne conserve un historique des validations : la
+  // liste se construit en direct pendant la session (voir ScannerTicket.jsx),
+  // donc on démarre simplement sur une liste vide.
   async getDernieresValidations() {
-    await delaiReseau();
-    return MOCK_DERNIERES_VALIDATIONS;
+    return [];
   },
 
-  // Recherche un ticket par son code (scan caméra ou saisie manuelle)
+  // Valide un ticket scanné/saisi : le marque comme utilisé côté backend et
+  // enregistre au passage le solde payé sur place (par défaut en espèces).
   async verifierTicket(code) {
-    await delaiReseau();
-    return MOCK_TICKETS_SCANNABLES[code.trim().toUpperCase()] || null;
+    try {
+      const { data } = await api.post('/tickets/valider/', { code: code.trim() });
+      const ticket = data.ticket;
+
+      try {
+        await api.post('/paiements/solde/', { reservation: ticket.reservation, moyen_paiement: 'cash' });
+      } catch (error) {
+        // Le solde a peut-être déjà été enregistré : on ne bloque pas la
+        // validation du ticket pour autant, qui a déjà réussi.
+        console.error('Erreur enregistrement solde:', error);
+      }
+
+      return {
+        code: ticket.code,
+        client: ticket.client,
+        terrain: ticket.terrain,
+        creneau: `${ticket.heure_debut.slice(0, 5)} - ${ticket.heure_fin.slice(0, 5)}`,
+        montantRestant: ticket.montant_restant,
+      };
+    } catch {
+      return null;
+    }
   },
 
   async getStatistiquesKpis() {
-    await delaiReseau();
-    return MOCK_STATISTIQUES_KPIS_GERANT;
+    const [dashboard, revenus] = await Promise.all([
+      api.get('/gerant/dashboard/'),
+      api.get('/gerant/revenus/'),
+    ]);
+    const d = dashboard.data;
+    const r = revenus.data;
+
+    return [
+      { id: 'reservations-jour', label: "Réservations aujourd'hui", value: d.reservations_aujourdhui, trend: 'Confirmées uniquement' },
+      { id: 'taux-occupation', label: "Taux d'occupation", value: `${d.taux_occupation}%`, trend: 'Créneaux du mois' },
+      { id: 'note-moyenne', label: 'Note moyenne', value: `${d.note_moyenne}/5`, trend: 'Tous terrains confondus' },
+      { id: 'revenus-mois', label: 'Revenus ce mois', value: `${r.revenus_mois.toLocaleString('fr-FR')} FCFA`, trend: 'Depuis le 1er du mois' },
+    ];
   },
 
+  // Nombre de réservations confirmées par jour sur les 7 derniers jours.
   async getReservationsParJour() {
-    await delaiReseau();
-    return MOCK_RESERVATIONS_PAR_JOUR;
+    const { data } = await api.get('/gerant/revenus/');
+    return data.reservations_par_jour.map((jour) => ({
+      jour: new Date(jour.date).toLocaleDateString('fr-FR', { weekday: 'short' }),
+      valeur: jour.nombre,
+    }));
   },
 
+  // Répartition (en %) des paiements par moyen de paiement, pour le donut.
   async getModesPaiementStats() {
-    await delaiReseau();
-    return MOCK_MODES_PAIEMENT_STATS;
+    const { data } = await api.get('/gerant/revenus/');
+    const total = data.modes_paiement_stats.reduce((somme, m) => somme + m.total, 0);
+    if (total === 0) return [];
+
+    const couleurs = { wave: '#0EA5E9', orange_money: '#F97316', cash: '#9CA3AF' };
+
+    return data.modes_paiement_stats.map((m) => ({
+      name: LABELS_MOYEN_PAIEMENT[m.moyen_paiement] || m.moyen_paiement,
+      value: Math.round((m.total / total) * 100),
+      color: couleurs[m.moyen_paiement] || '#9CA3AF',
+    }));
   },
 
+  // Recommandations générées par le micro-service IA (pas encore déployé,
+  // voir IAPredictionsView) : on tente pour le premier terrain du gérant,
+  // et on renvoie simplement une liste vide si le service est indisponible.
   async getRecommandationsIA() {
-    await delaiReseau();
-    return MOCK_RECOMMANDATIONS_IA;
+    const terrains = await this.getMesTerrains();
+    if (terrains.length === 0) return [];
+
+    try {
+      const { data } = await api.get(`/ia/predictions/${terrains[0].id}/`);
+      return data.recommandations || [];
+    } catch {
+      return [];
+    }
   },
 };

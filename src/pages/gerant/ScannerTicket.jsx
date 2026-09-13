@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import ScannerCameraPreview from '../../components/gerant/ScannerCameraPreview';
 import TicketValidationResult from '../../components/gerant/TicketValidationResult';
@@ -123,7 +123,7 @@ export default function ScannerTicket({ onLogout }) {
                 type="text"
                 value={codeTicket}
                 onChange={(e) => setCodeTicket(e.target.value)}
-                placeholder="Ex : RES-9421-SND"
+                placeholder="Ex : 3fa85f64-5717-4562-b3fc-2c963f66afa6"
                 className="flex-1 border border-gray-200 rounded-[8px] px-4 py-3 text-sm font-mono font-semibold text-gray-900 outline-none focus:border-vert-principal"
               />
               <Button
