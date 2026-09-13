@@ -115,9 +115,6 @@ export default function DetailTerrain({ currentUser }) {
           description: "Le Complexe Keur Madior propose un terrain de mini-foot haut de gamme en plein cœur des Almadies. Doté d'une pelouse synthétique dernière génération importée, d'un éclairage puissant par projecteurs LED pour les matchs nocturnes et de vestiaires propres et modernes. Un parking sécurisé gratuit est également disponible pour nos clients."
         };
         setTerrain(terrainFinal);
-        // L'avance est fixée par le gérant pour ce terrain (pas modifiable
-        // par l'amateur) : on la pré-remplit directement.
-        setAvance(terrainFinal.avance);
 
         setAvisList(avisData || []);
       } catch (error) {
@@ -156,16 +153,19 @@ export default function DetailTerrain({ currentUser }) {
   const hasChosenDateAndSlot = Boolean(selectedDate && !isPastDate && selectedCreneau);
   const avanceNum = Number(avance) || 0;
 
+  const MONTANT_AVANCE_MINIMUM = 10000;
+  const currentPrix = selectedCreneau ? selectedCreneau.prix : (terrain?.prixHeure || 30000);
+
   const isFormComplete = Boolean(
     selectedDate &&
     !isPastDate &&
     selectedCreneau &&
     nomComplet.trim() !== '' &&
     telephone.trim() !== '' &&
-    avanceNum > 0
+    avanceNum > MONTANT_AVANCE_MINIMUM &&
+    avanceNum < currentPrix
   );
 
-  const currentPrix = selectedCreneau ? selectedCreneau.prix : (terrain?.prixHeure || 30000);
   const resteAPayer = Math.max(0, currentPrix - avanceNum);
 
   const [erreurReservation, setErreurReservation] = useState('');
@@ -190,6 +190,7 @@ export default function DetailTerrain({ currentUser }) {
         creneauId: selectedCreneau.id,
         nomComplet,
         telephone,
+        montantAvance: avanceNum,
       });
 
       const reservationData = {
@@ -212,6 +213,7 @@ export default function DetailTerrain({ currentUser }) {
     } catch (error) {
       setErreurReservation(
         error.response?.data?.creneau?.[0] ||
+        error.response?.data?.montant_avance?.[0] ||
         error.response?.data?.detail ||
         "Impossible de réserver ce créneau. Il a peut-être déjà été pris, veuillez réessayer."
       );
@@ -470,21 +472,33 @@ export default function DetailTerrain({ currentUser }) {
 
                 <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-3 animate-in fade-in duration-200">
                   <h3 className="text-sm font-bold text-gray-900">
-                    Montant de l'avance <span className="text-xs text-gray-400 font-normal">(fixé par le gérant du terrain)</span>
+                    Montant de l'avance <span className="text-xs text-gray-400 font-normal">(supérieur à 10 000 FCFA)</span>
                   </h3>
 
                   <div className="relative max-w-md">
                     <input
                       type="number"
                       value={avance}
-                      readOnly
-                      disabled
-                      className="w-full bg-gray-100 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-500 cursor-not-allowed"
+                      onChange={(e) => setAvance(e.target.value)}
+                      placeholder="15 000 (FCFA)"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-vert-principal"
                     />
                     <span className="absolute right-4 top-2.5 text-xs font-bold text-gray-400">FCFA</span>
                   </div>
 
-                  {avanceNum > 0 && (
+                  {avance !== '' && avanceNum <= MONTANT_AVANCE_MINIMUM && (
+                    <p className="text-xs font-semibold text-red-600">
+                      L'avance doit être strictement supérieure à 10 000 FCFA.
+                    </p>
+                  )}
+
+                  {avance !== '' && avanceNum >= currentPrix && (
+                    <p className="text-xs font-semibold text-red-600">
+                      L'avance ne peut pas dépasser le prix total du créneau ({currentPrix.toLocaleString()} FCFA).
+                    </p>
+                  )}
+
+                  {avanceNum > MONTANT_AVANCE_MINIMUM && avanceNum < currentPrix && (
                     <p className="text-xs font-semibold text-gray-500">
                       Reste à payer sur place : <span className="text-vert-principal font-bold">{resteAPayer.toLocaleString()} FCFA</span>
                     </p>

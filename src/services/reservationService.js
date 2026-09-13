@@ -86,11 +86,12 @@ export const reservationService = {
   // Crée une réservation pour le créneau choisi : bloque immédiatement le
   // créneau (statut "en_attente") en attendant le paiement de l'avance.
   // Appelé depuis DetailTerrain.jsx, AVANT de rediriger vers /paiement.
-  creerReservation: async ({ creneauId, nomComplet, telephone }) => {
+  creerReservation: async ({ creneauId, nomComplet, telephone, montantAvance }) => {
     const { data } = await api.post('/reservations/', {
       creneau: creneauId,
       nom_complet: nomComplet,
       telephone,
+      montant_avance: montantAvance,
     });
     return normaliserReservation(data);
   },
