@@ -51,6 +51,22 @@ export default function MesReservations() {
     (res) => res.tabCategory === activeTab
   );
 
+  // Reprend le paiement d'une réservation "en attente" (créneau bloqué mais
+  // avance jamais payée, ex: fenêtre PayTech fermée trop tôt) : on renvoie
+  // vers la page Paiement avec les mêmes infos que depuis DetailTerrain.jsx.
+  const handlePayer = (item) => {
+    navigate('/paiement', {
+      state: {
+        terrain: { nom: item.nomTerrain },
+        date: item.date,
+        creneau: { heure: `${item.heure_debut.slice(0, 5)} - ${item.heure_fin.slice(0, 5)}` },
+        avance: item.montantAcompte,
+        resteSurPlace: item.resteAPayer,
+        reservationId: item.id,
+      },
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/60 py-10 px-4 sm:px-6 lg:px-20 font-sans text-left">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -192,6 +208,15 @@ export default function MesReservations() {
 
                   {/* ACTION BUTTONS */}
                   <div className="flex items-center space-x-3">
+                    {item.statut === 'en_attente' && (
+                      <button
+                        onClick={() => handlePayer(item)}
+                        className="px-4 py-2 bg-dore hover:bg-dore-survol text-gray-900 font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
+                      >
+                        Payer
+                      </button>
+                    )}
+
                     <button
                       onClick={() => item.ticketDisponible && setTicketModal(item)}
                       disabled={!item.ticketDisponible}

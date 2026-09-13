@@ -624,17 +624,21 @@ export default function DetailTerrain({ currentUser }) {
             
             <div className="bg-white rounded-[8px] p-4 border border-gray-200 space-y-3">
               <h4 className="text-xs font-bold text-gray-900 uppercase">Localisation du terrain</h4>
-              <div className="h-44 bg-emerald-50 rounded-[8px] border border-emerald-100 relative overflow-hidden flex items-center justify-center text-center p-4">
-                <div className="space-y-2">
-                  <div className="w-10 h-10 bg-red-500 text-white rounded-full mx-auto flex items-center justify-center shadow-md animate-bounce">
-                    <MapPin size={20} />
-                  </div>
-                  <p className="text-xs font-bold text-gray-800">
-                    Almadies, Dakar, Sénégal
-                  </p>
-                  <p className="text-[10px] text-gray-500">Rue NG-022, Almadies</p>
-                </div>
+              <div className="h-44 rounded-[8px] border border-gray-200 overflow-hidden">
+                <iframe
+                  title={`Carte de ${terrain?.nom || 'ce terrain'}`}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                    `${terrain?.adresse || ''}, ${terrain?.ville || ''}, Sénégal`
+                  )}&z=14&output=embed`}
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
               </div>
+              <p className="text-[11px] text-gray-500 flex items-center gap-1">
+                <MapPin size={12} className="shrink-0 text-vert-principal" />
+                <span>{terrain?.adresse}, {terrain?.ville}</span>
+              </p>
             </div>
 
             <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-5">

@@ -362,27 +362,27 @@ export default function Accueil() {
             </ul>
           </div>
 
-          {/* Visuel Carte Dakar */}
-          <div className="bg-emerald-50/50 rounded-[8px] p-6 border border-emerald-100 relative min-h-[280px] flex items-center justify-center text-center">
-            <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-full text-xs font-bold text-[#004030] border border-gray-200 flex items-center gap-2">
+          {/* Visuel Carte Dakar : vraie carte (pas un simple visuel décoratif) */}
+          <div className="rounded-[8px] border border-emerald-100 relative min-h-[280px] overflow-hidden">
+            <iframe
+              title="Carte des terrains à Dakar"
+              src="https://maps.google.com/maps?q=Dakar,%20S%C3%A9n%C3%A9gal&z=11&output=embed"
+              className="absolute inset-0 w-full h-full border-0"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+
+            <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-full text-xs font-bold text-[#004030] border border-gray-200 flex items-center gap-2 shadow-sm pointer-events-none">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              14 terrains disponibles ce soir à Dakar
+              Terrains disponibles à Dakar, Mermoz, Almadies, Yoff...
             </div>
-            
-            <div className="space-y-3">
-              <div className="w-16 h-16 bg-vert-principal text-white rounded-full mx-auto flex items-center justify-center">
-                <MapPin size={32} />
-              </div>
-              <p className="text-sm font-bold text-gray-800">
-                Almadies • Mermoz • Fann • Yoff • Guédiawaye
-              </p>
-              <button
-                onClick={() => navigate('/terrains')}
-                className="text-xs font-bold text-vert-principal hover:underline cursor-pointer"
-              >
-                Explorer la carte interactive →
-              </button>
-            </div>
+
+            <button
+              onClick={() => navigate('/terrains')}
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full text-xs font-bold text-vert-principal border border-gray-200 shadow-sm hover:bg-gray-50 cursor-pointer"
+            >
+              Explorer tous les terrains →
+            </button>
           </div>
 
         </div>
