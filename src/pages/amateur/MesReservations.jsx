@@ -28,11 +28,23 @@ export default function MesReservations() {
   }, []);
 
   const handleAnnuler = async (resId) => {
-    if (window.confirm('Voulez-vous vraiment annuler cette réservation ?')) {
-      await reservationService.annulerReservation(resId);
-      const updated = await reservationService.getUserReservations();
-      setReservations([...updated]);
+    if (!window.confirm('Voulez-vous vraiment annuler cette réservation ?')) return;
+
+    const resultat = await reservationService.annulerReservation(resId);
+
+    if (!resultat.success) {
+      window.alert(resultat.error);
+      return;
     }
+
+    window.alert(
+      resultat.remboursementTotal
+        ? `Réservation annulée. Vous serez remboursé de ${resultat.montantRembourse.toLocaleString()} FCFA.`
+        : "Réservation annulée. Comme c'était à moins de 24h du match, l'avance n'est pas remboursée."
+    );
+
+    const updated = await reservationService.getUserReservations();
+    setReservations(updated);
   };
 
   const filteredReservations = reservations.filter(
@@ -181,10 +193,16 @@ export default function MesReservations() {
                   {/* ACTION BUTTONS */}
                   <div className="flex items-center space-x-3">
                     <button
-                      onClick={() => setTicketModal(item)}
-                      className="px-4 py-2 bg-vert-clair hover:bg-[#d5ecd9] text-vert-principal font-bold text-xs rounded-[8px] transition-colors cursor-pointer"
+                      onClick={() => item.ticketDisponible && setTicketModal(item)}
+                      disabled={!item.ticketDisponible}
+                      title={item.ticketDisponible ? '' : 'Le ticket apparaîtra une fois le paiement confirmé.'}
+                      className={`px-4 py-2 font-bold text-xs rounded-[8px] transition-colors ${
+                        item.ticketDisponible
+                          ? 'bg-vert-clair hover:bg-[#d5ecd9] text-vert-principal cursor-pointer'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
                     >
-                      Voir ticket
+                      {item.ticketDisponible ? 'Voir ticket' : 'Ticket en attente'}
                     </button>
 
                     {item.tabCategory === 'a-venir' && (

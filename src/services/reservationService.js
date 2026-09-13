@@ -46,6 +46,11 @@ function normaliserReservation(r) {
     moyenPaiement: r.moyen_paiement,
     transactionId: r.transaction_id,
     tabCategory: determinerTabCategory(r),
+    // Le ticket (QR) n'existe qu'une fois le paiement confirmé par l'IPN
+    // PayTech : tant que la réservation est "en_attente", il n'y en a pas.
+    reference: r.ticket ? `#ST-${r.ticket.code.slice(0, 8).toUpperCase()}` : null,
+    ticketCode: r.ticket?.code || null,
+    ticketDisponible: Boolean(r.ticket),
   };
 }
 
