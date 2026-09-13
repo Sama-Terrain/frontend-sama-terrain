@@ -3,15 +3,6 @@
 
 export const MOYENS_PAIEMENT = ['Wave', 'Orange Money', 'Carte Bancaire'];
 
-// Historique des paiements reçus par un gérant (page "Revenus")
-export const MOCK_HISTORIQUE_PAIEMENTS = [
-  { id: 1, date: "Aujourd'hui, 14:32", client: 'Malick Fall', terrain: 'Terrain A - Elite Arena', mode: 'Wave', montant: 15000, statut: 'Succès' },
-  { id: 2, date: "Aujourd'hui, 11:15", client: 'Khady Syll', terrain: 'Terrain B - Classic Grass', mode: 'Orange Money', montant: 15000, statut: 'Succès' },
-  { id: 3, date: 'Hier, 21:03', client: 'Ibrahima Ndiaye', terrain: 'Terrain A - Elite Arena', mode: 'Wave', montant: 30000, statut: 'Succès' },
-  { id: 4, date: 'Hier, 18:40', client: 'Amy Collé', terrain: 'Terrain C - Saly Beach', mode: 'Carte Bancaire', montant: 30000, statut: 'Succès' },
-  { id: 5, date: '27 Nov, 16:12', client: 'Modou Lô', terrain: 'Terrain A - Elite Arena', mode: 'Orange Money', montant: 15000, statut: 'Succès' },
-];
-
 // Tickets (réservations payées) reconnus par le scanner du gérant, indexés par code
 export const MOCK_TICKETS_SCANNABLES = {
   'RES-9421-SND': { code: 'RES-9421-SND', client: 'Elhadji Diouf', terrain: 'Terrain A (Elite Arena)', creneau: 'Ce soir, 18h00 - 20h00', montantRestant: 15000 },

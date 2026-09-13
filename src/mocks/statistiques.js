@@ -81,23 +81,6 @@ export const MOCK_REVENUS_30_JOURS = {
   ],
 };
 
-export const MOCK_REVENUS_STATS = [
-  { id: 'revenus-mois', label: 'Revenus ce mois', value: '650 000 FCFA', trend: '+12% vs mois dernier', trendDirection: 'up' },
-  { id: 'revenus-hier', label: 'Revenus hier', value: '28 000 FCFA', trend: '-3% vs jour moyen', trendDirection: 'down' },
-  { id: 'avances-recues', label: 'Avances reçues', value: '325 000 FCFA', trend: '50% du total requis', trendDirection: 'up' },
-  { id: 'solde-a-percevoir', label: 'Solde à percevoir', value: '325 000 FCFA', trend: 'À récupérer sur place', trendDirection: 'up' },
-];
-
-export const MOCK_REVENUS_EVOLUTION = {
-  ville: 'Dakar',
-  data: [
-    { jour: 'J1', montant: 32000 }, { jour: 'J2', montant: 45000 }, { jour: 'J3', montant: 28000 },
-    { jour: 'J4', montant: 52000 }, { jour: 'J5', montant: 68000 }, { jour: 'J6', montant: 58000 },
-    { jour: 'J7', montant: 62000 }, { jour: 'J8', montant: 75000 }, { jour: 'J9', montant: 66000 },
-    { jour: 'J10', montant: 82000 }, { jour: 'J11', montant: 78000 }, { jour: 'J12', montant: 88000 },
-  ],
-};
-
 export const MOCK_STATISTIQUES_KPIS_GERANT = [
   { id: 'taux-occupation', label: "Taux d'occupation moyen", value: '78%', trend: '+4% vs mois dernier', trendDirection: 'up' },
   { id: 'terrain-demande', label: 'Terrain le plus demandé', value: 'Parcelles', trend: '48 Réservations', trendDirection: 'up' },

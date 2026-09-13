@@ -3,18 +3,24 @@ import { authService } from './authService';
 import { terrainService } from './terrainService';
 import { MOCK_RESERVATIONS_RECENTES_GERANT } from '../mocks/reservations';
 import { MOCK_AVIS_GERANT } from '../mocks/avis';
-import { MOCK_HISTORIQUE_PAIEMENTS, MOCK_TICKETS_SCANNABLES, MOCK_DERNIERES_VALIDATIONS } from '../mocks/paiements';
+import { MOCK_TICKETS_SCANNABLES, MOCK_DERNIERES_VALIDATIONS } from '../mocks/paiements';
 import {
   MOCK_GERANT_STATS,
   MOCK_REVENUS_30_JOURS,
-  MOCK_REVENUS_STATS,
-  MOCK_REVENUS_EVOLUTION,
   MOCK_STATISTIQUES_KPIS_GERANT,
   MOCK_RESERVATIONS_PAR_JOUR,
   MOCK_MODES_PAIEMENT_STATS,
   MOCK_RECOMMANDATIONS_IA,
 } from '../mocks/statistiques';
 import { delaiReseau } from '../utils/delaiReseau';
+
+// Libellés affichés pour chaque moyen de paiement stocké côté backend.
+const LABELS_MOYEN_PAIEMENT = {
+  wave: 'Wave',
+  orange_money: 'Orange Money',
+  cash: 'Cash',
+  '': 'Non renseigné',
+};
 
 const LABELS_STATUT_RESERVATION = {
   en_attente: { label: 'En attente', badge: 'bg-amber-100 text-amber-700' },
@@ -140,18 +146,36 @@ export const gerantService = {
   },
 
   async getRevenusStats() {
-    await delaiReseau();
-    return MOCK_REVENUS_STATS;
+    const { data } = await api.get('/gerant/revenus/');
+    return [
+      { id: 'revenus_mois', label: 'Revenus ce mois', value: `${data.revenus_mois.toLocaleString('fr-FR')} FCFA`, trend: 'Depuis le 1er du mois' },
+      { id: 'revenus_hier', label: 'Revenus hier', value: `${data.revenus_hier.toLocaleString('fr-FR')} FCFA`, trend: 'Journée précédente' },
+      { id: 'avances_recues', label: 'Avances reçues', value: `${data.avances_recues.toLocaleString('fr-FR')} FCFA`, trend: 'Ce mois-ci' },
+      { id: 'solde_a_percevoir', label: 'Solde à percevoir', value: `${data.solde_a_percevoir.toLocaleString('fr-FR')} FCFA`, trend: 'À encaisser sur place' },
+    ];
   },
 
   async getRevenusEvolution() {
-    await delaiReseau();
-    return MOCK_REVENUS_EVOLUTION;
+    const { data } = await api.get('/gerant/revenus/');
+    return {
+      data: data.evolution_30_jours.map((jour) => ({
+        jour: new Date(jour.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+        montant: jour.montant,
+      })),
+    };
   },
 
   async getHistoriquePaiements() {
-    await delaiReseau();
-    return MOCK_HISTORIQUE_PAIEMENTS;
+    const { data } = await api.get('/gerant/revenus/');
+    return data.historique_paiements.map((p) => ({
+      id: p.id,
+      date: new Date(p.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
+      client: p.client,
+      terrain: p.terrain,
+      mode: LABELS_MOYEN_PAIEMENT[p.moyen_paiement] || p.moyen_paiement,
+      montant: p.montant,
+      statut: 'Payé',
+    }));
   },
 
   async getDernieresValidations() {

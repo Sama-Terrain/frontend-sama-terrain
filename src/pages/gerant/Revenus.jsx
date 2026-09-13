@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import AdminKpiCard from '../../components/admin/AdminKpiCard';
 import RevenusNetChart from '../../components/gerant/RevenusNetChart';
