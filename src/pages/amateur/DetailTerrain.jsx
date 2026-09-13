@@ -5,7 +5,7 @@ import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
-import { MOCK_CRENEAUX } from '../../mocks/creneaux';
+import { creneauService } from '../../services/creneauService';
 
 export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
@@ -65,8 +65,30 @@ export default function DetailTerrain({ currentUser }) {
   const [newAvisNote, setNewAvisNote] = useState(5);
   const [newAvisTexte, setNewAvisTexte] = useState('');
 
-  // Créneaux horaires instantanés
-  const creneauxHoraires = MOCK_CRENEAUX;
+  // Créneaux horaires du terrain, rechargés à chaque changement de date.
+  const [creneauxHoraires, setCreneauxHoraires] = useState([]);
+  const [loadingCreneaux, setLoadingCreneaux] = useState(false);
+
+  useEffect(() => {
+    if (!selectedDate) {
+      setCreneauxHoraires([]);
+      return;
+    }
+
+    async function chargerCreneaux() {
+      try {
+        setLoadingCreneaux(true);
+        const data = await creneauService.getCreneauxByTerrainAndDate(terrainId, selectedDate);
+        setCreneauxHoraires(data);
+      } catch (error) {
+        console.error('Erreur chargement créneaux :', error);
+        setCreneauxHoraires([]);
+      } finally {
+        setLoadingCreneaux(false);
+      }
+    }
+    chargerCreneaux();
+  }, [terrainId, selectedDate]);
 
   // Chargement du terrain et des avis
   useEffect(() => {
@@ -325,13 +347,21 @@ export default function DetailTerrain({ currentUser }) {
                 <div className="p-4 bg-amber-50 rounded-[8px] border border-amber-200 text-amber-800 text-xs font-medium">
                   Veuillez d'abord cliquer sur un jour ci-dessus pour afficher les créneaux disponibles.
                 </div>
+              ) : loadingCreneaux ? (
+                <div className="py-8 text-center">
+                  <div className="w-8 h-8 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
+                </div>
+              ) : creneauxHoraires.length === 0 ? (
+                <div className="p-4 bg-gray-50 rounded-[8px] border border-gray-200 text-gray-600 text-xs font-medium">
+                  Aucun créneau configuré par le gérant pour cette date.
+                </div>
               ) : (
                 /* CRÉNEAUX HORAIRES DISPONIBLES */
                 <div className="space-y-3 pt-4 border-t border-gray-100">
                   <h4 className="text-xs font-bold text-gray-700 uppercase">
                     Créneaux disponibles ({selectedDate})
                   </h4>
-                  
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {creneauxHoraires.map((slot) => {
                       const isSelected = selectedCreneau?.id === slot.id;
