@@ -105,4 +105,49 @@ export const authService = {
       return { success: false, error: extraireMessageErreur(error) };
     }
   },
+
+  /**
+   * Affiche le vrai bouton Google (rendu par Google lui-même) à l'intérieur
+   * de `element`, et appelle `onResultat({success, user|error})` une fois que
+   * Google a répondu.
+   *
+   * On utilise `renderButton` plutôt que `prompt()` (One Tap) : ce dernier est
+   * de plus en plus bloqué par les navigateurs (cookies tiers, migration
+   * FedCM) même quand tout est bien configuré côté Google Cloud Console.
+   * Le vrai bouton, lui, fonctionne de façon fiable dans tous les cas.
+   *
+   * `element` est superposé (invisible) par-dessus notre bouton stylisé dans
+   * Connexion.jsx / Inscription.jsx, pour garder le design de la maquette
+   * tout en déclenchant l'authentification native de Google au clic.
+   */
+  initialiserBoutonGoogle: (element, onResultat, tentative = 0) => {
+    if (!element) return;
+
+    // Le script Google (chargé en `async defer` dans index.html) peut ne pas
+    // être encore prêt au moment où le composant se monte : on réessaie
+    // pendant 5 secondes avant d'abandonner.
+    if (!window.google?.accounts?.id) {
+      if (tentative >= 25) {
+        onResultat({ success: false, error: "Google n'a pas pu se charger. Réessayez." });
+        return;
+      }
+      setTimeout(() => authService.initialiserBoutonGoogle(element, onResultat, tentative + 1), 200);
+      return;
+    }
+
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: async (reponseGoogle) => {
+        const resultat = await authService.loginWithGoogle(reponseGoogle.credential);
+        onResultat(resultat);
+      },
+    });
+
+    window.google.accounts.id.renderButton(element, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      width: 400,
+    });
+  },
 };
