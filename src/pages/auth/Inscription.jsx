@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
+import { authService } from '../../services/authService';
 
 export default function Inscription() {
   const navigate = useNavigate();
@@ -25,12 +26,19 @@ export default function Inscription() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
+      return;
+    }
+
+    const resultat = await authService.register(formData);
+
+    if (!resultat.success) {
+      setError(resultat.error);
       return;
     }
 

@@ -1,43 +1,108 @@
-import { MOCK_AMATEUR, MOCK_ADMIN } from '../mocks/utilisateurs';
-import { MOCK_GERANT } from '../mocks/gerants';
-import { delaiReseau } from '../utils/delaiReseau';
+import api, { CLE_ACCESS_TOKEN, CLE_REFRESH_TOKEN } from './api';
 
 /**
  * Service d'authentification.
- * Aujourd'hui : compare les identifiants aux comptes de test mockés.
- * Demain : remplacer le contenu de ces fonctions par de vrais appels à l'API
- * Django (ex: POST /api/auth/login/) sans changer la façon dont les pages les utilisent.
+ * Appelle désormais le vrai backend Django (voir backend/authentification/).
  */
+
+// Calcule les initiales à partir du prénom/nom, comme le faisaient les mocks
+// (le backend ne renvoie pas ce champ, il n'a pas besoin de le connaître).
+function ajouterInitiales(user) {
+  const initiale1 = user.prenom?.[0] || '';
+  const initiale2 = user.nom?.[0] || '';
+  return { ...user, initiales: `${initiale1}${initiale2}`.toUpperCase() };
+}
+
+// Traduit les erreurs renvoyées par DRF (souvent {champ: [message]}) en un texte lisible.
+function extraireMessageErreur(error) {
+  const donnees = error.response?.data;
+  if (!donnees) return 'Une erreur réseau est survenue.';
+  if (typeof donnees === 'string') return donnees;
+  if (donnees.detail) return donnees.detail;
+
+  const premierChamp = Object.values(donnees)[0];
+  if (Array.isArray(premierChamp)) return premierChamp[0];
+  return 'Une erreur est survenue.';
+}
+
 export const authService = {
   login: async (email, password) => {
-    await delaiReseau();
+    try {
+      const { data } = await api.post('/auth/login', { email, password });
 
-    const emailSaisi = email.trim().toLowerCase();
+      localStorage.setItem(CLE_ACCESS_TOKEN, data.access);
+      localStorage.setItem(CLE_REFRESH_TOKEN, data.refresh);
 
-    if (emailSaisi === MOCK_ADMIN.email.toLowerCase() && password === MOCK_ADMIN.password) {
-      return { success: true, user: MOCK_ADMIN };
+      return { success: true, user: ajouterInitiales(data.user) };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
     }
-    if (emailSaisi === MOCK_GERANT.email.toLowerCase() && password === MOCK_GERANT.password) {
-      return { success: true, user: MOCK_GERANT };
-    }
-    if (emailSaisi === MOCK_AMATEUR.email.toLowerCase() && password === MOCK_AMATEUR.password) {
-      return { success: true, user: MOCK_AMATEUR };
-    }
-
-    return { success: false, error: 'Identifiants incorrects' };
-  },
-
-  verifyCode: async (code) => {
-    await delaiReseau();
-
-    if (code === MOCK_AMATEUR.verificationCode) {
-      return { success: true, user: MOCK_AMATEUR };
-    }
-    return { success: false, error: 'Code de vérification invalide' };
   },
 
   register: async (data) => {
-    await delaiReseau();
-    return { success: true, user: data };
-  }
+    try {
+      const reponse = await api.post('/auth/register', {
+        prenom: data.prenom,
+        nom: data.nom,
+        email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+      });
+      return { success: true, email: reponse.data.email };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  verifyCode: async (email, code) => {
+    try {
+      await api.post('/auth/verify-email', { email, code });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  resendCode: async (email) => {
+    try {
+      await api.post('/auth/resend-code', { email });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  loginWithGoogle: async (credential) => {
+    try {
+      const { data } = await api.post('/auth/google', { credential });
+
+      localStorage.setItem(CLE_ACCESS_TOKEN, data.access);
+      localStorage.setItem(CLE_REFRESH_TOKEN, data.refresh);
+
+      return { success: true, user: ajouterInitiales(data.user) };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  logout: async () => {
+    const refresh = localStorage.getItem(CLE_REFRESH_TOKEN);
+    try {
+      if (refresh) {
+        await api.post('/auth/logout', { refresh });
+      }
+    } finally {
+      localStorage.removeItem(CLE_ACCESS_TOKEN);
+      localStorage.removeItem(CLE_REFRESH_TOKEN);
+    }
+  },
+
+  getUtilisateurConnecte: async () => {
+    try {
+      const { data } = await api.get('/auth/me');
+      return { success: true, user: ajouterInitiales(data) };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
 };

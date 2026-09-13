@@ -19,7 +19,8 @@ export default function Input({
   errorMessage = '',
   state = 'default',
   variant = 'default',
-  className = ''
+  className = '',
+  ...rest
 }) {
   const estDesactive = state === 'disabled';
   const aErreur = state === 'error' || Boolean(errorMessage);
@@ -33,6 +34,7 @@ export default function Input({
         value={value}
         onChange={onChange}
         disabled={estDesactive}
+        {...rest}
         className={`w-full border rounded-[8px] px-4 py-3 text-xs font-semibold outline-none transition-colors ${
           estDesactive
             ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'

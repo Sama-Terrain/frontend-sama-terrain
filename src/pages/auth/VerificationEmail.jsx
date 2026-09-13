@@ -4,16 +4,18 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import loginBg from '../../assets/terrain-login.png';
+import { authService } from '../../services/authService';
 
 export default function VerificationEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || 'mariegodmer@gmail.com';
 
-  const [code, setCode] = useState(['4', '8', '2', '1', '']);
+  // Le backend envoie un code à 6 chiffres, donc 6 cases de saisie.
+  const [code, setCode] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef()];
+  const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
   const handleChange = (index, value) => {
     if (value.length > 1) {
@@ -24,7 +26,7 @@ export default function VerificationEmail() {
     newCode[index] = value;
     setCode(newCode);
 
-    if (value && index < 4) {
+    if (value && index < 5) {
       inputRefs[index + 1].current?.focus();
     }
   };
@@ -35,18 +37,34 @@ export default function VerificationEmail() {
     }
   };
 
-  const handleVerify = (e) => {
+  const handleVerify = async (e) => {
     e.preventDefault();
     setError('');
 
     const fullCode = code.join('');
-    if (fullCode.length >= 4) {
-      setSuccess(true);
-      setTimeout(() => {
-        navigate('/');
-      }, 1500);
-    } else {
-      setError('Veuillez entrer les 4 à 5 chiffres du code');
+    if (fullCode.length < 6) {
+      setError('Veuillez entrer les 6 chiffres du code');
+      return;
+    }
+
+    const resultat = await authService.verifyCode(email, fullCode);
+
+    if (!resultat.success) {
+      setError(resultat.error);
+      return;
+    }
+
+    setSuccess(true);
+    setTimeout(() => {
+      navigate('/login');
+    }, 1500);
+  };
+
+  const handleRenvoyerCode = async () => {
+    setError('');
+    const resultat = await authService.resendCode(email);
+    if (!resultat.success) {
+      setError(resultat.error);
     }
   };
 
@@ -111,7 +129,7 @@ export default function VerificationEmail() {
 
             <button
               type="button"
-              onClick={() => alert('Un nouveau code vous a été envoyé (4821).')}
+              onClick={handleRenvoyerCode}
               className="text-xs font-extrabold text-gray-900 hover:underline cursor-pointer"
             >
               Renvoyer le code
