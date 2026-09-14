@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/adminService';
-import { FileText, CheckCircle, XCircle } from 'lucide-react';
+import { FileText, CheckCircle, XCircle, Download } from 'lucide-react';
 
 /**
  * Page ValiderGerants (Validation des Gérants)
@@ -191,14 +191,30 @@ export default function ValiderGerants({ onLogout }) {
                   <p className="text-gray-500 text-[11px] font-bold uppercase leading-normal">
                     Document d'identité ou RCCM
                   </p>
-                  <div className="w-fit bg-[#f4f6f5] border border-[#e5e7eb] rounded-[6px] p-2 flex items-center gap-2">
-                    <div className="w-4 h-4 shrink-0 flex items-center justify-center">
+                  {request.documentUrl ? (
+                    <a
+                      href={request.documentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-fit bg-[#f4f6f5] hover:bg-[#e8ece9] border border-[#e5e7eb] rounded-[6px] p-2 flex items-center gap-2 transition-colors cursor-pointer"
+                      title="Ouvrir le document dans un nouvel onglet"
+                    >
+                      <div className="w-4 h-4 shrink-0 flex items-center justify-center">
+                        <FileText size={16} className="text-gray-600" />
+                      </div>
+                      <span className="text-vert-principal text-[12px] font-bold underline whitespace-nowrap">
+                        {request.documentName}
+                      </span>
+                      <Download size={13} className="text-gray-500 shrink-0" />
+                    </a>
+                  ) : (
+                    <div className="w-fit bg-[#f4f6f5] border border-[#e5e7eb] rounded-[6px] p-2 flex items-center gap-2">
                       <FileText size={16} className="text-gray-600" />
+                      <span className="text-gray-900 text-[12px] font-bold whitespace-nowrap">
+                        {request.documentName}
+                      </span>
                     </div>
-                    <span className="text-gray-900 text-[12px] font-bold whitespace-nowrap">
-                      {request.documentName}
-                    </span>
-                  </div>
+                  )}
                 </div>
               </div>
 

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Eye, ShieldCheck, Upload, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Calendar, Eye, ShieldCheck, Upload, ArrowRight } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import Alert from '../../components/ui/Alert';
 import heroBg from '../../assets/herobg.jpeg';
+import { authService } from '../../services/authService';
 
 export default function DevenirGerant() {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ export default function DevenirGerant() {
   const [formData, setFormData] = useState({
     prenom: '',
     nom: '',
+    email: '',
     adresse: '',
     whatsapp: '',
     password: '',
@@ -20,7 +23,8 @@ export default function DevenirGerant() {
     document: null
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [envoiEnCours, setEnvoiEnCours] = useState(false);
+  const [erreur, setErreur] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,9 +44,26 @@ export default function DevenirGerant() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setErreur('');
+    setEnvoiEnCours(true);
+
+    const resultat = await authService.devenirGerant(formData);
+
+    setEnvoiEnCours(false);
+
+    if (!resultat.success) {
+      setErreur(resultat.error);
+      return;
+    }
+
+    // Le compte est créé mais reste inactif tant qu'un admin ne l'a pas
+    // validé ET que l'email n'a pas été vérifié (comme pour un amateur) :
+    // on envoie donc directement vers la saisie du code reçu par email.
+    navigate('/verify-email', {
+      state: { email: formData.email, depuisDevenirGerant: true },
+    });
   };
 
   return (
@@ -121,26 +142,7 @@ export default function DevenirGerant() {
             </p>
           </div>
 
-          {submitted ? (
-            <div className="p-8 bg-[#e6f4ea] rounded-[8px] border border-emerald-200 text-center space-y-4">
-              <CheckCircle2 size={48} className="text-[#004030] mx-auto" />
-              <h3 className="text-lg font-bold text-[#004030]">
-                Demande d'adhésion envoyée avec succès !
-              </h3>
-              <p className="text-xs text-gray-700 max-w-md mx-auto">
-                Merci {formData.prenom} ! Notre équipe d'intégration valide votre dossier pour le complexe <strong>{formData.nomComplexe || 'sportif'}</strong> et vous contactera sous 24h.
-              </p>
-              <Button
-                onClick={() => navigate('/')}
-                variant="primary"
-                size="sm"
-                rounded="8px"
-              >
-                Retour à l'accueil
-              </Button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 
@@ -180,6 +182,24 @@ export default function DevenirGerant() {
                         className="text-xs font-bold"
                       />
                     </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-700">Email *</label>
+                    <Input
+                      type="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="moussa.diallo@exemple.com"
+                      variant="gray"
+                      className="text-xs font-bold"
+                    />
+                    <p className="text-[10px] text-gray-400">
+                      Servira à vous connecter à votre espace gérant.
+                    </p>
                   </div>
 
                   {/* Adresse */}
@@ -319,6 +339,7 @@ export default function DevenirGerant() {
                 const isFormComplete = Boolean(
                   formData.prenom.trim() &&
                   formData.nom.trim() &&
+                  formData.email.trim() &&
                   formData.adresse.trim() &&
                   formData.whatsapp.trim() &&
                   formData.password.trim() &&
@@ -328,16 +349,17 @@ export default function DevenirGerant() {
                 );
 
                 return (
-                  <div className="pt-4 text-left">
+                  <div className="pt-4 text-left space-y-3">
+                    {erreur && <Alert type="error" message={erreur} />}
                     <Button
                       type="submit"
-                      disabled={!isFormComplete}
+                      disabled={!isFormComplete || envoiEnCours}
                       variant="gold"
                       size="md"
                       rounded="8px"
                       className="py-3.5 px-8 font-extrabold inline-flex items-center gap-2"
                     >
-                      <span>Envoyer ma demande d'adhésion</span>
+                      <span>{envoiEnCours ? 'Envoi en cours...' : "Envoyer ma demande d'adhésion"}</span>
                       <ArrowRight size={16} />
                     </Button>
                   </div>
@@ -345,7 +367,6 @@ export default function DevenirGerant() {
               })()}
 
             </form>
-          )}
 
         </div>
       </section>

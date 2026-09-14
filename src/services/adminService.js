@@ -16,6 +16,7 @@ function normaliserDemandeGerant(d) {
     terrainName: d.nom_complexe,
     terrainCity: d.quartier,
     documentName: d.document ? d.document.split('/').pop() : 'Aucun document',
+    documentUrl: d.document || null,
     submittedAt: new Date(d.cree_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
     status: d.statut === 'en_attente' ? 'pending' : d.statut === 'validee' ? 'approved' : 'rejected',
   };

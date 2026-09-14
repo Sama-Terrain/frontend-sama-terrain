@@ -54,6 +54,29 @@ export const authService = {
     }
   },
 
+  // Crée un compte gérant + sa demande de validation (formulaire "Devenir
+  // gérant"). Le compte reste inactif tant qu'un admin ne l'a pas validé.
+  devenirGerant: async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append('prenom', data.prenom);
+      formData.append('nom', data.nom);
+      formData.append('email', data.email);
+      formData.append('password', data.password);
+      formData.append('confirmPassword', data.password);
+      formData.append('nom_complexe', data.nomComplexe);
+      formData.append('quartier', data.quartier);
+      formData.append('adresse', data.adresse);
+      formData.append('whatsapp', `+221${data.whatsapp}`);
+      formData.append('document', data.document);
+
+      const { data: reponse } = await api.post('/auth/devenir-gerant', formData);
+      return { success: true, email: reponse.email };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
   verifyCode: async (email, code) => {
     try {
       await api.post('/auth/verify-email', { email, code });
