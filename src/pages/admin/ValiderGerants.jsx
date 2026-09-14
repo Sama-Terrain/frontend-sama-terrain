@@ -16,6 +16,10 @@ export default function ValiderGerants({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0 });
+  // Id de la demande pour laquelle on est en train de saisir un motif de rejet.
+  const [demandeARejeter, setDemandeARejeter] = useState(null);
+  const [motifRejet, setMotifRejet] = useState('');
+  const [erreurRejet, setErreurRejet] = useState('');
 
   const calculerStats = (liste) => ({
     pending: liste.filter(r => r.status === 'pending').length,
@@ -54,14 +58,33 @@ export default function ValiderGerants({ onLogout }) {
     setStats(calculerStats(updated));
   };
 
-  // Rejette la demande : le compte reste inactif.
-  const handleReject = async (requestId) => {
-    await adminService.rejeterGerant(requestId);
+  // Le motif est obligatoire (envoyé par email à la personne), donc on
+  // ouvre d'abord une petite modale de saisie plutôt que de rejeter direct.
+  const ouvrirModalRejet = (requestId) => {
+    setDemandeARejeter(requestId);
+    setMotifRejet('');
+    setErreurRejet('');
+  };
+
+  const fermerModalRejet = () => {
+    setDemandeARejeter(null);
+    setMotifRejet('');
+    setErreurRejet('');
+  };
+
+  const confirmerRejet = async () => {
+    if (!motifRejet.trim()) {
+      setErreurRejet('Le motif du rejet est obligatoire.');
+      return;
+    }
+
+    await adminService.rejeterGerant(demandeARejeter, motifRejet.trim());
     const updated = requests.map(req =>
-      req.id === requestId ? { ...req, status: 'rejected' } : req
+      req.id === demandeARejeter ? { ...req, status: 'rejected' } : req
     );
     setRequests(updated);
     setStats(calculerStats(updated));
+    fermerModalRejet();
   };
 
   // Affichage pendant le chargement
@@ -230,7 +253,7 @@ export default function ValiderGerants({ onLogout }) {
                     <button
                       type="button"
                       className="bg-[#fee2e2] px-4 py-2.5 rounded-[8px] text-red-600 text-[13px] font-bold whitespace-nowrap"
-                      onClick={() => handleReject(request.id)}
+                      onClick={() => ouvrirModalRejet(request.id)}
                     >
                       Rejeter la demande
                     </button>
@@ -260,6 +283,43 @@ export default function ValiderGerants({ onLogout }) {
           ))
         )}
       </section>
+
+      {/* MODAL : motif du rejet (obligatoire, envoyé par email à la personne) */}
+      {demandeARejeter !== null && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[12px] p-6 max-w-md w-full space-y-4">
+            <h3 className="text-gray-900 text-[16px] font-extrabold">
+              Motif du rejet
+            </h3>
+            <textarea
+              value={motifRejet}
+              onChange={(e) => setMotifRejet(e.target.value)}
+              rows={4}
+              placeholder="Ex : le document fourni n'est pas lisible, merci de le renvoyer."
+              className="w-full border border-gray-300 rounded-[8px] p-3 text-sm focus:outline-none focus:border-vert-principal focus:ring-1 focus:ring-vert-principal"
+            />
+            {erreurRejet && (
+              <p className="text-red-600 text-xs font-bold">{erreurRejet}</p>
+            )}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={fermerModalRejet}
+                className="px-4 py-2.5 rounded-[8px] text-gray-600 text-[13px] font-bold whitespace-nowrap"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={confirmerRejet}
+                className="bg-red-600 hover:bg-red-700 px-4 py-2.5 rounded-[8px] text-white text-[13px] font-bold whitespace-nowrap"
+              >
+                Confirmer le rejet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </AdminLayout>
   );

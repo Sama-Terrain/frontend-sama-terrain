@@ -90,8 +90,8 @@ export const adminService = {
     await api.patch(`/admin/gerants/${id}/valider/`);
   },
 
-  async rejeterGerant(id) {
-    await api.patch(`/admin/gerants/${id}/rejeter/`);
+  async rejeterGerant(id, motif) {
+    await api.patch(`/admin/gerants/${id}/rejeter/`, { motif });
   },
 
   async getReviews() {
