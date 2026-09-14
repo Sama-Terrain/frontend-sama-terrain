@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Clock, CheckCircle2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
+import RetourAccueilButton from '../../components/auth/RetourAccueilButton';
 import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';
 
@@ -9,6 +11,11 @@ export default function VerificationEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || 'mariegodmer@gmail.com';
+  // Un compte gérant reste inactif tant qu'un admin ne l'a pas validé : on
+  // ne peut pas le renvoyer directement vers /login (ça échouerait), on lui
+  // explique plutôt qu'il doit attendre la validation de sa demande.
+  const depuisDevenirGerant = Boolean(location.state?.depuisDevenirGerant);
+  const [demandeEnAttente, setDemandeEnAttente] = useState(false);
 
   // Le backend envoie un code à 6 chiffres, donc 6 cases de saisie.
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -54,6 +61,14 @@ export default function VerificationEmail() {
     }
 
     setSuccess(true);
+
+    if (depuisDevenirGerant) {
+      // Le compte n'est pas encore actif (validation admin en attente) :
+      // on affiche l'info à la place de rediriger vers /login.
+      setDemandeEnAttente(true);
+      return;
+    }
+
     setTimeout(() => {
       navigate('/login');
     }, 1500);
@@ -68,7 +83,8 @@ export default function VerificationEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex font-sans">
+    <div className="min-h-screen bg-white flex font-sans relative">
+      <RetourAccueilButton />
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-center">
           
@@ -86,7 +102,14 @@ export default function VerificationEmail() {
           )}
 
           {success && (
-            <Alert type="success" message="✓ E-mail vérifié avec succès ! Redirection..." />
+            <Alert
+              type="success"
+              message={
+                demandeEnAttente
+                  ? 'E-mail vérifié avec succès !'
+                  : 'E-mail vérifié avec succès ! Redirection...'
+              }
+            />
           )}
 
           <form onSubmit={handleVerify} className="space-y-8">
@@ -154,6 +177,44 @@ export default function VerificationEmail() {
           className="w-full h-full object-cover"
         />
       </div>
+
+      {/* MODAL : demande gérant en attente de validation admin */}
+      {demandeEnAttente && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[8px] p-6 sm:p-8 max-w-md w-full space-y-5 text-center animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 rounded-full bg-vert-clair flex items-center justify-center mx-auto">
+              <CheckCircle2 size={32} className="text-vert-principal" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg font-extrabold text-vert-principal">
+                Email vérifié avec succès !
+              </h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Votre demande pour devenir gérant a bien été enregistrée.
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-[8px] p-4 flex items-start gap-2.5 text-left">
+              <Clock size={18} className="text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-800 leading-relaxed">
+                Notre équipe va examiner votre dossier sous <strong>24h</strong>. Votre compte sera activé
+                dès validation — vous pourrez alors vous connecter à votre espace gérant.
+              </p>
+            </div>
+
+            <Button
+              onClick={() => navigate('/')}
+              variant="primary"
+              size="md"
+              rounded="8px"
+              fullWidth
+            >
+              Retour à l'accueil
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

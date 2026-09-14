@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
+import RetourAccueilButton from '../../components/auth/RetourAccueilButton';
 import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
@@ -73,7 +74,8 @@ export default function Inscription() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white flex font-sans">
+    <div className="min-h-screen bg-white flex font-sans relative">
+      <RetourAccueilButton />
       {/* Colonne Gauche - Formulaire d'inscription */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-5 text-left">
