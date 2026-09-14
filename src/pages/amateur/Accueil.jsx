@@ -58,10 +58,8 @@ export default function Accueil() {
     navigate('/terrains', { state: { searchZone, searchDate, searchCreneau } });
   };
 
-  // Handler d'envoi de message à l'assistant IA.
-  // Pas de vrai LLM branché pour le moment : iaService renvoie une réponse
-  // mockée (cf. src/mocks/chatbot.js), avec un délai réseau simulé pour que
-  // l'indicateur "en train d'écrire" ait le temps de s'afficher.
+  // Handler d'envoi de message à l'assistant IA (micro-service FastAPI +
+  // LLM externe, voir iaService.js).
   const handleSendAiMessage = async (e) => {
     e.preventDefault();
     const messageEnvoye = aiInput.trim();
@@ -72,11 +70,17 @@ export default function Accueil() {
     setAiInput('');
     setAiEnAttente(true);
 
-    const reponse = await iaService.envoyerMessageChatbot(messageEnvoye);
+    let texteReponse;
+    try {
+      const reponse = await iaService.envoyerMessageChatbot(messageEnvoye);
+      texteReponse = reponse.texte;
+    } catch {
+      texteReponse = "Désolé, je ne suis pas disponible pour le moment. Réessayez dans un instant.";
+    }
 
     setAiMessages((prev) => [
       ...prev,
-      { id: Date.now() + 1, sender: 'bot', text: reponse.texte }
+      { id: Date.now() + 1, sender: 'bot', text: texteReponse }
     ]);
     setAiEnAttente(false);
   };
