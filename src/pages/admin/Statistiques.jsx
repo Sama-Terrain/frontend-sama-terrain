@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import AdminKpiCard from '../../components/admin/AdminKpiCard';
 import ChartsGrid from '../../components/admin/ChartsGrid';
@@ -27,22 +27,24 @@ export default function Statistiques({ onLogout }) {
   const [paymentData, setPaymentData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [topTerrains, setTopTerrains] = useState([]);
+  const [profile, setProfile] = useState(null);
 
-  // Effet pour charger les données mockées
   useEffect(() => {
     async function loadStats() {
       try {
         setLoading(true);
-        const [kpiData, payment, city, terrains] = await Promise.all([
+        const [kpiData, payment, city, terrains, profileData] = await Promise.all([
           adminService.getStatsKpi(),
           adminService.getStatsPayment(),
           adminService.getStatsCity(),
           adminService.getStatsTopTerrains(),
+          adminService.getAdminProfile(),
         ]);
         setKpis(kpiData);
         setPaymentData(payment);
         setCityData(city);
         setTopTerrains(terrains);
+        setProfile(profileData);
       } catch (error) {
         console.error('Erreur chargement statistiques:', error);
       } finally {
@@ -56,7 +58,7 @@ export default function Statistiques({ onLogout }) {
   // Affichage pendant le chargement
   if (loading) {
     return (
-      <AdminLayout title="Analyses et Statistiques Globales" onLogout={onLogout}>
+      <AdminLayout title="Analyses et Statistiques Globales" profile={profile} onLogout={onLogout}>
         <div className="py-24 text-center space-y-4">
           <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-gray-500 font-bold">Chargement des statistiques...</p>
@@ -66,7 +68,7 @@ export default function Statistiques({ onLogout }) {
   }
 
   return (
-    <AdminLayout title="Analyses et Statistiques Globales" onLogout={onLogout}>
+    <AdminLayout title="Analyses et Statistiques Globales" profile={profile} onLogout={onLogout}>
       <main className="dashboard">
         {/* Période */}
         <section className="date-card">

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -14,7 +13,7 @@ import '../../styles/admin/ChartsGrid.css';
 const PAYMENT_COLORS = {
   Wave: "var(--color-vert-principal, #004030)",
   OrangeMoney: "var(--color-dore, #D4AF37)",
-  Free: "#DEF7EC",
+  Cash: "#DEF7EC",
 };
 
 const CITY_COLORS = [
@@ -54,10 +53,10 @@ function PaymentChart({ paymentData }) {
       textColor: "#004030",
     },
     {
-      name: "Free Money",
-      label: `Free (${data.Free}%)`,
-      percentage: data.Free,
-      color: PAYMENT_COLORS.Free,
+      name: "Cash",
+      label: `Cash (${data.Cash}%)`,
+      percentage: data.Cash,
+      color: PAYMENT_COLORS.Cash,
       textColor: "#004030",
     },
   ];
@@ -88,9 +87,9 @@ function PaymentChart({ paymentData }) {
                 isAnimationActive={false}
               />
               <Bar
-                dataKey="Free"
+                dataKey="Cash"
                 stackId="payment"
-                fill={PAYMENT_COLORS.Free}
+                fill={PAYMENT_COLORS.Cash}
                 radius={[0, 5, 5, 0]}
                 isAnimationActive={false}
               />
@@ -103,7 +102,7 @@ function PaymentChart({ paymentData }) {
         <div className="chart-legend">
           <LegendItem color={PAYMENT_COLORS.Wave} label="Wave Senegal" />
           <LegendItem color={PAYMENT_COLORS.OrangeMoney} label="Orange Money" />
-          <LegendItem color={PAYMENT_COLORS.Free} label="Free Money" />
+          <LegendItem color={PAYMENT_COLORS.Cash} label="Cash" />
         </div>
       </div>
     </div>

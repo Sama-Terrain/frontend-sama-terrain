@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import ReviewCard from '../../components/admin/ReviewCard';
 import { adminService } from '../../services/adminService';
@@ -15,17 +15,21 @@ import { ChevronRight } from 'lucide-react';
 export default function ModerationAvis({ onLogout }) {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
   const [currentPage, setCurrentPage] = useState(1);
   const reviewsPerPage = 3;
 
-  // Effet pour charger les données mockées
   useEffect(() => {
     async function loadReviews() {
       try {
         setLoading(true);
-        const reviewsData = await adminService.getReviews();
+        const [reviewsData, profileData] = await Promise.all([
+          adminService.getReviews(),
+          adminService.getAdminProfile(),
+        ]);
         setReviews(reviewsData);
+        setProfile(profileData);
       } catch (error) {
         console.error('Erreur chargement avis:', error);
       } finally {
@@ -54,22 +58,25 @@ export default function ModerationAvis({ onLogout }) {
     setCurrentPage(1);
   }, [activeTab]);
 
-  const handleApprove = (review) => {
-    setReviews(reviews.map(r => 
+  // Lève le signalement : l'avis reste visible publiquement.
+  const handleApprove = async (review) => {
+    await adminService.approuverAvis(review.id);
+    setReviews(reviews.map(r =>
       r.id === review.id ? { ...r, status: 'approved' } : r
     ));
-    console.log("Avis approuvé :", review);
   };
 
-  const handleDelete = (review) => {
+  // Masque l'avis : il n'apparaît plus publiquement (le backend ne supprime
+  // jamais un avis pour de bon, il le rend juste invisible).
+  const handleDelete = async (review) => {
+    await adminService.supprimerAvis(review.id);
     setReviews(reviews.filter(r => r.id !== review.id));
-    console.log("Avis supprimé :", review);
   };
 
   // Affichage pendant le chargement
   if (loading) {
     return (
-      <AdminLayout title="Modération des Avis" onLogout={onLogout}>
+      <AdminLayout title="Modération des Avis" profile={profile} onLogout={onLogout}>
         <div className="py-24 text-center space-y-4">
           <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-gray-500 font-bold">Chargement des avis...</p>
@@ -81,7 +88,7 @@ export default function ModerationAvis({ onLogout }) {
   const pendingCount = reviews.filter(r => r.status === 'pending').length;
 
   return (
-    <AdminLayout title="Modération des Avis" onLogout={onLogout}>
+    <AdminLayout title="Modération des Avis" profile={profile} onLogout={onLogout}>
       
       {/* TABS */}
       <div className="flex w-full gap-[4px] rounded-[8px] border border-[#e5e7eb] bg-white p-[4px]">

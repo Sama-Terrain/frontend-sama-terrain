@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/adminService';
-import { Search, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Eye, Edit, Trash2, ChevronLeft } from 'lucide-react';
 
 /**
  * Page Utilisateurs (Gestion des Utilisateurs)
@@ -19,15 +19,19 @@ export default function Utilisateurs({ onLogout }) {
   const [search, setSearch] = useState('');
   const [city, setCity] = useState('Toutes les villes');
   const [page, setPage] = useState(1);
+  const [profile, setProfile] = useState(null);
   const usersPerPage = 8;
 
-  // Effet pour charger les données mockées
   useEffect(() => {
     async function loadUsers() {
       try {
         setLoading(true);
-        const usersData = await adminService.getUsers();
+        const [usersData, profileData] = await Promise.all([
+          adminService.getUsers(),
+          adminService.getAdminProfile(),
+        ]);
         setUsers(usersData);
+        setProfile(profileData);
       } catch (error) {
         console.error('Erreur chargement utilisateurs:', error);
       } finally {
@@ -96,7 +100,7 @@ export default function Utilisateurs({ onLogout }) {
   // Affichage pendant le chargement
   if (loading) {
     return (
-      <AdminLayout title="Gestion des Utilisateurs" onLogout={onLogout}>
+      <AdminLayout title="Gestion des Utilisateurs" profile={profile} onLogout={onLogout}>
         <div className="py-24 text-center space-y-4">
           <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-gray-500 font-bold">Chargement des utilisateurs...</p>
@@ -108,7 +112,7 @@ export default function Utilisateurs({ onLogout }) {
   const tabs = ["Joueurs", "Gérants", "Admins"];
 
   return (
-    <AdminLayout title="Gestion des Utilisateurs" onLogout={onLogout}>
+    <AdminLayout title="Gestion des Utilisateurs" profile={profile} onLogout={onLogout}>
       
       {/* SECTION FILTRES */}
       <div className="flex w-full items-center gap-[20px] rounded-[12px] border border-[#e5e7eb] bg-white p-[20px]">

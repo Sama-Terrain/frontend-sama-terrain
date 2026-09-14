@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/adminService';
-import Button from '../../components/ui/Button';
-import Badge from '../../components/ui/Badge';
 import { FileText, CheckCircle, XCircle } from 'lucide-react';
 
 /**
@@ -16,21 +14,26 @@ import { FileText, CheckCircle, XCircle } from 'lucide-react';
 export default function ValiderGerants({ onLogout }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
   const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0 });
 
-  // Effet pour charger les données mockées
+  const calculerStats = (liste) => ({
+    pending: liste.filter(r => r.status === 'pending').length,
+    approved: liste.filter(r => r.status === 'approved').length,
+    rejected: liste.filter(r => r.status === 'rejected').length,
+  });
+
   useEffect(() => {
     async function loadRequests() {
       try {
         setLoading(true);
-        const requestsData = await adminService.getValidationRequests();
+        const [requestsData, profileData] = await Promise.all([
+          adminService.getValidationRequests(),
+          adminService.getAdminProfile(),
+        ]);
         setRequests(requestsData);
-        
-        // Calculer les statistiques
-        const pending = requestsData.filter(r => r.status === 'pending').length;
-        const approved = requestsData.filter(r => r.status === 'approved').length;
-        const rejected = requestsData.filter(r => r.status === 'rejected').length;
-        setStats({ pending, approved, rejected });
+        setStats(calculerStats(requestsData));
+        setProfile(profileData);
       } catch (error) {
         console.error('Erreur chargement demandes:', error);
       } finally {
@@ -41,26 +44,30 @@ export default function ValiderGerants({ onLogout }) {
     loadRequests();
   }, []);
 
-  // Fonction pour approuver une demande
-  const handleApprove = (requestId) => {
-    setRequests(requests.map(req => 
+  // Approuve la demande : active le compte du gérant et démarre son essai gratuit.
+  const handleApprove = async (requestId) => {
+    await adminService.approuverGerant(requestId);
+    const updated = requests.map(req =>
       req.id === requestId ? { ...req, status: 'approved' } : req
-    ));
-    setStats(prev => ({ ...prev, pending: prev.pending - 1, approved: prev.approved + 1 }));
+    );
+    setRequests(updated);
+    setStats(calculerStats(updated));
   };
 
-  // Fonction pour rejeter une demande
-  const handleReject = (requestId) => {
-    setRequests(requests.map(req => 
+  // Rejette la demande : le compte reste inactif.
+  const handleReject = async (requestId) => {
+    await adminService.rejeterGerant(requestId);
+    const updated = requests.map(req =>
       req.id === requestId ? { ...req, status: 'rejected' } : req
-    ));
-    setStats(prev => ({ ...prev, pending: prev.pending - 1, rejected: prev.rejected + 1 }));
+    );
+    setRequests(updated);
+    setStats(calculerStats(updated));
   };
 
   // Affichage pendant le chargement
   if (loading) {
     return (
-      <AdminLayout title="Validation des Gérants" onLogout={onLogout}>
+      <AdminLayout title="Validation des Gérants" profile={profile} onLogout={onLogout}>
         <div className="py-24 text-center space-y-4">
           <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-gray-500 font-bold">Chargement des demandes...</p>
@@ -70,7 +77,7 @@ export default function ValiderGerants({ onLogout }) {
   }
 
   return (
-    <AdminLayout title="Validation des Gérants" onLogout={onLogout}>
+    <AdminLayout title="Validation des Gérants" profile={profile} onLogout={onLogout}>
       
       {/* BARRE D'INFORMATION */}
       <section className="w-full bg-vert-principal rounded-[12px] px-5 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border border-vert-survol shadow-2xs mb-6">
