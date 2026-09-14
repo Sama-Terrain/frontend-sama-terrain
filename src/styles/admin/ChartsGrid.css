@@ -1,0 +1,115 @@
+/* =========================
+   CHARTS GRID STYLES
+========================= */
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  padding: 24px;
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.chart-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-vert-principal, #004030);
+  margin: 0;
+}
+
+/* =========================
+   PAYMENT CHART
+========================= */
+
+.payment-chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.payment-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.payment-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.payment-label-wave {
+  color: var(--color-vert-principal, #004030);
+}
+
+.payment-label-orange {
+  color: var(--color-dore, #D4AF37);
+}
+
+.payment-label-free {
+  color: #4b5563;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-square {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+/* =========================
+   CITY CHART
+========================= */
+
+.city-card {
+  min-height: 200px;
+}
+
+.city-chart-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.city-donut {
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.city-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
+}

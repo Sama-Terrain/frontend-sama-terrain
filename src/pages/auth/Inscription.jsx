@@ -1,0 +1,260 @@
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import Button from '../../components/ui/Button';
+import Input from '../../components/ui/Input';
+import Alert from '../../components/ui/Alert';
+import RetourAccueilButton from '../../components/auth/RetourAccueilButton';
+import loginBg from '../../assets/terrain-login.png';
+import { authService } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
+import { getHomeRouteForRole } from '../../utils/roles';
+
+export default function Inscription() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    prenom: '',
+    nom: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Les mots de passe ne correspondent pas');
+      return;
+    }
+
+    const resultat = await authService.register(formData);
+
+    if (!resultat.success) {
+      setError(resultat.error);
+      return;
+    }
+
+    // Navigation vers la vérification d'email
+    navigate('/verify-email', { state: { email: formData.email } });
+  };
+
+  // Le vrai bouton Google est superposé (invisible) par-dessus notre bouton
+  // stylisé ci-dessous : c'est lui qui reçoit le clic et déclenche
+  // l'authentification native de Google (voir authService.initialiserBoutonGoogle).
+  const googleBtnRef = useRef(null);
+  const googleDejaInitialise = useRef(false);
+
+  useEffect(() => {
+    // Évite un double appel en développement (React StrictMode monte les
+    // effets deux fois), qui déclencherait un avertissement Google inutile.
+    if (googleDejaInitialise.current) return;
+    googleDejaInitialise.current = true;
+
+    authService.initialiserBoutonGoogle(googleBtnRef.current, (resultat) => {
+      if (!resultat.success) {
+        setError(resultat.error);
+        return;
+      }
+      // Google a déjà vérifié l'email : pas besoin de passer par /verify-email.
+      login(resultat.user);
+      navigate(getHomeRouteForRole(resultat.user.role));
+    });
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-white flex font-sans relative">
+      <RetourAccueilButton />
+      {/* Colonne Gauche - Formulaire d'inscription */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
+        <div className="w-full max-w-md space-y-5 text-left">
+          
+          <h1 className="text-3xl font-extrabold text-vert-principal text-center mb-6">
+            Inscrivez-vous
+          </h1>
+
+          {error && (
+            <Alert type="error" message={error} />
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {/* Prénom & Nom */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-800">Prenom</label>
+                <Input
+                  type="text"
+                  name="prenom"
+                  required
+                  value={formData.prenom}
+                  onChange={handleChange}
+                  placeholder="Votre prenom"
+                  className="text-xs font-semibold"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-800">Nom</label>
+                <Input
+                  type="text"
+                  name="nom"
+                  required
+                  value={formData.nom}
+                  onChange={handleChange}
+                  placeholder="Votre nom"
+                  className="text-xs font-semibold"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-800">Email</label>
+              <Input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="exemple@gmail.com"
+                className="text-xs font-semibold"
+              />
+            </div>
+
+            {/* Mot de passe */}
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-800">Mot de passe</label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="........"
+                  className="text-xs font-semibold pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirmer mot de passe */}
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-gray-800">Confirmer mot de passe</label>
+              <div className="relative">
+                <Input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="........"
+                  className="text-xs font-semibold pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Bouton S'inscrire */}
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              rounded="8px"
+              fullWidth
+              className="mt-4"
+            >
+              S'inscrire
+            </Button>
+          </form>
+
+          {/* Diviseur OR */}
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-gray-200"></div>
+            <span className="flex-shrink mx-4 text-xs text-gray-400 font-medium">Or</span>
+            <div className="flex-grow border-t border-gray-200"></div>
+          </div>
+
+          {/* Google Sign In : le bouton visuel ci-dessous garde le design de
+              la maquette, tandis que le vrai bouton Google (rendu par
+              Google, invisible) est superposé par-dessus et capte le clic. */}
+          <div className="relative w-full">
+            <div
+              aria-hidden="true"
+              className="w-full py-3 bg-[#e8f5e9]/60 text-gray-700 font-semibold rounded-[8px] text-xs flex items-center justify-center gap-3 border border-emerald-100"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>Sign in with Google</span>
+            </div>
+            <div
+              ref={googleBtnRef}
+              className="absolute inset-0 opacity-0 overflow-hidden [&>div]:!w-full"
+            />
+          </div>
+
+          {/* Lien vers Connexion */}
+          <p className="text-center text-xs text-gray-500 pt-3">
+            Already have an account?{' '}
+            <button
+              onClick={() => navigate('/login')}
+              className="text-[#D4AF37] font-bold hover:underline cursor-pointer"
+            >
+              Sign in
+            </button>
+          </p>
+
+        </div>
+      </div>
+
+      {/* Colonne Droite - Image Figma */}
+      <div className="hidden lg:block lg:w-1/2 bg-gray-200 relative overflow-hidden">
+        <img
+          src={loginBg}
+          alt="Sama-Terrain Auth"
+          className="w-full h-full object-cover"
+        />
+      </div>
+    </div>
+  );
+}

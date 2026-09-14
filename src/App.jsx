@@ -1,15 +1,52 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useState } from 'react';
+import { BrowserRouter, useLocation } from 'react-router-dom';
+import Navbar from './components/layout/Navbar';
+import Footer from './components/layout/Footer';
+import AppRoutes from './routes/AppRoutes';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const { currentUser, logout } = useAuth();
+
+  const [searchParams, setSearchParams] = useState({});
+
+  // Masquer la Navbar et le Footer grand public sur les pages auth et les espaces
+  // admin / gérant connectés (qui ont leur propre sidebar + header dédiés).
+  // Note : '/gerant' seul (page publique "Devenir Gérant") garde la Navbar ;
+  // seul '/gerant/...' (espace connecté) la masque.
+  const isAuthOrAdminPage =
+    ['/login', '/register', '/verify-email'].includes(location.pathname) ||
+    location.pathname.startsWith('/admin') ||
+    location.pathname.startsWith('/gerant/');
 
   return (
-    <>
-      <h1>Bonjour, Vite + React!</h1>
-    </>
-  )
+    <div className="min-h-screen flex flex-col justify-between bg-gray-50 font-sans">
+      {!isAuthOrAdminPage && (
+        <Navbar
+          currentUser={currentUser}
+          onLogout={logout}
+        />
+      )}
+
+      <main className="flex-1">
+        <AppRoutes searchParams={searchParams} />
+      </main>
+
+      {!isAuthOrAdminPage && (
+        <Footer />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
