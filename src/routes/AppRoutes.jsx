@@ -25,6 +25,7 @@ import Reservations from '../pages/gerant/Reservations';
 import Revenus from '../pages/gerant/Revenus';
 import ScannerTicket from '../pages/gerant/ScannerTicket';
 import GerantStatistiques from '../pages/gerant/Statistiques';
+import InsightsIA from '../pages/gerant/InsightsIA';
 import Abonnement from '../pages/gerant/Abonnement';
 import AbonnementSucces from '../pages/gerant/AbonnementSucces';
 import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
@@ -156,6 +157,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/gerant/revenus" element={pageGerant(<Revenus onLogout={logout} />)} />
       <Route path="/gerant/scanner" element={pageGerant(<ScannerTicket onLogout={logout} />)} />
       <Route path="/gerant/statistiques" element={pageGerant(<GerantStatistiques onLogout={logout} />)} />
+      <Route path="/gerant/insights" element={pageGerant(<InsightsIA onLogout={logout} />)} />
 
       {/* Routes Administrateur : réservées au rôle admin */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
