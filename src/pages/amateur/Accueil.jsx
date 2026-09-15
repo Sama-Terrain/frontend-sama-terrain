@@ -118,19 +118,19 @@ export default function Accueil() {
           {/* Formulaire de Recherche Rapide (Fidèle au Figma) */}
           <form 
             onSubmit={handleSearchSubmit}
-            className="mt-10 bg-white rounded-[16px] p-5 sm:p-6 w-full text-gray-800 grid grid-cols-1 md:grid-cols-4 gap-4 items-end border border-gray-100"
+            className="mt-6 sm:mt-10 bg-white rounded-[16px] p-4 sm:p-6 w-full text-gray-800 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 items-end border border-gray-100"
           >
             {/* Champ 1: Zone / Quartier */}
-            <div className="flex flex-col space-y-1.5 text-left">
+            <div className="col-span-1 flex flex-col space-y-1.5 text-left min-w-0">
               <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5 pl-1">
-                <MapPin size={15} className="text-vert-principal" />
-                <span>Zone / Quartier</span>
+                <MapPin size={15} className="text-vert-principal shrink-0" />
+                <span className="truncate">Zone / Quartier</span>
               </label>
-              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
+              <div className="bg-[#f3f4f6] rounded-xl px-3 sm:px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
                 <select
                   value={searchZone}
                   onChange={(e) => setSearchZone(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-xs sm:text-sm text-vert-principal focus:outline-none cursor-pointer truncate"
                 >
                   {VILLES.map((ville) => (
                     <option key={ville} value={ville}>{ville}</option>
@@ -140,16 +140,16 @@ export default function Accueil() {
             </div>
 
             {/* Champ 2: Date de match */}
-            <div className="flex flex-col space-y-1.5 text-left">
+            <div className="col-span-1 flex flex-col space-y-1.5 text-left min-w-0">
               <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5 pl-1">
-                <Calendar size={15} className="text-vert-principal" />
-                <span>Date de match</span>
+                <Calendar size={15} className="text-vert-principal shrink-0" />
+                <span className="truncate">Date de match</span>
               </label>
-              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
+              <div className="bg-[#f3f4f6] rounded-xl px-3 sm:px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
                 <select
                   value={searchDate}
                   onChange={(e) => setSearchDate(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-xs sm:text-sm text-vert-principal focus:outline-none cursor-pointer truncate"
                 >
                   <option value="Aujourd'hui">Aujourd'hui</option>
                   <option value="Demain">Demain</option>
@@ -159,17 +159,17 @@ export default function Accueil() {
               </div>
             </div>
 
-            {/* Champ 3: Créneau horaire */}
-            <div className="flex flex-col space-y-1.5 text-left">
+            {/* Champ 3: Créneau horaire (pleine largeur sur mobile car libellés longs) */}
+            <div className="col-span-2 md:col-span-1 flex flex-col space-y-1.5 text-left min-w-0">
               <label className="text-xs font-semibold text-gray-600 flex items-center gap-1.5 pl-1">
-                <Clock size={15} className="text-vert-principal" />
+                <Clock size={15} className="text-vert-principal shrink-0" />
                 <span>Créneau horaire</span>
               </label>
-              <div className="bg-[#f3f4f6] rounded-xl px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
+              <div className="bg-[#f3f4f6] rounded-xl px-3 sm:px-4 py-3 border border-transparent focus-within:border-vert-principal transition-colors">
                 <select
                   value={searchCreneau}
                   onChange={(e) => setSearchCreneau(e.target.value)}
-                  className="w-full bg-transparent font-bold text-sm text-vert-principal focus:outline-none cursor-pointer"
+                  className="w-full bg-transparent font-bold text-xs sm:text-sm text-vert-principal focus:outline-none cursor-pointer"
                 >
                   <option value="19:00 - Plein jeu">19:00 - Plein jeu</option>
                   <option value="20:00 - Plein jeu">20:00 - Plein jeu</option>
@@ -179,8 +179,8 @@ export default function Accueil() {
               </div>
             </div>
 
-            {/* Bouton 4: Rechercher un terrain */}
-            <div className="flex flex-col justify-end">
+            {/* Bouton 4: Rechercher un terrain (pleine largeur, toujours visible sans scroll excessif) */}
+            <div className="col-span-2 md:col-span-1 flex flex-col justify-end">
               <Button
                 type="submit"
                 variant="gold"
@@ -188,8 +188,8 @@ export default function Accueil() {
                 rounded="xl"
                 fullWidth
               >
-                <Search size={18} className="stroke-[2.5] text-vert-principal" />
-                <span className='text-vert-principal'>Rechercher un terrain</span>
+                <Search size={18} className="stroke-[2.5] text-vert-principal shrink-0" />
+                <span className="text-vert-principal">Rechercher un terrain</span>
               </Button>
             </div>
           </form>
@@ -265,25 +265,27 @@ export default function Accueil() {
       <section className="py-16 bg-white px-4 sm:px-6 lg:px-20 border-y border-gray-200">
         <div className="max-w-7xl mx-auto">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-vert-principal">
-                Terrains vedettes à la une
-              </h2>
-              <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                Les complexes les plus prisés par les passionnés de football à Dakar.
-              </p>
-            </div>
+          <div className="mb-8 sm:mb-10">
+  <div className="flex items-center justify-between gap-3">
+    <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-vert-principal tracking-tight truncate">
+      Terrains vedettes à la une
+    </h2>
 
-            <Button
-              onClick={() => navigate('/terrains')}
-              variant="secondary"
-              size="sm"
-              className="self-start sm:self-auto"
-            >
-              Voir tous les terrains
-            </Button>
-          </div>
+    <Button
+      onClick={() => navigate('/terrains')}
+      variant="secondary"
+      size="sm"
+      className="shrink-0 whitespace-nowrap"
+    >
+      <span className="hidden sm:inline">Voir tous les terrains</span>
+      <span className="sm:hidden">Voir tout</span>
+    </Button>
+  </div>
+
+  <p className="text-gray-600 mt-1.5 text-sm sm:text-base">
+    Les complexes les plus prisés par les passionnés de football à Dakar.
+  </p>
+</div>
 
           {/* Grille des Terrains Vedettes */}
           {loading ? (

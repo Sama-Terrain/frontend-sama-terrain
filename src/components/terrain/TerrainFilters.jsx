@@ -75,14 +75,14 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
   };
 
   return (
-    <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-6 text-left">
-      
+    <div className="bg-white rounded-[8px] p-4 sm:p-6 border border-gray-200 space-y-5 sm:space-y-6 text-left">
+
       {/* En-tête Filtres */}
       <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-        <h3 className="text-lg font-extrabold text-gray-900">Filtres</h3>
+        <h3 className="text-base sm:text-lg font-extrabold text-gray-900">Filtres</h3>
         <button
           onClick={handleResetFilters}
-          className="text-xs font-bold text-[#D4AF37] hover:text-[#b08d25] transition-colors cursor-pointer flex items-center gap-1"
+          className="text-xs font-bold text-[#D4AF37] hover:text-[#b08d25] transition-colors cursor-pointer flex items-center gap-1 py-2 -my-2 px-1"
         >
           <RotateCcw size={12} />
           <span>Effacer</span>
@@ -97,7 +97,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
         <select
           value={activeFilters?.localisation || activeFilters?.quartier || 'Tous les quartiers'}
           onChange={(e) => updateFilters((prev) => ({ ...prev, localisation: e.target.value, quartier: e.target.value }))}
-          className="w-full bg-gray-50 border border-gray-200 rounded-[4px] px-3.5 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
+          className="w-full bg-gray-50 border border-gray-200 rounded-[4px] px-3.5 py-3 sm:py-2.5 text-sm sm:text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#004030] cursor-pointer"
         >
           <option value="Tous les quartiers">Tous les quartiers</option>
           {VILLES.map((ville) => (
@@ -122,7 +122,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
                 date: e.target.value,
               }))
             }
-            className="w-full bg-gray-50 border border-gray-200 rounded-[4px] pl-3.5 pr-9 py-2.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-vert-principal"
+            className="w-full bg-gray-50 border border-gray-200 rounded-[4px] pl-3.5 pr-9 py-3 sm:py-2.5 text-sm sm:text-xs font-semibold text-gray-800 focus:outline-none focus:border-vert-principal"
           />
         </div>
       </div>
@@ -132,18 +132,18 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
         <label className="text-xs font-bold text-gray-700 uppercase tracking-wide block">
           Type de terrain
         </label>
-        <div className="space-y-2 text-xs font-semibold text-gray-700">
+        <div className="space-y-1 text-sm sm:text-xs font-semibold text-gray-700">
           {[
             { id: '5v5', label: '5 contre 5' },
             { id: '6v6', label: '6 contre 6' },
             { id: '7v7', label: '7 contre 7' }
           ].map((item) => (
-            <label key={item.id} className="flex items-center space-x-2.5 cursor-pointer">
+            <label key={item.id} className="flex items-center gap-2.5 cursor-pointer py-1.5 -mx-1 px-1 rounded hover:bg-gray-50 transition-colors">
               <input
                 type="checkbox"
                 checked={(activeFilters?.types || []).includes(item.id)}
                 onChange={() => handleTypeChange(item.id)}
-                className="w-4 h-4 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
+                className="w-5 h-5 sm:w-4 sm:h-4 shrink-0 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
               />
               <span>{item.label}</span>
             </label>
@@ -156,14 +156,14 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
         <label className="text-xs font-bold text-gray-700 uppercase tracking-wide block">
           Surface
         </label>
-        <div className="space-y-2 text-xs font-semibold text-gray-700">
+        <div className="space-y-1 text-sm sm:text-xs font-semibold text-gray-700">
           {['Synthétique', 'Gazon naturel', 'Bitume'].map((surf) => (
-            <label key={surf} className="flex items-center space-x-2.5 cursor-pointer">
+            <label key={surf} className="flex items-center gap-2.5 cursor-pointer py-1.5 -mx-1 px-1 rounded hover:bg-gray-50 transition-colors">
               <input
                 type="checkbox"
                 checked={(activeFilters?.surfaces || []).includes(surf)}
                 onChange={() => handleSurfaceChange(surf)}
-                className="w-4 h-4 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
+                className="w-5 h-5 sm:w-4 sm:h-4 shrink-0 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
               />
               <span>{surf}</span>
             </label>
@@ -178,7 +178,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
             Tarif Max (FCFA / H)
           </label>
         </div>
-        
+
         {/* Curseur de prix */}
         <input
           type="range"
@@ -187,7 +187,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
           step="1000"
           value={activeFilters?.maxPrix || activeFilters?.prixMax || 35000}
           onChange={(e) => updateFilters((prev) => ({ ...prev, maxPrix: Number(e.target.value), prixMax: Number(e.target.value) }))}
-          className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#004030]"
+          className="w-full h-2 sm:h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#004030] touch-none"
         />
 
         <div className="flex justify-between text-xs font-bold text-gray-600">
@@ -202,14 +202,14 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
         <label className="text-xs font-bold text-gray-700 uppercase tracking-wide block">
           Équipements
         </label>
-        <div className="space-y-2 text-xs font-semibold text-gray-700">
+        <div className="space-y-1 text-sm sm:text-xs font-semibold text-gray-700">
           {EQUIPEMENTS_DISPONIBLES.map((eq) => (
-            <label key={eq} className="flex items-center space-x-2.5 cursor-pointer">
+            <label key={eq} className="flex items-center gap-2.5 cursor-pointer py-1.5 -mx-1 px-1 rounded hover:bg-gray-50 transition-colors">
               <input
                 type="checkbox"
                 checked={(activeFilters?.equipements || []).includes(eq)}
                 onChange={() => handleEquipementChange(eq)}
-                className="w-4 h-4 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
+                className="w-5 h-5 sm:w-4 sm:h-4 shrink-0 rounded text-vert-principal focus:ring-vert-principal border-gray-300 accent-vert-principal"
               />
               <span>{eq}</span>
             </label>
