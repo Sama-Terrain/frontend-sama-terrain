@@ -52,7 +52,7 @@ export default function Statistiques({ onLogout }) {
 
   if (loading) {
     return (
-      <GerantLayout title="Statistiques & Recommandations IA" profile={profile} onLogout={onLogout}>
+      <GerantLayout title="Statistiques & IA" profile={profile} onLogout={onLogout}>
         <div className="py-24 text-center space-y-4">
           <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm text-gray-500 font-bold">Chargement des statistiques...</p>
