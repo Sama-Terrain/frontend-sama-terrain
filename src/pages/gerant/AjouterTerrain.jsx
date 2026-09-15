@@ -355,10 +355,10 @@ export default function AjouterTerrain({ onLogout }) {
               size="md"
               rounded="8px"
               disabled={envoiEnCours}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6"
             >
-              <Check size={16} />
-              <span>
+              <Check size={16} className="shrink-0" />
+              <span className="truncate">
                 {envoiEnCours
                   ? 'Enregistrement...'
                   : modeEdition
