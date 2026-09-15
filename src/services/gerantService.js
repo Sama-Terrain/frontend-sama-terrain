@@ -273,4 +273,12 @@ export const gerantService = {
       return [];
     }
   },
+
+  // Vue d'ensemble IA (page "Insights IA") : occupation prévue des 7
+  // prochains jours, recommandations tarifaires et alertes, agrégées sur
+  // tous les terrains du gérant connecté.
+  async getInsightsIA() {
+    const { data } = await api.get('/gerant/insights-ia/');
+    return data;
+  },
 };

@@ -96,4 +96,10 @@ export const creneauService = {
 
     return { crees, misAJour, erreurs };
   },
+
+  // Applique au créneau le prix recommandé par l'IA (voir Insights IA).
+  async appliquerPrixRecommande(creneauId) {
+    const { data } = await api.patch(`/creneaux/${creneauId}/prix-dynamique/`);
+    return normaliserCreneau(data);
+  },
 };
