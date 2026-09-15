@@ -159,8 +159,75 @@ export const adminService = {
     return data.city_stats;
   },
 
+  // Active/suspend un compte (bouton "Modifier" de la page Utilisateurs).
+  async toggleActifUtilisateur(id) {
+    try {
+      const { data } = await api.patch(`/admin/utilisateurs/${id}/toggle-actif/`);
+      return { success: true, actif: data.actif };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || "Impossible de modifier ce compte." };
+    }
+  },
+
+  // Supprime définitivement un compte (bouton "Supprimer" de la page Utilisateurs).
+  async supprimerUtilisateur(id) {
+    try {
+      await api.delete(`/admin/utilisateurs/${id}/`);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.detail || "Impossible de supprimer ce compte." };
+    }
+  },
+
   async getStatsTopTerrains() {
     const data = await this._getStatistiquesCompletes();
     return data.top_terrains;
+  },
+
+  // Vue détaillée d'un gérant (page "Gestion des utilisateurs" -> Voir) :
+  // ses terrains, son abonnement, ses revenus et son historique de paiements.
+  async getGerantDetail(userId) {
+    const { data } = await api.get(`/admin/utilisateurs/${userId}/gerant-detail/`);
+    const LABELS_TYPE_PAIEMENT = {
+      avance: 'Avance de réservation',
+      solde: 'Solde payé sur place',
+      abonnement: 'Abonnement',
+    };
+    const LABELS_MOYEN_PAIEMENT = { wave: 'Wave', orange_money: 'Orange Money', cash: 'Cash', '': 'Non renseigné' };
+
+    return {
+      gerant: data.gerant,
+      nombreTerrains: data.nombre_terrains,
+      terrains: data.terrains.map((t) => ({
+        id: t.id,
+        nom: t.nom,
+        ville: t.ville,
+        actif: t.actif,
+        prixHeure: t.prix_heure,
+        noteMoyenne: t.note_moyenne,
+        nombreAvis: t.nombre_avis,
+      })),
+      revenusTotaux: data.revenus_totaux,
+      revenusMois: data.revenus_mois,
+      abonnement: data.abonnement && {
+        statut: data.abonnement.statut,
+        estActif: data.abonnement.est_actif,
+        dateFinEssai: data.abonnement.date_fin_essai,
+        dateFinAbonnement: data.abonnement.date_fin_abonnement,
+      },
+      paiementsRecus: data.paiements_recus.map((p) => ({
+        id: p.id,
+        type: LABELS_TYPE_PAIEMENT[p.type] || p.type,
+        montant: p.montant,
+        moyenPaiement: LABELS_MOYEN_PAIEMENT[p.moyen_paiement] ?? p.moyen_paiement,
+        date: new Date(p.cree_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
+      })),
+      paiementsAbonnement: data.paiements_abonnement.map((p) => ({
+        id: p.id,
+        montant: p.montant,
+        moyenPaiement: LABELS_MOYEN_PAIEMENT[p.moyen_paiement] ?? p.moyen_paiement,
+        date: new Date(p.cree_le).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
+      })),
+    };
   },
 };

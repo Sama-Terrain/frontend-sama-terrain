@@ -41,6 +41,7 @@ import ValiderGerants from '../pages/admin/ValiderGerants';
 import ModerationAvis from '../pages/admin/ModerationAvis';
 import Statistiques from '../pages/admin/Statistiques';
 import Parametres from '../pages/admin/Parametres';
+import GerantDetail from '../pages/admin/GerantDetail';
 
 export default function AppRoutes({ searchParams }) {
   const { currentUser, logout } = useAuth();
@@ -160,6 +161,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><AdminDashboard onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/utilisateurs" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Utilisateurs onLogout={logout} /></ProtectedRoute>} />
+      <Route path="/admin/gerants/:id" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><GerantDetail onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/validation-gerants" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ValiderGerants onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/moderation-avis" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ModerationAvis onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/statistiques" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Statistiques onLogout={logout} /></ProtectedRoute>} />

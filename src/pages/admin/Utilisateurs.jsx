@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/adminService';
-import { Search, Eye, Edit, Trash2, ChevronLeft } from 'lucide-react';
+import { Search, Eye, Ban, CheckCircle2, Trash2, ChevronLeft } from 'lucide-react';
 
 /**
  * Page Utilisateurs (Gestion des Utilisateurs)
@@ -13,6 +14,7 @@ import { Search, Eye, Edit, Trash2, ChevronLeft } from 'lucide-react';
  * 4. Effectuer des actions sur les utilisateurs (voir, éditer, supprimer)
  */
 export default function Utilisateurs({ onLogout }) {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Joueurs');
@@ -21,6 +23,7 @@ export default function Utilisateurs({ onLogout }) {
   const [page, setPage] = useState(1);
   const [profile, setProfile] = useState(null);
   const usersPerPage = 8;
+  const [actionEnCours, setActionEnCours] = useState(null);
 
   useEffect(() => {
     async function loadUsers() {
@@ -71,6 +74,41 @@ export default function Utilisateurs({ onLogout }) {
   useEffect(() => {
     setPage(1);
   }, [search, city, activeTab]);
+
+  // Active/suspend le compte (bouton "Modifier"), avec confirmation puisque
+  // ça bloque immédiatement la connexion de la personne concernée.
+  const handleToggleActif = async (user) => {
+    const action = user.status === 'actif' ? 'suspendre' : 'réactiver';
+    if (!window.confirm(`Voulez-vous vraiment ${action} le compte de ${user.name} ?`)) return;
+
+    setActionEnCours(user.id);
+    const resultat = await adminService.toggleActifUtilisateur(user.id);
+    setActionEnCours(null);
+
+    if (!resultat.success) {
+      window.alert(resultat.error);
+      return;
+    }
+    setUsers((precedent) =>
+      precedent.map((u) => (u.id === user.id ? { ...u, status: resultat.actif ? 'actif' : 'inactif' } : u))
+    );
+  };
+
+  // Supprime définitivement le compte (bouton "Supprimer") : action
+  // irréversible, donc double confirmation implicite via le message clair.
+  const handleSupprimer = async (user) => {
+    if (!window.confirm(`Supprimer définitivement le compte de ${user.name} (${user.email}) ? Cette action est irréversible.`)) return;
+
+    setActionEnCours(user.id);
+    const resultat = await adminService.supprimerUtilisateur(user.id);
+    setActionEnCours(null);
+
+    if (!resultat.success) {
+      window.alert(resultat.error);
+      return;
+    }
+    setUsers((precedent) => precedent.filter((u) => u.id !== user.id));
+  };
 
   // Fonction pour obtenir l'initiale
   const getInitial = (name) => {
@@ -233,22 +271,35 @@ export default function Utilisateurs({ onLogout }) {
                   <div className="flex w-[100px] shrink-0 items-center justify-center gap-[8px]">
                     <button
                       type="button"
-                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      onClick={() => user.role === 'Gérant' && navigate(`/admin/gerants/${user.id}`)}
+                      disabled={user.role !== 'Gérant'}
+                      className="flex h-[14px] w-[14px] items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       aria-label={`Voir ${user.name}`}
+                      title={user.role === 'Gérant' ? 'Voir le détail (terrains, revenus, abonnement)' : 'Détail disponible uniquement pour les gérants'}
                     >
                       <Eye size={14} className="text-gray-600" />
                     </button>
                     <button
                       type="button"
-                      className="flex h-[14px] w-[14px] items-center justify-center"
-                      aria-label={`Modifier ${user.name}`}
+                      onClick={() => handleToggleActif(user)}
+                      disabled={actionEnCours === user.id}
+                      className="flex h-[14px] w-[14px] items-center justify-center disabled:opacity-30 cursor-pointer"
+                      aria-label={`${user.status === 'actif' ? 'Suspendre' : 'Réactiver'} ${user.name}`}
+                      title={user.status === 'actif' ? 'Suspendre ce compte' : 'Réactiver ce compte'}
                     >
-                      <Edit size={14} className="text-green-600" />
+                      {user.status === 'actif' ? (
+                        <Ban size={14} className="text-amber-600" />
+                      ) : (
+                        <CheckCircle2 size={14} className="text-green-600" />
+                      )}
                     </button>
                     <button
                       type="button"
-                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      onClick={() => handleSupprimer(user)}
+                      disabled={actionEnCours === user.id}
+                      className="flex h-[14px] w-[14px] items-center justify-center disabled:opacity-30 cursor-pointer"
                       aria-label={`Supprimer ${user.name}`}
+                      title="Supprimer définitivement ce compte"
                     >
                       <Trash2 size={14} className="text-red-600" />
                     </button>
