@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { ROLES } from '../utils/roles';
+import { ROLES, getHomeRouteForRole } from '../utils/roles';
 import ProtectedRoute from './ProtectedRoute';
 import RequireAbonnementActif from './RequireAbonnementActif';
 
@@ -56,8 +56,16 @@ export default function AppRoutes({ searchParams }) {
 
   return (
     <Routes>
-      {/* Route Accueil */}
-      <Route path="/" element={<Accueil />} />
+      {/* Route Accueil : un gérant ou un admin déjà connecté ne doit jamais
+          retomber sur la page publique amateur, mais sur SON espace. */}
+      <Route
+        path="/"
+        element={
+          currentUser && currentUser.role !== ROLES.AMATEUR
+            ? <Navigate to={getHomeRouteForRole(currentUser.role)} replace />
+            : <Accueil />
+        }
+      />
       <Route path="/accueil" element={<Navigate to="/" replace />} />
 
       {/* Routes Terrains */}
