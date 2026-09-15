@@ -116,18 +116,18 @@ export default function RechercheTerrains() {
           <div className="lg:col-span-3 space-y-6">
             
             {/* En-tête de la liste avec compteur "12 terrains trouvés à Dakar" & Tri */}
-            <div className="bg-white rounded-2xl p-4 border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="text-xs font-bold text-gray-800">
+            <div className="bg-white rounded-2xl p-4 border border-gray-200 flex flex-row items-center justify-between gap-2 sm:gap-4">
+              <div className="text-xs font-bold text-gray-800 truncate">
                 <span className="text-sm font-black text-gray-900">{filteredTerrains.length}</span> terrains trouvés
                 {filters.localisation !== 'Tous les quartiers' && ` à ${filters.localisation}`}
               </div>
 
-              <div className="flex items-center space-x-3 text-xs">
-                <span className="text-gray-500 font-medium">Trier par :</span>
+              <div className="flex items-center space-x-2 sm:space-x-3 text-xs shrink-0">
+                <span className="text-gray-500 font-medium hidden xs:inline">Trier par :</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="bg-transparent font-bold text-gray-900 focus:outline-none cursor-pointer"
+                  className="bg-transparent font-bold text-gray-900 focus:outline-none cursor-pointer max-w-[140px] sm:max-w-none"
                 >
                   <option value="Recommandé">Recommandé</option>
                   <option value="note">Meilleures notes</option>
