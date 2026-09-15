@@ -26,9 +26,9 @@ export default function AbonnementTrialBanner() {
 
   return (
     <div className="w-full bg-amber-50 border border-amber-200 rounded-[10px] px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div className="flex items-center gap-2.5 text-amber-800">
-        <Clock size={16} className="shrink-0" />
-        <p className="text-sm font-semibold">
+      <div className="flex items-start sm:items-center gap-2.5 text-amber-800 min-w-0">
+        <Clock size={16} className="shrink-0 mt-0.5 sm:mt-0" />
+        <p className="text-sm font-semibold leading-snug">
           Essai gratuit : il vous reste {joursRestants} jour{joursRestants > 1 ? 's' : ''} avant l'activation de l'abonnement (7 500 FCFA/mois).
         </p>
       </div>
@@ -38,6 +38,7 @@ export default function AbonnementTrialBanner() {
         size="sm"
         rounded="8px"
         onClick={() => navigate('/gerant/abonnement')}
+        className="w-full sm:w-auto shrink-0 justify-center"
       >
         Activer maintenant
       </Button>

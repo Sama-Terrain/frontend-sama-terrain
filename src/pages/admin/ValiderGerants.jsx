@@ -103,33 +103,33 @@ export default function ValiderGerants({ onLogout }) {
     <AdminLayout title="Validation des Gérants" profile={profile} onLogout={onLogout}>
       
       {/* BARRE D'INFORMATION */}
-      <section className="w-full bg-vert-principal rounded-[12px] px-5 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border border-vert-survol shadow-2xs mb-6">
-        
+      <section className="w-full bg-vert-principal rounded-[12px] px-4 sm:px-5 py-4 sm:py-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6 border border-vert-survol shadow-2xs mb-6">
+
         {/* Titre */}
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="w-5 h-5 flex items-center justify-center shrink-0">
+        <div className="flex items-start sm:items-center gap-3 min-w-0">
+          <div className="w-5 h-5 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
             <FileText size={20} className="text-white" />
           </div>
-          <p className="text-white text-[16px] font-bold leading-normal whitespace-nowrap">
-            Validation des professionnels : Sécurisez l'accès aux terrains
+          <p className="text-white text-[15px] sm:text-[16px] font-bold leading-snug sm:leading-normal">
+            Validation des professionnels
           </p>
         </div>
 
         {/* Statistiques */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-white text-[14px] whitespace-nowrap">
-          <p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6 text-white text-[13px] sm:text-[14px] shrink-0">
+          <p className="whitespace-nowrap">
             En attente :{" "}
             <span className="font-extrabold text-dore">
               {stats.pending} demandes
             </span>
           </p>
-          <p>
+          <p className="whitespace-nowrap">
             Approuvés :{" "}
             <span className="font-extrabold">
               {stats.approved} gérants
             </span>
           </p>
-          <p>
+          <p className="whitespace-nowrap">
             Rejetés :{" "}
             <span className="font-extrabold">
               {stats.rejected} rejets
