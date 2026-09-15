@@ -102,21 +102,22 @@ export default function ValiderGerants({ onLogout }) {
   return (
     <AdminLayout title="Validation des Gérants" profile={profile} onLogout={onLogout}>
       
+  
       {/* BARRE D'INFORMATION */}
-      <section className="w-full bg-vert-principal rounded-[12px] px-5 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border border-vert-survol shadow-2xs mb-6">
+      <section className="w-full bg-vert-principal rounded-xl px-4 sm:px-5 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 border border-vert-survol shadow-2xs mb-6">
         
         {/* Titre */}
         <div className="flex items-center gap-3 shrink-0">
           <div className="w-5 h-5 flex items-center justify-center shrink-0">
             <FileText size={20} className="text-white" />
           </div>
-          <p className="text-white text-[16px] font-bold leading-normal whitespace-nowrap">
-            Validation des professionnels : Sécurisez l'accès aux terrains
+          <p className="text-white text-sm sm:text-[16px] font-bold leading-snug">
+            Validation des professionnels
           </p>
         </div>
 
         {/* Statistiques */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 text-white text-[14px] whitespace-nowrap">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 sm:gap-6 text-white text-xs sm:text-[14px] whitespace-nowrap">
           <p>
             En attente :{" "}
             <span className="font-extrabold text-dore">
@@ -129,12 +130,12 @@ export default function ValiderGerants({ onLogout }) {
               {stats.approved} gérants
             </span>
           </p>
-          <p>
+          {/* <p>
             Rejetés :{" "}
             <span className="font-extrabold">
               {stats.rejected} rejets
             </span>
-          </p>
+          </p> */}
         </div>
       </section>
 
@@ -242,24 +243,24 @@ export default function ValiderGerants({ onLogout }) {
               </div>
 
               {/* Pied de carte */}
-              <div className="w-full flex items-center justify-between">
+              <div className="w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 {/* Date */}
-                <p className="text-gray-500 text-[12px] font-normal whitespace-nowrap">
+                <p className="text-gray-500 text-[11px] sm:text-[12px] font-normal whitespace-nowrap order-2 sm:order-1">
                   Soumis le : {request.submittedAt}
                 </p>
                 {/* Actions */}
                 {request.status === 'pending' && (
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 order-1 sm:order-2">
                     <button
                       type="button"
-                      className="bg-[#fee2e2] px-4 py-2.5 rounded-[8px] text-red-600 text-[13px] font-bold whitespace-nowrap"
+                      className="flex-1 sm:flex-initial bg-[#fee2e2] px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-red-600 text-xs sm:text-[13px] font-bold whitespace-nowrap"
                       onClick={() => ouvrirModalRejet(request.id)}
                     >
-                      Rejeter la demande
+                      Rejeter
                     </button>
                     <button
                       type="button"
-                      className="bg-vert-principal px-4 py-2.5 rounded-[8px] text-white text-[13px] font-bold whitespace-nowrap"
+                      className="flex-1 sm:flex-initial bg-vert-principal px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-white text-xs sm:text-[13px] font-bold whitespace-nowrap"
                       onClick={() => handleApprove(request.id)}
                     >
                       Approuver & Activer
@@ -267,13 +268,13 @@ export default function ValiderGerants({ onLogout }) {
                   </div>
                 )}
                 {request.status === 'approved' && (
-                  <div className="flex items-center gap-2 text-emerald-600">
+                  <div className="flex items-center gap-2 text-emerald-600 order-1 sm:order-2">
                     <CheckCircle size={16} />
                     <span className="text-xs font-bold">Demande approuvée</span>
                   </div>
                 )}
                 {request.status === 'rejected' && (
-                  <div className="flex items-center gap-2 text-red-600">
+                  <div className="flex items-center gap-2 text-red-600 order-1 sm:order-2">
                     <XCircle size={16} />
                     <span className="text-xs font-bold">Demande rejetée</span>
                   </div>
@@ -287,8 +288,8 @@ export default function ValiderGerants({ onLogout }) {
       {/* MODAL : motif du rejet (obligatoire, envoyé par email à la personne) */}
       {demandeARejeter !== null && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[12px] p-6 max-w-md w-full space-y-4">
-            <h3 className="text-gray-900 text-[16px] font-extrabold">
+          <div className="bg-white rounded-xl p-5 sm:p-6 max-w-md w-full space-y-4">
+            <h3 className="text-gray-900 text-sm sm:text-[16px] font-extrabold">
               Motif du rejet
             </h3>
             <textarea
@@ -296,7 +297,7 @@ export default function ValiderGerants({ onLogout }) {
               onChange={(e) => setMotifRejet(e.target.value)}
               rows={4}
               placeholder="Ex : le document fourni n'est pas lisible, merci de le renvoyer."
-              className="w-full border border-gray-300 rounded-[8px] p-3 text-sm focus:outline-none focus:border-vert-principal focus:ring-1 focus:ring-vert-principal"
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-vert-principal focus:ring-1 focus:ring-vert-principal"
             />
             {erreurRejet && (
               <p className="text-red-600 text-xs font-bold">{erreurRejet}</p>
@@ -305,14 +306,14 @@ export default function ValiderGerants({ onLogout }) {
               <button
                 type="button"
                 onClick={fermerModalRejet}
-                className="px-4 py-2.5 rounded-[8px] text-gray-600 text-[13px] font-bold whitespace-nowrap"
+                className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-gray-600 text-xs sm:text-[13px] font-bold whitespace-nowrap"
               >
                 Annuler
               </button>
               <button
                 type="button"
                 onClick={confirmerRejet}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2.5 rounded-[8px] text-white text-[13px] font-bold whitespace-nowrap"
+                className="bg-red-600 hover:bg-red-700 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg text-white text-xs sm:text-[13px] font-bold whitespace-nowrap"
               >
                 Confirmer le rejet
               </button>
