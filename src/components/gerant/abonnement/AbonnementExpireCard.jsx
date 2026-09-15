@@ -2,13 +2,12 @@ import { AlertTriangle, Lock } from 'lucide-react';
 import Button from '../../ui/Button';
 import Alert from '../../ui/Alert';
 import AvantagesAbonnement from './AvantagesAbonnement';
-import { PRIX_ABONNEMENT_MENSUEL } from '../../../mocks/abonnements';
 
 /**
  * Écran affiché quand l'essai (ou l'abonnement) est terminé : bloque l'accès
  * au tableau de bord tant que le gérant n'a pas renouvelé son abonnement.
  */
-export default function AbonnementExpireCard({ dateSuspension, chargement, erreur, onPayer }) {
+export default function AbonnementExpireCard({ dateSuspension, prixMensuel, chargement, erreur, onPayer }) {
   return (
     <div className="max-w-md w-full bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-8 space-y-6 text-center">
 
@@ -30,7 +29,7 @@ export default function AbonnementExpireCard({ dateSuspension, chargement, erreu
 
       <div className="border-t border-gray-100 pt-5 text-left space-y-5">
         <p className="text-2xl font-black text-vert-principal text-center">
-          {PRIX_ABONNEMENT_MENSUEL.toLocaleString('fr-FR')} FCFA
+          {prixMensuel.toLocaleString('fr-FR')} FCFA
           <span className="text-sm font-bold text-gray-500"> / mois</span>
         </p>
         <AvantagesAbonnement />

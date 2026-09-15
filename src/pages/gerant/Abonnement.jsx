@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import AbonnementActivationCard from '../../components/gerant/abonnement/AbonnementActivationCard';
 import AbonnementExpireCard from '../../components/gerant/abonnement/AbonnementExpireCard';
-import { abonnementService } from '../../services/abonnementService';
+import { abonnementService, joursRestantsEssai } from '../../services/abonnementService';
 import { formatDateCourte } from '../../utils/formatDate';
 
 /**
@@ -51,12 +51,15 @@ export default function Abonnement() {
       {abonnement.statutEffectif === 'expire' ? (
         <AbonnementExpireCard
           dateSuspension={formatDateCourte(abonnement.dateFinEssai)}
+          prixMensuel={abonnement.prixMensuel}
           chargement={chargement}
           erreur={erreur}
           onPayer={payer}
         />
       ) : (
         <AbonnementActivationCard
+          dureeEssaiJours={joursRestantsEssai(abonnement)}
+          prixMensuel={abonnement.prixMensuel}
           chargement={chargement}
           erreur={erreur}
           onPayer={payer}

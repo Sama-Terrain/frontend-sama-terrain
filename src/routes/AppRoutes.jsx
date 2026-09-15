@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { ROLES } from '../utils/roles';
+import { ROLES, getHomeRouteForRole } from '../utils/roles';
 import ProtectedRoute from './ProtectedRoute';
 import RequireAbonnementActif from './RequireAbonnementActif';
 
@@ -41,6 +41,7 @@ import ValiderGerants from '../pages/admin/ValiderGerants';
 import ModerationAvis from '../pages/admin/ModerationAvis';
 import Statistiques from '../pages/admin/Statistiques';
 import Parametres from '../pages/admin/Parametres';
+import GerantDetail from '../pages/admin/GerantDetail';
 
 export default function AppRoutes({ searchParams }) {
   const { currentUser, logout } = useAuth();
@@ -56,8 +57,16 @@ export default function AppRoutes({ searchParams }) {
 
   return (
     <Routes>
-      {/* Route Accueil */}
-      <Route path="/" element={<Accueil />} />
+      {/* Route Accueil : un gérant ou un admin déjà connecté ne doit jamais
+          retomber sur la page publique amateur, mais sur SON espace. */}
+      <Route
+        path="/"
+        element={
+          currentUser && currentUser.role !== ROLES.AMATEUR
+            ? <Navigate to={getHomeRouteForRole(currentUser.role)} replace />
+            : <Accueil />
+        }
+      />
       <Route path="/accueil" element={<Navigate to="/" replace />} />
 
       {/* Routes Terrains */}
@@ -152,6 +161,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><AdminDashboard onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/utilisateurs" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Utilisateurs onLogout={logout} /></ProtectedRoute>} />
+      <Route path="/admin/gerants/:id" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><GerantDetail onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/validation-gerants" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ValiderGerants onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/moderation-avis" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ModerationAvis onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/statistiques" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Statistiques onLogout={logout} /></ProtectedRoute>} />

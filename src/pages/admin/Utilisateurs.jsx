@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { adminService } from '../../services/adminService';
-import { Search, Eye, Edit, Trash2, ChevronLeft } from 'lucide-react';
+import { Search, Eye, Ban, CheckCircle2, Trash2, ChevronLeft } from 'lucide-react';
 
 /**
  * Page Utilisateurs (Gestion des Utilisateurs)
@@ -13,6 +14,7 @@ import { Search, Eye, Edit, Trash2, ChevronLeft } from 'lucide-react';
  * 4. Effectuer des actions sur les utilisateurs (voir, éditer, supprimer)
  */
 export default function Utilisateurs({ onLogout }) {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Joueurs');
@@ -21,6 +23,7 @@ export default function Utilisateurs({ onLogout }) {
   const [page, setPage] = useState(1);
   const [profile, setProfile] = useState(null);
   const usersPerPage = 8;
+  const [actionEnCours, setActionEnCours] = useState(null);
 
   useEffect(() => {
     async function loadUsers() {
@@ -72,6 +75,41 @@ export default function Utilisateurs({ onLogout }) {
     setPage(1);
   }, [search, city, activeTab]);
 
+  // Active/suspend le compte (bouton "Modifier"), avec confirmation puisque
+  // ça bloque immédiatement la connexion de la personne concernée.
+  const handleToggleActif = async (user) => {
+    const action = user.status === 'actif' ? 'suspendre' : 'réactiver';
+    if (!window.confirm(`Voulez-vous vraiment ${action} le compte de ${user.name} ?`)) return;
+
+    setActionEnCours(user.id);
+    const resultat = await adminService.toggleActifUtilisateur(user.id);
+    setActionEnCours(null);
+
+    if (!resultat.success) {
+      window.alert(resultat.error);
+      return;
+    }
+    setUsers((precedent) =>
+      precedent.map((u) => (u.id === user.id ? { ...u, status: resultat.actif ? 'actif' : 'inactif' } : u))
+    );
+  };
+
+  // Supprime définitivement le compte (bouton "Supprimer") : action
+  // irréversible, donc double confirmation implicite via le message clair.
+  const handleSupprimer = async (user) => {
+    if (!window.confirm(`Supprimer définitivement le compte de ${user.name} (${user.email}) ? Cette action est irréversible.`)) return;
+
+    setActionEnCours(user.id);
+    const resultat = await adminService.supprimerUtilisateur(user.id);
+    setActionEnCours(null);
+
+    if (!resultat.success) {
+      window.alert(resultat.error);
+      return;
+    }
+    setUsers((precedent) => precedent.filter((u) => u.id !== user.id));
+  };
+
   // Fonction pour obtenir l'initiale
   const getInitial = (name) => {
     return name.charAt(0).toUpperCase();
@@ -115,15 +153,15 @@ export default function Utilisateurs({ onLogout }) {
     <AdminLayout title="Gestion des Utilisateurs" profile={profile} onLogout={onLogout}>
       
       {/* SECTION FILTRES */}
-      <div className="flex w-full items-center gap-[20px] rounded-[12px] border border-[#e5e7eb] bg-white p-[20px]">
+      <div className="flex w-full items-center gap-2 sm:gap-5 rounded-xl border border-[#e5e7eb] bg-white p-2 sm:p-5">
         {/* Tabs */}
-        <div className="flex flex-1 gap-[8px] rounded-[8px] bg-[#f4f6f5] p-[4px]">
+        <div className="flex flex-1 gap-1 sm:gap-2 rounded-lg bg-[#f4f6f5] p-1">
           {tabs.map((tab) => (
             <button
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`flex flex-1 items-center justify-center rounded-[6px] px-[16px] py-[8px] text-[12px] transition ${
+              className={`flex flex-1 items-center justify-center rounded-md px-1.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs leading-tight text-center transition truncate ${
                 activeTab === tab
                   ? "bg-vert-principal font-bold text-white"
                   : "font-semibold text-[#4b5563]"
@@ -135,16 +173,16 @@ export default function Utilisateurs({ onLogout }) {
         </div>
 
         {/* Search */}
-        <div className="flex flex-1 items-center gap-[8px] rounded-[8px] border border-[#e5e7eb] px-[14px] py-[10px]">
-          <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center">
+        <div className="flex flex-1 items-center gap-2 rounded-lg border border-[#e5e7eb] px-2 sm:px-3.5 py-2 sm:py-2.5 min-w-0">
+          <div className="flex h-4 w-4 shrink-0 items-center justify-center">
             <Search size={16} className="text-gray-400" />
           </div>
           <input
             type="text"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Rechercher par nom, email, téléphone..."
-            className="w-full bg-transparent text-[14px] text-[#111827] outline-none placeholder:text-[#9ca3af]"
+            placeholder="Rechercher..."
+            className="w-full min-w-0 bg-transparent text-xs sm:text-sm text-[#111827] outline-none placeholder:text-[#9ca3af]"
           />
         </div>
 
@@ -233,22 +271,35 @@ export default function Utilisateurs({ onLogout }) {
                   <div className="flex w-[100px] shrink-0 items-center justify-center gap-[8px]">
                     <button
                       type="button"
-                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      onClick={() => user.role === 'Gérant' && navigate(`/admin/gerants/${user.id}`)}
+                      disabled={user.role !== 'Gérant'}
+                      className="flex h-[14px] w-[14px] items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                       aria-label={`Voir ${user.name}`}
+                      title={user.role === 'Gérant' ? 'Voir le détail (terrains, revenus, abonnement)' : 'Détail disponible uniquement pour les gérants'}
                     >
                       <Eye size={14} className="text-gray-600" />
                     </button>
                     <button
                       type="button"
-                      className="flex h-[14px] w-[14px] items-center justify-center"
-                      aria-label={`Modifier ${user.name}`}
+                      onClick={() => handleToggleActif(user)}
+                      disabled={actionEnCours === user.id}
+                      className="flex h-[14px] w-[14px] items-center justify-center disabled:opacity-30 cursor-pointer"
+                      aria-label={`${user.status === 'actif' ? 'Suspendre' : 'Réactiver'} ${user.name}`}
+                      title={user.status === 'actif' ? 'Suspendre ce compte' : 'Réactiver ce compte'}
                     >
-                      <Edit size={14} className="text-green-600" />
+                      {user.status === 'actif' ? (
+                        <Ban size={14} className="text-amber-600" />
+                      ) : (
+                        <CheckCircle2 size={14} className="text-green-600" />
+                      )}
                     </button>
                     <button
                       type="button"
-                      className="flex h-[14px] w-[14px] items-center justify-center"
+                      onClick={() => handleSupprimer(user)}
+                      disabled={actionEnCours === user.id}
+                      className="flex h-[14px] w-[14px] items-center justify-center disabled:opacity-30 cursor-pointer"
                       aria-label={`Supprimer ${user.name}`}
+                      title="Supprimer définitivement ce compte"
                     >
                       <Trash2 size={14} className="text-red-600" />
                     </button>
@@ -260,21 +311,25 @@ export default function Utilisateurs({ onLogout }) {
         </div>
 
         {/* PAGINATION */}
-        <div className="flex items-center justify-between gap-4 pt-[16px]">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 pt-4">
           {/* INFORMATION */}
-          <p className="whitespace-nowrap text-[13px] text-[#4b5563]">
+          <p className="hidden sm:block whitespace-nowrap text-[13px] text-[#4b5563]">
             Affichage de {indexOfFirstUser + 1} à {Math.min(indexOfLastUser, filteredUsers.length)} sur {filteredUsers.length} utilisateurs
+          </p>
+          <p className="sm:hidden whitespace-nowrap text-[11px] text-[#4b5563] shrink-0">
+            {indexOfFirstUser + 1}–{Math.min(indexOfLastUser, filteredUsers.length)} / {filteredUsers.length}
           </p>
 
           {/* BUTTONS */}
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto max-w-full">
             <button
               type="button"
               disabled={page === 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
-              className="rounded-[6px] border border-[#e5e7eb] bg-white px-[12px] py-[8px] text-[13px] text-[#4b5563] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
+              className="shrink-0 rounded-md border border-[#e5e7eb] bg-white px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-[13px] text-[#4b5563] transition hover:bg-[#f9fafb] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Précédent
+              <span className="hidden sm:inline">Précédent</span>
+              <span className="sm:hidden">Préc.</span>
             </button>
 
             {[...Array(totalPages)].map((_, i) => (
@@ -282,7 +337,7 @@ export default function Utilisateurs({ onLogout }) {
                 key={i + 1}
                 type="button"
                 onClick={() => setPage(i + 1)}
-                className={`rounded-[6px] px-[12px] py-[8px] text-[13px] ${
+                className={`shrink-0 rounded-md px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-[13px] ${
                   page === i + 1
                     ? "bg-vert-principal font-bold text-white"
                     : "border border-[#e5e7eb] bg-white text-[#111827] transition hover:bg-[#f9fafb]"
@@ -295,9 +350,10 @@ export default function Utilisateurs({ onLogout }) {
             <button
               type="button"
               onClick={() => setPage((current) => current + 1)}
-              className="rounded-[6px] border border-[#e5e7eb] bg-white px-[12px] py-[8px] text-[13px] text-[#4b5563] transition hover:bg-[#f9fafb]"
+              className="shrink-0 rounded-md border border-[#e5e7eb] bg-white px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-[13px] text-[#4b5563] transition hover:bg-[#f9fafb]"
             >
-              Suivant
+              <span className="hidden sm:inline">Suivant</span>
+              <span className="sm:hidden">Suiv.</span>
             </button>
           </div>
         </div>

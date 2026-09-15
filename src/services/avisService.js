@@ -25,6 +25,12 @@ export const avisService = {
     return data.map(normaliserAvis);
   },
 
+  // Témoignages mis en avant sur la page d'accueil (tous terrains confondus).
+  getMeilleursAvis: async () => {
+    const { data } = await api.get('/avis/meilleurs/');
+    return data.map((a) => ({ ...normaliserAvis(a), role: `A joué à ${a.terrain}` }));
+  },
+
   // Indique si l'amateur peut laisser un avis pour cette réservation précise
   // (réservation confirmée, match déjà joué, pas déjà notée).
   avisPossible: async (reservationId) => {

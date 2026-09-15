@@ -72,8 +72,8 @@ export default function MesReservations() {
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* EN-TÊTE : TITRE ET BOUTON "RÉSERVER UN NOUVEAU MATCH" */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-vert-principal tracking-tight">
+        <div className="flex flex-row items-center justify-between gap-3">
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-vert-principal tracking-tight truncate">
             Mes Réservations
           </h1>
 
@@ -82,9 +82,10 @@ export default function MesReservations() {
             variant="gold"
             size="md"
             rounded="12px"
-            className="rounded-[8px] font-extrabold shadow-xs inline-flex items-center justify-center gap-2 text-vert-principal"
+            className="shrink-0 rounded-[8px] font-extrabold shadow-xs inline-flex items-center justify-center gap-2 text-vert-principal whitespace-nowrap px-3 sm:px-5"
           >
-            <span>Réserver un nouveau match</span>
+            <span className="hidden sm:inline">Réserver un nouveau match</span>
+            <span className="sm:hidden">Réserver</span>
           </Button>
         </div>
 

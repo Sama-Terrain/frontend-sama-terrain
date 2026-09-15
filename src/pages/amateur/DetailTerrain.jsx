@@ -344,16 +344,26 @@ export default function DetailTerrain({ currentUser }) {
                 <div className="flex items-center space-x-1 text-amber-400">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        size={14}
+                        className={
+                          i < Math.round(terrain?.note || 0)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-gray-300'
+                        }
+                      />
                     ))}
                   </div>
-                  <span className="font-bold text-gray-800 ml-1">4.8</span>
+                  <span className="font-bold text-gray-800 ml-1">{(terrain?.note || 0).toFixed(1)}</span>
                   <span className="text-gray-400">({avisList.length} avis)</span>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                {['Synthétique', '5v5', 'Éclairage', 'Vestiaires', 'Parking'].map((badge) => (
+                {[terrain?.surface, terrain?.type, ...(terrain?.equipements || [])]
+                  .filter(Boolean)
+                  .map((badge) => (
                   <Badge
                     key={badge}
                     statut="disponible"
@@ -440,41 +450,129 @@ export default function DetailTerrain({ currentUser }) {
               ) : (
                 /* CRÉNEAUX HORAIRES DISPONIBLES */
                 <div className="space-y-3 pt-4 border-t border-gray-100">
-                  <h4 className="text-xs font-bold text-gray-700 uppercase">
-                    Créneaux disponibles ({selectedDate})
-                  </h4>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Titre */}
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold text-gray-700 uppercase">
+                      Créneaux disponibles
+                    </h4>
+
+                    <span className="text-[10px] font-medium text-gray-400">
+                      {selectedDate}
+                    </span>
+                  </div>
+
+                  {/* Créneaux */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
+
                     {creneauxHoraires.map((slot) => {
+
                       const isSelected = selectedCreneau?.id === slot.id;
+
+                      /* Créneau indisponible */
                       if (!slot.disponible) {
                         return (
                           <div
                             key={slot.id}
-                            className="p-3 rounded-[8px] bg-gray-100 text-gray-400 text-center border border-gray-200 opacity-60 cursor-not-allowed"
+                            className="
+                              min-h-[64px]
+                              px-2.5 py-2
+                              rounded-xl
+                              bg-gray-100
+                              text-gray-400
+                              text-center
+                              border border-gray-200
+                              opacity-60
+                              cursor-not-allowed
+                              flex
+                              flex-col
+                              items-center
+                              justify-center
+                            "
                           >
-                            <p className="text-xs font-bold">{slot.heure}</p>
-                            <p className="text-[10px] mt-0.5">{slot.prix.toLocaleString()} FCFA</p>
+                            <p className="text-xs font-bold line-through">
+                              {slot.heure}
+                            </p>
+
+                            <p className="text-[10px] mt-1">
+                              {slot.prix.toLocaleString()} FCFA
+                            </p>
+
+                            <span className="text-[9px] mt-0.5">
+                              Indisponible
+                            </span>
                           </div>
                         );
                       }
+
+                      /* Créneau disponible */
                       return (
                         <button
                           key={slot.id}
+                          type="button"
                           onClick={() => setSelectedCreneau(slot)}
-                          className={`p-3 rounded-[8px] text-center border transition-all cursor-pointer ${
-                            isSelected
-                              ? 'bg-vert-principal text-white border-vert-principal font-bold shadow-sm'
-                              : 'bg-white text-gray-800 border-gray-200 hover:border-vert-principal'
-                          }`}
+                          className={`
+                            min-h-[64px]
+                            px-2.5 py-2
+                            rounded-xl
+                            text-center
+                            border
+                            transition-all
+                            duration-200
+                            active:scale-[0.97]
+                            flex
+                            flex-col
+                            items-center
+                            justify-center
+                            ${
+                              isSelected
+                                ? `
+                                  bg-vert-principal
+                                  text-white
+                                  border-vert-principal
+                                  shadow-md
+                                `
+                                : `
+                                  bg-white
+                                  text-gray-800
+                                  border-gray-200
+                                  hover:border-vert-principal
+                                  hover:bg-gray-50
+                                `
+                            }
+                          `}
                         >
-                          <p className="text-xs font-extrabold">{slot.heure}</p>
-                          <p className={`text-[11px] mt-0.5 ${isSelected ? 'text-emerald-200' : 'text-gray-500'}`}>
+                          {/* Heure */}
+                          <p className="text-sm font-extrabold leading-none">
+                            {slot.heure}
+                          </p>
+
+                          {/* Prix */}
+                          <p
+                            className={`
+                              text-[10px]
+                              font-medium
+                              mt-1.5
+                              ${
+                                isSelected
+                                  ? "text-emerald-100"
+                                  : "text-gray-500"
+                              }
+                            `}
+                          >
                             {slot.prix.toLocaleString()} FCFA
                           </p>
+
+                          {/* Sélection */}
+                          {isSelected && (
+                            <span className="text-[9px] font-bold mt-1">
+                              Sélectionné ✓
+                            </span>
+                          )}
                         </button>
                       );
                     })}
+
                   </div>
                 </div>
               )}

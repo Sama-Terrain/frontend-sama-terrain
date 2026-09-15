@@ -2,13 +2,12 @@ import { Lock } from 'lucide-react';
 import Button from '../../ui/Button';
 import Alert from '../../ui/Alert';
 import AvantagesAbonnement from './AvantagesAbonnement';
-import { PRIX_ABONNEMENT_MENSUEL, DUREE_ESSAI_JOURS } from '../../../mocks/abonnements';
 
 /**
  * Écran affiché pendant la période d'essai gratuite : présente l'offre et
  * permet de payer tout de suite pour activer l'abonnement sans attendre la fin de l'essai.
  */
-export default function AbonnementActivationCard({ chargement, erreur, onPayer }) {
+export default function AbonnementActivationCard({ dureeEssaiJours, prixMensuel, chargement, erreur, onPayer }) {
   return (
     <div className="max-w-md w-full bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-8 space-y-6">
 
@@ -19,14 +18,14 @@ export default function AbonnementActivationCard({ chargement, erreur, onPayer }
 
       <div className="bg-vert-clair/40 rounded-[10px] p-5 text-center space-y-1">
         <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
-          {DUREE_ESSAI_JOURS} jours d'essai gratuit inclus
+          {dureeEssaiJours} jours d'essai gratuit restants
         </p>
         <p className="text-2xl font-black text-vert-principal">
-          {PRIX_ABONNEMENT_MENSUEL.toLocaleString('fr-FR')} FCFA
+          {prixMensuel.toLocaleString('fr-FR')} FCFA
           <span className="text-sm font-bold text-gray-500"> / mois</span>
         </p>
         <p className="text-xs text-gray-500">
-          Puis {PRIX_ABONNEMENT_MENSUEL.toLocaleString('fr-FR')} FCFA/mois — résiliable à tout moment
+          Puis {prixMensuel.toLocaleString('fr-FR')} FCFA/mois — résiliable à tout moment
         </p>
       </div>
 
