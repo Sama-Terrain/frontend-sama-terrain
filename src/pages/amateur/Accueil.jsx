@@ -5,11 +5,8 @@ import TerrainCard from '../../components/terrain/TerrainCard';
 import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
 import { iaService } from '../../services/iaService';
-import { MESSAGE_ACCUEIL_CHATBOT } from '../../mocks/chatbot';
+import { avisService } from '../../services/avisService';
 import { VILLES } from '../../utils/villes';
-// Témoignages de la section marketing d'accueil : pas liés à un terrain
-// précis, donc pas couverts par l'API (qui n'expose que les avis PAR terrain).
-import { MOCK_AVIS } from '../../mocks/avis';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
@@ -30,19 +27,22 @@ export default function Accueil() {
   // État du Widget Assistant IA (Panneau flottant)
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [aiMessages, setAiMessages] = useState([
-    { id: 1, sender: 'bot', text: MESSAGE_ACCUEIL_CHATBOT }
+    { id: 1, sender: 'bot', text: "Bonjour ! Je suis l'assistant Sama-Terrain. Quel quartier ou créneau cherchez-vous à Dakar ?" }
   ]);
   const [aiInput, setAiInput] = useState('');
   const [aiEnAttente, setAiEnAttente] = useState(false);
 
-  // Chargement des terrains vedettes (backend) et des témoignages (mockés)
+  // Chargement des terrains vedettes et des témoignages (backend)
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const terrainsData = await terrainService.getTerrainsVedettes();
+        const [terrainsData, avisData] = await Promise.all([
+          terrainService.getTerrainsVedettes(),
+          avisService.getMeilleursAvis(),
+        ]);
         setTerrainsVedettes(terrainsData);
-        setAvisJoueurs(MOCK_AVIS);
+        setAvisJoueurs(avisData);
       } catch (error) {
         console.error('Erreur lors du chargement des données :', error);
       } finally {

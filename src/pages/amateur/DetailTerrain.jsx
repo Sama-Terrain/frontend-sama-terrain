@@ -344,16 +344,26 @@ export default function DetailTerrain({ currentUser }) {
                 <div className="flex items-center space-x-1 text-amber-400">
                   <div className="flex">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        size={14}
+                        className={
+                          i < Math.round(terrain?.note || 0)
+                            ? 'fill-amber-400 text-amber-400'
+                            : 'text-gray-300'
+                        }
+                      />
                     ))}
                   </div>
-                  <span className="font-bold text-gray-800 ml-1">4.8</span>
+                  <span className="font-bold text-gray-800 ml-1">{(terrain?.note || 0).toFixed(1)}</span>
                   <span className="text-gray-400">({avisList.length} avis)</span>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                {['Synthétique', '5v5', 'Éclairage', 'Vestiaires', 'Parking'].map((badge) => (
+                {[terrain?.surface, terrain?.type, ...(terrain?.equipements || [])]
+                  .filter(Boolean)
+                  .map((badge) => (
                   <Badge
                     key={badge}
                     statut="disponible"
