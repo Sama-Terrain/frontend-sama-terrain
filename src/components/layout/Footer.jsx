@@ -108,7 +108,7 @@ export default function Footer() {
 
         {/* Bas de page avec année 2024 comme sur la maquette */}
         <div className="pt-6 flex flex-col md:flex-row items-center justify-between text-xs text-gray-300">
-          <p>© 2024 Sama-Terrain. Tous droits réservés.</p>
+          <p>© 2026 Sama-Terrain. Tous droits réservés.</p>
           <p className="mt-2 md:mt-0 flex items-center gap-1.5">
             Fait au Sénégal avec passion 🇸🇳
           </p>
