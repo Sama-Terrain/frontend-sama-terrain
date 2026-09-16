@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, LogOut, Calendar } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut, Calendar, User } from 'lucide-react';
 import logoVert from '../../assets/logo-sama-terrain-vert.png';
 
 export default function Navbar({ currentUser, onLogout }) {
@@ -109,6 +109,17 @@ export default function Navbar({ currentUser, onLogout }) {
                     <p className="text-xs font-bold text-gray-900">{currentUser.prenom} {currentUser.nom}</p>
                     <p className="text-[11px] text-gray-500 truncate">{currentUser.email}</p>
                   </div>
+
+                  <button
+                    onClick={() => {
+                      setUserDropdownOpen(false);
+                      navigate('/profil');
+                    }}
+                    className="w-full flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-vert-principal text-left cursor-pointer"
+                  >
+                    <User size={14} />
+                    <span>Mon profil</span>
+                  </button>
 
                   <button
                     onClick={() => {
