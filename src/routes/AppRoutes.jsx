@@ -6,6 +6,7 @@ import RequireAbonnementActif from './RequireAbonnementActif';
 
 // Pages Amateurs
 import Accueil from '../pages/amateur/Accueil';
+import Profil from '../pages/amateur/Profil';
 import RechercheTerrains from '../pages/amateur/RechercheTerrains';
 import DetailTerrain from '../pages/amateur/DetailTerrain';
 import MesReservations from '../pages/amateur/MesReservations';
@@ -80,6 +81,14 @@ export default function AppRoutes({ searchParams }) {
         element={
           <ProtectedRoute allowedRoles={[ROLES.AMATEUR]}>
             <MesReservations />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profil"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.AMATEUR]}>
+            <Profil />
           </ProtectedRoute>
         }
       />

@@ -129,6 +129,16 @@ export const authService = {
     }
   },
 
+  // Modifie le profil de l'utilisateur connecté (page "Profil").
+  modifierProfil: async ({ prenom, nom, telephone, ville_preferee }) => {
+    try {
+      const { data } = await api.patch('/auth/me', { prenom, nom, telephone, ville_preferee });
+      return { success: true, user: ajouterInitiales(data) };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
   /**
    * Affiche le vrai bouton Google (rendu par Google lui-même) à l'intérieur
    * de `element`, et appelle `onResultat({success, user|error})` une fois que
