@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
-import Navbar from './components/layout/Navbar';
+import Navbar, { BarreNavigationBasse } from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
@@ -30,12 +30,15 @@ function AppContent() {
         />
       )}
 
-      <main className="flex-1">
+      <main className={`flex-1 ${!isAuthOrAdminPage ? 'pb-16 md:pb-0' : ''}`}>
         <AppRoutes searchParams={searchParams} />
       </main>
 
       {!isAuthOrAdminPage && (
-        <Footer />
+        <>
+          <Footer />
+          <BarreNavigationBasse currentUser={currentUser} />
+        </>
       )}
     </div>
   );

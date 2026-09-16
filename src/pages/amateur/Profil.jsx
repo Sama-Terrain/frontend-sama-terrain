@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Calendar, LogOut } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { authService } from '../../services/authService';
 import { VILLES } from '../../utils/villes';
@@ -14,7 +15,8 @@ const ONGLETS = ['Informations personnelles', 'Sécurité', 'Notifications'];
  * implémentées : on l'affiche clairement plutôt que de faire semblant.
  */
 export default function Profil() {
-  const { currentUser, login } = useAuth();
+  const navigate = useNavigate();
+  const { currentUser, login, logout } = useAuth();
   const [ongletActif, setOngletActif] = useState(ONGLETS[0]);
 
   const [prenom, setPrenom] = useState(currentUser.prenom || '');
@@ -74,6 +76,17 @@ export default function Profil() {
               <span>Membre depuis : {membreDepuis}</span>
             </div>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              navigate('/');
+            }}
+            className="w-full flex items-center justify-center gap-1.5 text-xs font-bold text-red-600 bg-red-50 rounded-[8px] py-2.5 cursor-pointer"
+          >
+            <LogOut size={14} />
+            <span>Se déconnecter</span>
+          </button>
         </div>
 
         {/* COLONNE DE DROITE */}
