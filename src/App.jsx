@@ -2,15 +2,34 @@ import { useState } from 'react';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import Navbar, { BarreNavigationBasse } from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import Splash from './pages/Splash';
 import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
+
+// Ne montrer le splash qu'une fois par session de navigation (pas à chaque
+// changement de page, seulement au tout premier chargement de l'app).
+const SPLASH_DEJA_VU = 'sama_splash_vu';
 
 function AppContent() {
   const location = useLocation();
   const { currentUser, logout } = useAuth();
 
   const [searchParams, setSearchParams] = useState({});
+  const [splashTermine, setSplashTermine] = useState(
+    () => sessionStorage.getItem(SPLASH_DEJA_VU) === 'true'
+  );
+
+  if (!splashTermine) {
+    return (
+      <Splash
+        onTermine={() => {
+          sessionStorage.setItem(SPLASH_DEJA_VU, 'true');
+          setSplashTermine(true);
+        }}
+      />
+    );
+  }
 
   // Masquer la Navbar et le Footer grand public sur les pages auth et les espaces
   // admin / gérant connectés (qui ont leur propre sidebar + header dédiés).
