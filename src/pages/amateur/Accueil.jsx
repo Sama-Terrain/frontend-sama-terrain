@@ -462,7 +462,7 @@ export default function Accueil() {
         </button>
       ) : (
         <div
-          className="fixed z-50 bg-white flex flex-col overflow-hidden
+          className="fixed z-[60] bg-white flex flex-col overflow-hidden
                      inset-0
                      sm:inset-auto sm:bottom-6 sm:right-6 sm:w-96 sm:h-[560px] sm:max-h-[80vh] sm:rounded-2xl sm:border sm:border-gray-300 sm:shadow-2xl"
         >

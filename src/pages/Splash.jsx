@@ -21,7 +21,7 @@ export default function Splash({ onTermine }) {
   }, [onTermine]);
 
   return (
-    <div className="fixed inset-0 z-[100] bg-vert-principal flex items-center justify-center">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden">
       <video
         ref={videoRef}
         src={splashVideo}
@@ -30,7 +30,7 @@ export default function Splash({ onTermine }) {
         playsInline
         onLoadedMetadata={(e) => { e.target.playbackRate = 2; }}
         onEnded={onTermine}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
       />
     </div>
   );
