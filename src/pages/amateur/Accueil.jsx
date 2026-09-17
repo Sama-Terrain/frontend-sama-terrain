@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, Clock, ShieldCheck, CheckCircle2, Bot, X } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, ShieldCheck, CheckCircle2, Bot, X, Send } from 'lucide-react';
 import TerrainCard from '../../components/terrain/TerrainCard';
 import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
@@ -58,11 +58,9 @@ export default function Accueil() {
     navigate('/terrains', { state: { searchZone, searchDate, searchCreneau } });
   };
 
-  // Handler d'envoi de message à l'assistant IA (micro-service FastAPI +
-  // LLM externe, voir iaService.js).
-  const handleSendAiMessage = async (e) => {
-    e.preventDefault();
-    const messageEnvoye = aiInput.trim();
+  // Envoie un message à l'assistant IA (micro-service FastAPI + LLM externe,
+  // voir iaService.js). Utilisé par le formulaire ET par les suggestions rapides.
+  const envoyerMessageIA = async (messageEnvoye) => {
     if (!messageEnvoye || aiEnAttente) return;
 
     const userMsg = { id: Date.now(), sender: 'user', text: messageEnvoye };
@@ -84,6 +82,18 @@ export default function Accueil() {
     ]);
     setAiEnAttente(false);
   };
+
+  const handleSendAiMessage = (e) => {
+    e.preventDefault();
+    envoyerMessageIA(aiInput.trim());
+  };
+
+  // Suggestions rapides affichées au-dessus du champ de saisie.
+  const SUGGESTIONS_RAPIDES = [
+    { label: 'Réserver un terrain', message: 'Je veux réserver un terrain' },
+    { label: 'Mes réservations', message: 'Je veux voir mes réservations' },
+    { label: 'Contacter support', message: "J'ai besoin de contacter le support" },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -266,26 +276,26 @@ export default function Accueil() {
         <div className="max-w-7xl mx-auto">
           
           <div className="mb-8 sm:mb-10">
-  <div className="flex items-center justify-between gap-3">
-    <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-vert-principal tracking-tight truncate">
-      Terrains vedettes à la une
-    </h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold text-vert-principal tracking-tight truncate">
+                Terrains vedettes à la une
+              </h2>
 
-    <Button
-      onClick={() => navigate('/terrains')}
-      variant="secondary"
-      size="sm"
-      className="shrink-0 whitespace-nowrap"
-    >
-      <span className="hidden sm:inline">Voir tous les terrains</span>
-      <span className="sm:hidden">Voir tout</span>
-    </Button>
-  </div>
+              <Button
+                onClick={() => navigate('/terrains')}
+                variant="secondary"
+                size="sm"
+                className="shrink-0 whitespace-nowrap"
+              >
+                <span className="hidden sm:inline">Voir tous les terrains</span>
+                <span className="sm:hidden">Voir tout</span>
+              </Button>
+            </div>
 
-  <p className="text-gray-600 mt-1.5 text-sm sm:text-base">
-    Les complexes les plus prisés par les passionnés de football à Dakar.
-  </p>
-</div>
+            <p className="text-gray-600 mt-1.5 text-sm sm:text-base">
+              Les complexes les plus prisés par les passionnés de football à Dakar.
+            </p>
+          </div>
 
           {/* Grille des Terrains Vedettes */}
           {loading ? (
@@ -438,90 +448,117 @@ export default function Accueil() {
       </section>
 
       {/* 7. WIDGET ASSISTANT IA FLOTTANT */}
-      <div className="fixed bottom-6 right-6 z-50">
-        {!isAiOpen ? (
-          <button
-            onClick={() => setIsAiOpen(true)}
-            className="w-36 h-36 sm:w-40 sm:h-40 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
-            title="Ouvrir l'assistant IA"
-          >
-            <img
-              src={chatbotGif}
-              alt="Assistant IA"
-              className="w-full h-full object-contain"
-            />
-          </button>
-        ) : (
-          <div className="w-80 sm:w-96 bg-white rounded-2xl border border-gray-300 overflow-hidden">
-            <div className="bg-vert-principal text-white p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Bot size={20} className="text-emerald-300" />
-                <span className="font-bold text-sm">Assistant Sama-Terrain</span>
+      {!isAiOpen ? (
+        <button
+          onClick={() => setIsAiOpen(true)}
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-20 h-20 sm:w-36 sm:h-36 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
+          title="Ouvrir l'assistant IA"
+        >
+          <img
+            src={chatbotGif}
+            alt="Assistant IA"
+            className="w-full h-full object-contain"
+          />
+        </button>
+      ) : (
+        <div
+          className="fixed z-50 bg-white flex flex-col overflow-hidden
+                     inset-0
+                     sm:inset-auto sm:bottom-6 sm:right-6 sm:w-96 sm:h-[560px] sm:max-h-[80vh] sm:rounded-2xl sm:border sm:border-gray-300 sm:shadow-2xl"
+        >
+          {/* EN-TÊTE */}
+          <div className="bg-vert-principal text-white p-4 flex items-center justify-between shrink-0 pt-[calc(1rem+env(safe-area-inset-top,0px))] sm:pt-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-dore flex items-center justify-center shrink-0">
+                <Bot size={20} className="text-vert-principal" />
               </div>
-
-              <button
-                onClick={() => setIsAiOpen(false)}
-                className="text-gray-300 hover:text-white p-1"
-              >
-                <X size={18} />
-              </button>
+              <div>
+                <p className="font-bold text-sm leading-tight">Assistant Sama-Terrain</p>
+                <p className="flex items-center gap-1.5 text-[11px] text-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  En ligne pour vous aider
+                </p>
+              </div>
             </div>
 
-            <div className="p-4 h-64 overflow-y-auto space-y-3 bg-gray-50 text-xs">
-              {aiMessages.map((msg) => (
+            <button
+              onClick={() => setIsAiOpen(false)}
+              className="text-gray-300 hover:text-white p-1 cursor-pointer"
+              aria-label="Fermer l'assistant"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* MESSAGES */}
+          <div className="flex-1 min-h-0 p-4 overflow-y-auto space-y-3 bg-gray-50 text-xs sm:text-[13px]">
+            {aiMessages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
                 <div
-                  key={msg.id}
-                  className={`flex ${
-                    msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl leading-relaxed ${
+                    msg.sender === 'user'
+                      ? 'bg-vert-principal text-white'
+                      : 'bg-vert-clair text-gray-800'
                   }`}
                 >
-                  <div
-                    className={`max-w-[80%] p-3 rounded-xl ${
-                      msg.sender === 'user'
-                        ? 'bg-vert-principal text-white rounded-br-none'
-                        : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none'
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
+                  {msg.text}
                 </div>
-              ))}
+              </div>
+            ))}
 
-              {/* INDICATEUR "EN TRAIN D'ÉCRIRE" pendant l'attente de la réponse mockée */}
-              {aiEnAttente && (
-                <div className="flex justify-start">
-                  <div className="bg-white border border-gray-200 text-gray-400 rounded-xl rounded-bl-none p-3">
-                    <span className="animate-pulse">L'assistant écrit...</span>
-                  </div>
+            {/* INDICATEUR "EN TRAIN D'ÉCRIRE" pendant l'attente de la vraie réponse IA */}
+            {aiEnAttente && (
+              <div className="flex justify-start">
+                <div className="bg-vert-clair text-gray-500 rounded-2xl px-4 py-2.5">
+                  <span className="animate-pulse">L'assistant écrit...</span>
                 </div>
-              )}
-            </div>
-
-            <form
-              onSubmit={handleSendAiMessage}
-              className="p-3 bg-white border-t border-gray-200 flex gap-2"
-            >
-              <input
-                type="text"
-                value={aiInput}
-                onChange={(e) => setAiInput(e.target.value)}
-                placeholder="Ex: Terrain disponible à Yoff..."
-                disabled={aiEnAttente}
-                className="flex-1 bg-gray-100 px-3 py-2 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-[#004030] disabled:opacity-60"
-              />
-
-              <Button
-                type="submit"
-                variant="primary"
-                size="sm"
-                disabled={aiEnAttente}
-              >
-                Envoyer
-              </Button>
-            </form>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+
+          {/* SUGGESTIONS RAPIDES */}
+          <div className="shrink-0 px-4 pt-3 flex flex-wrap gap-2 bg-white border-t border-gray-100">
+            {SUGGESTIONS_RAPIDES.map((suggestion) => (
+              <button
+                key={suggestion.label}
+                type="button"
+                disabled={aiEnAttente}
+                onClick={() => envoyerMessageIA(suggestion.message)}
+                className="px-3 py-1.5 rounded-full border border-vert-principal text-vert-principal text-[11px] font-semibold hover:bg-vert-clair transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {suggestion.label}
+              </button>
+            ))}
+          </div>
+
+          {/* SAISIE */}
+          <form
+            onSubmit={handleSendAiMessage}
+            className="shrink-0 p-3 bg-white flex gap-2 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] sm:pb-3"
+          >
+            <input
+              type="text"
+              value={aiInput}
+              onChange={(e) => setAiInput(e.target.value)}
+              placeholder="Écrivez votre message..."
+              disabled={aiEnAttente}
+              className="flex-1 bg-gray-100 px-4 py-2.5 rounded-full text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-vert-principal disabled:opacity-60"
+            />
+
+            <button
+              type="submit"
+              disabled={aiEnAttente || !aiInput.trim()}
+              aria-label="Envoyer"
+              className="w-10 h-10 shrink-0 rounded-full bg-vert-principal text-white flex items-center justify-center hover:bg-vert-survol transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <Send size={16} />
+            </button>
+          </form>
+        </div>
+      )}
 
     </div>
   );
