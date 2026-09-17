@@ -451,7 +451,7 @@ export default function Accueil() {
       {!isAiOpen ? (
         <button
           onClick={() => setIsAiOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-20 h-20 sm:w-36 sm:h-36 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
+          className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 w-20 h-20 sm:w-36 sm:h-36 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
           title="Ouvrir l'assistant IA"
         >
           <img
