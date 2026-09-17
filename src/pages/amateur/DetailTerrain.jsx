@@ -56,7 +56,11 @@ export default function DetailTerrain({ currentUser }) {
 
   // Coordonnées utilisateur (Placeholders)
   const [nomComplet, setNomComplet] = useState('');
+  // On ne stocke que les 9 chiffres locaux : l'indicatif +221 est fixe et
+  // ajouté au moment de l'envoi (voir telephoneComplet plus bas). Utile
+  // pour WhatsApp/N8n, qui exigent un numéro au format international.
   const [telephone, setTelephone] = useState('');
+  const telephoneComplet = telephone ? `221${telephone}` : '';
   const [avance, setAvance] = useState('');
 
   // Avis clients du terrain
@@ -203,7 +207,7 @@ export default function DetailTerrain({ currentUser }) {
     !isPastDate &&
     selectedCreneau &&
     nomComplet.trim() !== '' &&
-    telephone.trim() !== '' &&
+    telephone.length === 9 &&
     avanceNum > MONTANT_AVANCE_MINIMUM &&
     avanceNum < currentPrix
   );
@@ -231,7 +235,7 @@ export default function DetailTerrain({ currentUser }) {
       const reservationCreee = await reservationService.creerReservation({
         creneauId: selectedCreneau.id,
         nomComplet,
-        telephone,
+        telephone: telephoneComplet,
         montantAvance: avanceNum,
       });
 
@@ -240,7 +244,7 @@ export default function DetailTerrain({ currentUser }) {
         date: selectedDate,
         creneau: selectedCreneau,
         nomComplet,
-        telephone,
+        telephone: telephoneComplet,
         avance: avanceNum,
         resteSurPlace: resteAPayer,
         // Id de la vraie réservation backend : nécessaire à Paiement.jsx
@@ -599,13 +603,19 @@ export default function DetailTerrain({ currentUser }) {
 
                     <div className="space-y-1">
                       <label className="text-xs font-semibold text-gray-600">Numéro de Téléphone</label>
-                      <input
-                        type="text"
-                        value={telephone}
-                        onChange={(e) => setTelephone(e.target.value)}
-                        placeholder="77 777 00 00"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-[8px] px-4 py-2.5 text-xs font-bold text-gray-900 focus:outline-none focus:border-vert-principal"
-                      />
+                      <div className="flex items-stretch bg-gray-50 border border-gray-200 rounded-[8px] focus-within:border-vert-principal overflow-hidden">
+                        <span className="flex items-center px-3 text-xs font-bold text-gray-500 bg-gray-100 border-r border-gray-200">
+                          +221
+                        </span>
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          value={telephone}
+                          onChange={(e) => setTelephone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                          placeholder="77 777 00 00"
+                          className="w-full bg-transparent px-3 py-2.5 text-xs font-bold text-gray-900 focus:outline-none"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

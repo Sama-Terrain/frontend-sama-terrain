@@ -107,8 +107,8 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
       </div>
 
       {/* 2. Date */}
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+      <div className="space-y-1.5 sm:space-y-2">
+        <label className="text-[11px] sm:text-xs font-bold text-gray-700 uppercase tracking-wide">
           Date
         </label>
 
@@ -122,7 +122,7 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
                 date: e.target.value,
               }))
             }
-            className="w-full bg-gray-50 border border-gray-200 rounded-[4px] pl-3.5 pr-9 py-3 sm:py-2.5 text-sm sm:text-xs font-semibold text-gray-800 focus:outline-none focus:border-vert-principal"
+            className="w-full bg-gray-50 border border-gray-200 rounded-md pl-3 pr-3 py-2.5 sm:py-2.5 text-sm font-semibold text-gray-800 focus:outline-none focus:border-vert-principal [color-scheme:light] appearance-none"
           />
         </div>
       </div>
