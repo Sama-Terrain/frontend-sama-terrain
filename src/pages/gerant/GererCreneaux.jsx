@@ -171,7 +171,7 @@ export default function GererCreneaux({ onLogout }) {
 
       {/* GRILLE + PANNEAU DE CONFIGURATION */}
       {config && (
-        <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-5 items-start">
+        <section className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-5 items-start">
           <CreneauxGrid creneaux={creneaux} grille={grille} />
 
           <ConfigurerCreneauxPanel
