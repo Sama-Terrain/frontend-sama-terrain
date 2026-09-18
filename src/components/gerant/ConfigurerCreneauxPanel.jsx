@@ -21,7 +21,7 @@ export default function ConfigurerCreneauxPanel({
   message = '',
 }) {
   return (
-    <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-6 lg:sticky lg:top-24">
+    <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-6 xl:sticky xl:top-24">
 
       <h3 className="text-base font-black text-gray-900">Configurer les créneaux</h3>
 
