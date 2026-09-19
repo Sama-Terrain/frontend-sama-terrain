@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Calendar, Clock, ShieldCheck, CheckCircle2, Bot, X, Send } from 'lucide-react';
+import { Search, MapPin, Calendar, Clock, ShieldCheck, Bot, X, Send, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import TerrainCard from '../../components/terrain/TerrainCard';
 import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
@@ -10,6 +10,7 @@ import { VILLES } from '../../utils/villes';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
+import commentSaMarcheVideo from '../../assets/comment-sa-marche.mp4';
 
 export default function Accueil() {
   const navigate = useNavigate();
@@ -31,6 +32,28 @@ export default function Accueil() {
   ]);
   const [aiInput, setAiInput] = useState('');
   const [aiEnAttente, setAiEnAttente] = useState(false);
+
+  // Vidéo "Comment ça marche ?"
+  const videoRef = useRef(null);
+  const [videoEnLecture, setVideoEnLecture] = useState(true);
+  const [videoCoupee, setVideoCoupee] = useState(true);
+
+  const toggleLectureVideo = () => {
+    if (!videoRef.current) return;
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+      setVideoEnLecture(true);
+    } else {
+      videoRef.current.pause();
+      setVideoEnLecture(false);
+    }
+  };
+
+  const toggleSonVideo = () => {
+    if (!videoRef.current) return;
+    videoRef.current.muted = !videoRef.current.muted;
+    setVideoCoupee(videoRef.current.muted);
+  };
 
   // Chargement des terrains vedettes et des témoignages (backend)
   useEffect(() => {
@@ -218,56 +241,51 @@ export default function Accueil() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* Étape 1 */}
-          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-vert-principal transition-colors">
-            <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
-                <Search size={24} />
-              </div>
-              <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
-                01
-              </span>
+        {/* Vidéo de présentation, dans un cadre façon fenêtre de navigateur */}
+        <div className="max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-gray-200">
+          {/* Barre de titre façon navigateur */}
+          <div className="bg-gray-900 flex items-center justify-center px-4 py-2.5 relative">
+            <div className="absolute left-4 flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Cherchez un terrain</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Indiquez votre localisation et comparez les terrains disponibles en temps réel.
-            </p>
+            <span className="bg-gray-800 text-gray-300 text-[11px] font-semibold px-3 py-1 rounded-full">
+              sama-terrain.sn
+            </span>
           </div>
 
-          {/* Étape 2 */}
-          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-vert-principal transition-colors">
-            <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
-                <Calendar size={24} />
-              </div>
-              <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
-                02
-              </span>
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Choisissez un créneau</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Sélectionnez l'heure et la date qui conviennent à votre équipe en quelques clics.
-            </p>
-          </div>
+          {/* Vidéo + contrôles */}
+          <div className="relative bg-black group">
+            <video
+              ref={videoRef}
+              src={commentSaMarcheVideo}
+              className="w-full max-h-[520px] object-contain"
+              autoPlay
+              loop
+              muted={videoCoupee}
+              playsInline
+              onClick={toggleLectureVideo}
+            />
 
-          {/* Étape 3 */}
-          <div className="bg-white p-8 rounded-[8px] border border-gray-200 text-left relative overflow-hidden group hover:border-vert-principal transition-colors">
-            <div className="flex items-center justify-between mb-6">
-              <div className="w-12 h-12 rounded-full bg-vert-clair text-vert-principal flex items-center justify-center">
-                <CheckCircle2 size={24} />
-              </div>
-              <span className="text-4xl font-black text-gray-200 group-hover:text-emerald-100 transition-colors">
-                03
-              </span>
-            </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Réservez et jouez</h3>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Confirmez instantanément et recevez votre code d'accès au terrain en toute sécurité.
-            </p>
-          </div>
+            <button
+              type="button"
+              onClick={toggleLectureVideo}
+              aria-label={videoEnLecture ? 'Mettre en pause' : 'Lancer la vidéo'}
+              className="absolute bottom-4 left-4 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors cursor-pointer"
+            >
+              {videoEnLecture ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+            </button>
 
+            <button
+              type="button"
+              onClick={toggleSonVideo}
+              aria-label={videoCoupee ? 'Activer le son' : 'Couper le son'}
+              className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors cursor-pointer"
+            >
+              {videoCoupee ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
+          </div>
         </div>
       </section>
 

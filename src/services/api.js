@@ -9,7 +9,7 @@ import axios from 'axios';
  * à s'en soucier.
  */
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api',
+  baseURL: import.meta.env.VITE_API_URL 
 });
 
 // Clé utilisée pour stocker le token dans le navigateur (voir authService.js)
