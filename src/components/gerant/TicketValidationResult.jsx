@@ -31,10 +31,10 @@ export default function TicketValidationResult({ result }) {
       <div className="bg-red-50 border border-red-200 rounded-[12px] p-6 space-y-2">
         <div className="flex items-center gap-2.5">
           <XCircle size={20} className="text-red-500 shrink-0" />
-          <h3 className="text-base font-black text-red-700">Ticket introuvable</h3>
+          <h3 className="text-base font-black text-red-700">Ticket refusé</h3>
         </div>
         <p className="text-sm text-red-600">
-          Le code « {result.code} » ne correspond à aucune réservation valide.
+          {result.message || `Le code « ${result.code} » ne correspond à aucune réservation valide.`}
         </p>
       </div>
     );
