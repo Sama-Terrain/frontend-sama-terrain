@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { ScanLine, X } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import ScannerCameraPreview from '../../components/gerant/ScannerCameraPreview';
 import TicketValidationResult from '../../components/gerant/TicketValidationResult';
@@ -23,6 +24,7 @@ export default function ScannerTicket({ onLogout }) {
   const [erreurMontant, setErreurMontant] = useState('');
   const [resultat, setResultat] = useState(null);
   const [verification, setVerification] = useState(false);
+  const [scanActif, setScanActif] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -44,28 +46,34 @@ export default function ScannerTicket({ onLogout }) {
     loadData();
   }, []);
 
-  const handleVerifier = async () => {
+  // `codeSource` permet d'appeler cette fonction juste après un scan caméra
+  // (avec la valeur tout juste décodée), sans dépendre du state `codeTicket`
+  // qui n'aurait pas encore été mis à jour à ce moment précis.
+  const handleVerifier = async (codeSource) => {
+    const code = (codeSource ?? codeTicket).trim();
     setErreurMontant('');
 
-    if (!codeTicket.trim()) {
-      setErreurMontant('Veuillez saisir ou scanner un code de ticket.');
+    if (!montantSolde || Number(montantSolde) <= 0) {
+      setErreurMontant('Le montant du solde restant est obligatoire pour valider un ticket.');
       return;
     }
-    if (!montantSolde || Number(montantSolde) < 0) {
-      setErreurMontant('Le montant solde est obligatoire pour valider le ticket.');
+    if (!code) {
+      setErreurMontant('Scannez un ticket, ou saisissez son code manuellement.');
       return;
     }
 
     setVerification(true);
-    const ticket = await gerantService.verifierTicket(codeTicket);
+    const ticket = await gerantService.verifierTicket(code);
     setVerification(false);
 
     if (!ticket) {
-      setResultat({ status: 'error', code: codeTicket.trim() });
+      setResultat({ status: 'error', code });
       return;
     }
 
     setResultat({ status: 'success', ticket, montantSaisi: Number(montantSolde) });
+    setCodeTicket('');
+    setMontantSolde('');
 
     // Ajoute la validation en tête de la liste "Dernières validations"
     setValidations((current) => [
@@ -79,6 +87,27 @@ export default function ScannerTicket({ onLogout }) {
       ...current,
     ]);
   };
+
+  // Démarre le scan caméra : le montant doit déjà être renseigné, sinon on
+  // ne sait pas quel solde enregistrer une fois le ticket reconnu.
+  const handleDemarrerScan = () => {
+    setErreurMontant('');
+    if (!montantSolde || Number(montantSolde) <= 0) {
+      setErreurMontant('Renseignez le montant du solde restant avant de scanner.');
+      return;
+    }
+    setResultat(null);
+    setScanActif(true);
+  };
+
+  // Appelé par ScannerCameraPreview dès qu'un QR code est décodé : on coupe
+  // le scan et on lance directement la vérification (le montant est déjà là).
+  const handleCodeDetecte = useCallback((valeur) => {
+    setScanActif(false);
+    setCodeTicket(valeur);
+    handleVerifier(valeur);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [montantSolde]);
 
   if (loading) {
     return (
@@ -101,11 +130,43 @@ export default function ScannerTicket({ onLogout }) {
 
           <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-4">
             <h3 className="text-base font-black text-gray-900">Caméra de Validation en Direct</h3>
-            <ScannerCameraPreview />
+            <ScannerCameraPreview scanActif={scanActif} onCodeDetecte={handleCodeDetecte} />
+
+            {scanActif ? (
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                rounded="8px"
+                fullWidth
+                onClick={() => setScanActif(false)}
+                className="gap-2"
+              >
+                <X size={16} />
+                <span>Arrêter le scan</span>
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="gold"
+                size="md"
+                rounded="8px"
+                fullWidth
+                onClick={handleDemarrerScan}
+                disabled={verification}
+                className="gap-2"
+              >
+                <ScanLine size={16} />
+                <span>Scanner un ticket</span>
+              </Button>
+            )}
           </div>
 
           <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-3">
-            <label className="text-sm font-bold text-gray-900">Saisir le montant solde *</label>
+            <label className="text-sm font-bold text-gray-900">Montant du solde restant *</label>
+            <p className="text-xs text-gray-500">
+              Obligatoire avant de scanner ou de valider un ticket : c'est le montant réglé sur place par le client.
+            </p>
             <input
               type="number"
               min={0}
@@ -114,10 +175,16 @@ export default function ScannerTicket({ onLogout }) {
               placeholder="15000 FCFA"
               className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-sm font-semibold text-gray-900 outline-none focus:border-vert-principal"
             />
+            {erreurMontant && (
+              <p className="text-xs font-semibold text-red-600">{erreurMontant}</p>
+            )}
           </div>
 
           <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-3">
-            <label className="text-sm font-bold text-gray-900">Saisir le code manuellement</label>
+            <label className="text-sm font-bold text-gray-900">Caméra indisponible ?</label>
+            <p className="text-xs text-gray-500">
+              Vous pouvez à la place saisir le code du ticket à la main (facultatif si vous scannez).
+            </p>
             <div className="flex items-center gap-3">
               <input
                 type="text"
@@ -128,18 +195,15 @@ export default function ScannerTicket({ onLogout }) {
               />
               <Button
                 type="button"
-                variant="gold"
+                variant="primary"
                 size="md"
                 rounded="8px"
-                onClick={handleVerifier}
+                onClick={() => handleVerifier()}
                 disabled={verification}
               >
                 {verification ? 'Vérification...' : 'Vérifier'}
               </Button>
             </div>
-            {erreurMontant && (
-              <p className="text-xs font-semibold text-red-600">{erreurMontant}</p>
-            )}
           </div>
 
         </div>
