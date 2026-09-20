@@ -11,7 +11,7 @@ import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/teleph
 
 export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
-  const terrainId = Number(id) || 1;
+  const terrainId = Number(id);
   const navigate = useNavigate();
 
   const [terrain, setTerrain] = useState(null);
@@ -138,20 +138,10 @@ export default function DetailTerrain({ currentUser }) {
           avisService.getAvisJoueurs(terrainId)
         ]);
 
-        const terrainFinal = terrainData || {
-          id: 1,
-          nom: 'Complexe Keur Madior',
-          localisation: 'Almadies, Dakar',
-          type: '5v5',
-          prixHeure: 30000,
-          avance: 15000,
-          note: 4.8,
-          nombreAvis: 24,
-          disponible: true,
-          surface: 'Synthétique',
-          description: "Le Complexe Keur Madior propose un terrain de mini-foot haut de gamme en plein cœur des Almadies. Doté d'une pelouse synthétique dernière génération importée, d'un éclairage puissant par projecteurs LED pour les matchs nocturnes et de vestiaires propres et modernes. Un parking sécurisé gratuit est également disponible pour nos clients."
-        };
-        setTerrain(terrainFinal);
+        // Si le terrain n'existe pas (mauvais id, terrain supprimé...), on
+        // ne doit jamais afficher un terrain inventé à la place : `terrain`
+        // reste `null` et l'écran "Terrain introuvable" prend le relais.
+        setTerrain(terrainData);
 
         setAvisList(avisData || []);
       } catch (error) {
@@ -279,6 +269,18 @@ export default function DetailTerrain({ currentUser }) {
       <div className="max-w-7xl mx-auto py-20 px-4 text-center">
         <div className="w-12 h-12 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-gray-600 font-semibold text-sm">Chargement du terrain...</p>
+      </div>
+    );
+  }
+
+  if (!terrain) {
+    return (
+      <div className="max-w-7xl mx-auto py-20 px-4 text-center space-y-4">
+        <AlertTriangle size={40} className="text-amber-500 mx-auto" />
+        <p className="text-gray-700 font-bold">Ce terrain est introuvable ou n'existe plus.</p>
+        <Button onClick={() => navigate('/terrains')} variant="primary" size="md" rounded="8px">
+          Voir les terrains disponibles
+        </Button>
       </div>
     );
   }
