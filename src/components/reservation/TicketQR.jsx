@@ -1,4 +1,5 @@
 import React from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Check, Download, Share2, X } from 'lucide-react';
 
 export default function TicketQR({ ticket, onClose }) {
@@ -9,6 +10,11 @@ export default function TicketQR({ ticket, onClose }) {
     const terrainName = ticket.nomTerrain || ticket.terrainName || 'Stadium Mermoz - Elite Arena';
     const dateHeure = ticket.dateTexte || ticket.dateHeure || 'Vendredi 29 Nov — 18:00 à 19:00';
     const dureeJoueurs = ticket.dureeJoueurs || ticket.format || '1 Heures — 5 vs 5';
+
+    // Le vrai code du ticket (UUID généré côté backend à la confirmation du
+    // paiement) : c'est LUI qui doit être encodé dans le QR, sinon il n'y a
+    // rien de réel à scanner à l'entrée du terrain.
+    const codeTicket = ticket.ticketCode || ticket.code || null;
 
     const acompte = ticket.montantAcompte !== undefined ? ticket.montantAcompte : 15000;
     const moyenPaiement = ticket.moyenPaiement || 'Wave';
@@ -75,74 +81,23 @@ export default function TicketQR({ ticket, onClose }) {
                     {/* SÉPARATEUR */}
                     <div className="w-full border-t border-dashed border-gray-300 mb-1.5 sm:mb-4"></div>
 
-                    {/* CONTENEUR QR CODE */}
+                    {/* CONTENEUR QR CODE — encode le vrai code du ticket (UUID
+                        backend), sinon rien de réel ne peut être scanné à l'entrée. */}
                     <div className="bg-[#F3F6F4] rounded-lg sm:rounded-2xl p-1.5 sm:p-4 flex justify-center items-center mx-auto w-fit mb-1.5 sm:mb-4">
-                        <svg className="w-24 h-24 sm:w-44 sm:h-44" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            {/* Finder Pattern Top-Left */}
-                            <rect x="10" y="10" width="50" height="50" rx="10" fill="#004030" />
-                            <rect x="20" y="20" width="30" height="30" rx="6" fill="#F3F6F4" />
-                            <rect x="27.5" y="27.5" width="15" height="15" rx="3" fill="#004030" />
-
-                            {/* Finder Pattern Top-Right */}
-                            <rect x="140" y="10" width="50" height="50" rx="10" fill="#004030" />
-                            <rect x="150" y="20" width="30" height="30" rx="6" fill="#F3F6F4" />
-                            <rect x="157.5" y="27.5" width="15" height="15" rx="3" fill="#004030" />
-
-                            {/* Finder Pattern Bottom-Left */}
-                            <rect x="10" y="140" width="50" height="50" rx="10" fill="#004030" />
-                            <rect x="20" y="150" width="30" height="30" rx="6" fill="#F3F6F4" />
-                            <rect x="27.5" y="157.5" width="15" height="15" rx="3" fill="#004030" />
-
-                            {/* Data Modules */}
-                            <rect x="75" y="10" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="95" y="10" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="115" y="10" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="75" y="30" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="115" y="30" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="75" y="50" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="95" y="50" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="115" y="50" width="12" height="12" rx="3" fill="#004030" />
-
-                            <rect x="10" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="30" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="50" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="75" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="95" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="115" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="140" y="75" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="175" y="75" width="12" height="12" rx="3" fill="#004030" />
-
-                            <rect x="10" y="95" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="50" y="95" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="75" y="95" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="140" y="95" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="160" y="95" width="12" height="12" rx="3" fill="#004030" />
-
-                            <rect x="10" y="115" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="30" y="115" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="75" y="115" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="95" y="115" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="115" y="115" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="140" y="115" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="160" y="115" width="12" height="12" rx="3" fill="#004030" />
-
-                            <rect x="75" y="140" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="95" y="140" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="140" y="140" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="160" y="140" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="175" y="140" width="12" height="12" rx="3" fill="#004030" />
-
-                            <rect x="75" y="160" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="115" y="160" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="140" y="160" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="175" y="160" width="12" height="12" rx="3" fill="#004030" />
-
-                            <rect x="75" y="175" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="95" y="175" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="140" y="175" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="160" y="175" width="12" height="12" rx="3" fill="#004030" />
-                            <rect x="175" y="175" width="12" height="12" rx="3" fill="#004030" />
-                        </svg>
+                        {codeTicket ? (
+                            <QRCodeSVG
+                                value={codeTicket}
+                                size={176}
+                                bgColor="#F3F6F4"
+                                fgColor="#004030"
+                                level="M"
+                                className="w-24 h-24 sm:w-44 sm:h-44"
+                            />
+                        ) : (
+                            <p className="text-[9px] sm:text-xs text-gray-500 font-semibold text-center px-4 py-8 max-w-[140px] sm:max-w-none">
+                                Ticket en cours de confirmation, le QR code apparaîtra dès le paiement validé.
+                            </p>
+                        )}
                     </div>
 
                     {/* TABLEAU DES DÉTAILS DE LA RÉSERVATION */}
