@@ -194,6 +194,8 @@ export const gerantService = {
 
   // Valide un ticket scanné/saisi : le marque comme utilisé côté backend et
   // enregistre au passage le solde payé sur place (par défaut en espèces).
+  // Renvoie { success, ticket } ou { success: false, error } avec le vrai
+  // motif du refus (déjà utilisé, date passée, annulé...), pas un message générique.
   async verifierTicket(code) {
     try {
       const { data } = await api.post('/tickets/valider/', { code: code.trim() });
@@ -208,14 +210,20 @@ export const gerantService = {
       }
 
       return {
-        code: ticket.code,
-        client: ticket.client,
-        terrain: ticket.terrain,
-        creneau: `${ticket.heure_debut.slice(0, 5)} - ${ticket.heure_fin.slice(0, 5)}`,
-        montantRestant: ticket.montant_restant,
+        success: true,
+        ticket: {
+          code: ticket.code,
+          client: ticket.client,
+          terrain: ticket.terrain,
+          creneau: `${ticket.heure_debut.slice(0, 5)} - ${ticket.heure_fin.slice(0, 5)}`,
+          montantRestant: ticket.montant_restant,
+        },
       };
-    } catch {
-      return null;
+    } catch (error) {
+      const erreurs = error.response?.data;
+      const message = erreurs?.code?.[0] || erreurs?.non_field_errors?.[0] || erreurs?.detail
+        || "Code de ticket invalide.";
+      return { success: false, error: message };
     }
   },
 

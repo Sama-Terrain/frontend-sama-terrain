@@ -63,13 +63,15 @@ export default function ScannerTicket({ onLogout }) {
     }
 
     setVerification(true);
-    const ticket = await gerantService.verifierTicket(code);
+    const resultatVerif = await gerantService.verifierTicket(code);
     setVerification(false);
 
-    if (!ticket) {
-      setResultat({ status: 'error', code });
+    if (!resultatVerif.success) {
+      setResultat({ status: 'error', code, message: resultatVerif.error });
       return;
     }
+
+    const ticket = resultatVerif.ticket;
 
     setResultat({ status: 'success', ticket, montantSaisi: Number(montantSolde) });
     setCodeTicket('');
