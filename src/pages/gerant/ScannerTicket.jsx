@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ScanLine, X } from 'lucide-react';
+import { CheckCircle2, XCircle, ScanLine, ArrowLeft } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import ScannerCameraPreview from '../../components/gerant/ScannerCameraPreview';
-import TicketValidationResult from '../../components/gerant/TicketValidationResult';
+import ClavierMontant from '../../components/gerant/ClavierMontant';
 import DernieresValidationsList from '../../components/gerant/DernieresValidationsList';
 import Button from '../../components/ui/Button';
 import { gerantService } from '../../services/gerantService';
@@ -10,21 +10,23 @@ import { gerantService } from '../../services/gerantService';
 /**
  * Page ScannerTicket (Espace Gérant)
  *
- * Le jour du match, le gérant valide le ticket de l'amateur (par scan caméra
- * ou saisie manuelle du code) et enregistre le solde réglé sur place.
- * La saisie du montant solde est obligatoire avant de pouvoir valider.
+ * Pensée pour un usage rapide et répétitif à l'entrée du terrain, par
+ * quelqu'un pas forcément à l'aise avec le numérique : un seul écran, une
+ * seule action à la fois (façon Wave), plutôt que tout afficher en même
+ * temps. Étapes : scan → montant → vérification → résultat → suivant.
  */
 export default function ScannerTicket({ onLogout }) {
   const [profile, setProfile] = useState(null);
   const [validations, setValidations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [codeTicket, setCodeTicket] = useState('');
-  const [montantSolde, setMontantSolde] = useState('');
-  const [erreurMontant, setErreurMontant] = useState('');
+  // 'scan' | 'manuel' | 'montant' | 'verification' | 'resultat'
+  const [etape, setEtape] = useState('scan');
+  const [scanActif, setScanActif] = useState(true);
+  const [codeManuel, setCodeManuel] = useState('');
+  const [codeConfirme, setCodeConfirme] = useState('');
+  const [montant, setMontant] = useState('0');
   const [resultat, setResultat] = useState(null);
-  const [verification, setVerification] = useState(false);
-  const [scanActif, setScanActif] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -46,38 +48,36 @@ export default function ScannerTicket({ onLogout }) {
     loadData();
   }, []);
 
-  // `codeSource` permet d'appeler cette fonction juste après un scan caméra
-  // (avec la valeur tout juste décodée), sans dépendre du state `codeTicket`
-  // qui n'aurait pas encore été mis à jour à ce moment précis.
-  const handleVerifier = async (codeSource) => {
-    const code = (codeSource ?? codeTicket).trim();
-    setErreurMontant('');
+  // Un QR détecté fait directement passer à l'écran "montant" : pas de
+  // vérification tant que le montant n'est pas confirmé.
+  const handleCodeDetecte = useCallback((valeur) => {
+    setScanActif(false);
+    setCodeConfirme(valeur);
+    setMontant('0');
+    setEtape('montant');
+  }, []);
 
-    if (!montantSolde || Number(montantSolde) <= 0) {
-      setErreurMontant('Le montant du solde restant est obligatoire pour valider un ticket.');
-      return;
-    }
-    if (!code) {
-      setErreurMontant('Scannez un ticket, ou saisissez son code manuellement.');
-      return;
-    }
+  const handleValiderCodeManuel = () => {
+    if (!codeManuel.trim()) return;
+    setCodeConfirme(codeManuel.trim());
+    setMontant('0');
+    setEtape('montant');
+  };
 
-    setVerification(true);
-    const resultatVerif = await gerantService.verifierTicket(code);
-    setVerification(false);
+  const handleConfirmerMontant = async () => {
+    setEtape('verification');
+    const resultatVerif = await gerantService.verifierTicket(codeConfirme);
 
     if (!resultatVerif.success) {
-      setResultat({ status: 'error', code, message: resultatVerif.error });
+      setResultat({ status: 'error', message: resultatVerif.error });
+      setEtape('resultat');
       return;
     }
 
     const ticket = resultatVerif.ticket;
+    setResultat({ status: 'success', ticket, montantSaisi: Number(montant) });
+    setEtape('resultat');
 
-    setResultat({ status: 'success', ticket, montantSaisi: Number(montantSolde) });
-    setCodeTicket('');
-    setMontantSolde('');
-
-    // Ajoute la validation en tête de la liste "Dernières validations"
     setValidations((current) => [
       {
         id: `${ticket.code}-${Date.now()}`,
@@ -90,26 +90,15 @@ export default function ScannerTicket({ onLogout }) {
     ]);
   };
 
-  // Démarre le scan caméra : le montant doit déjà être renseigné, sinon on
-  // ne sait pas quel solde enregistrer une fois le ticket reconnu.
-  const handleDemarrerScan = () => {
-    setErreurMontant('');
-    if (!montantSolde || Number(montantSolde) <= 0) {
-      setErreurMontant('Renseignez le montant du solde restant avant de scanner.');
-      return;
-    }
+  // Repart de zéro pour le client suivant : relance directement la caméra.
+  const handleClientSuivant = () => {
+    setCodeManuel('');
+    setCodeConfirme('');
+    setMontant('0');
     setResultat(null);
     setScanActif(true);
+    setEtape('scan');
   };
-
-  // Appelé par ScannerCameraPreview dès qu'un QR code est décodé : on coupe
-  // le scan et on lance directement la vérification (le montant est déjà là).
-  const handleCodeDetecte = useCallback((valeur) => {
-    setScanActif(false);
-    setCodeTicket(valeur);
-    handleVerifier(valeur);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [montantSolde]);
 
   if (loading) {
     return (
@@ -125,98 +114,140 @@ export default function ScannerTicket({ onLogout }) {
   return (
     <GerantLayout title="Scanner QR Code" profile={profile} onLogout={onLogout}>
 
-      <section className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-5 items-start">
+      {/* ÉCRAN 1 : SCAN CAMÉRA (démarre tout seul) */}
+      {etape === 'scan' && (
+        <div className="bg-white rounded-[16px] border border-gray-200/80 shadow-2xs p-6 sm:p-8 space-y-5 max-w-xl mx-auto text-center">
+          <h2 className="text-lg font-black text-gray-900">Scannez le QR code du client</h2>
+          <ScannerCameraPreview scanActif={scanActif} onCodeDetecte={handleCodeDetecte} />
+          <button
+            type="button"
+            onClick={() => setEtape('manuel')}
+            className="text-sm font-bold text-vert-principal hover:underline cursor-pointer"
+          >
+            Le QR ne scanne pas ? Saisir le code
+          </button>
+        </div>
+      )}
 
-        {/* COLONNE GAUCHE : CAMÉRA + FORMULAIRES */}
-        <div className="space-y-5">
+      {/* ÉCRAN ALTERNATIF : CODE SAISI À LA MAIN (si caméra en panne) */}
+      {etape === 'manuel' && (
+        <div className="bg-white rounded-[16px] border border-gray-200/80 shadow-2xs p-6 sm:p-8 space-y-5 max-w-xl mx-auto">
+          <button
+            type="button"
+            onClick={() => setEtape('scan')}
+            className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-gray-700 cursor-pointer"
+          >
+            <ArrowLeft size={14} /> Revenir au scan
+          </button>
+          <h2 className="text-lg font-black text-gray-900 text-center">Code du ticket</h2>
+          <input
+            type="text"
+            autoFocus
+            value={codeManuel}
+            onChange={(e) => setCodeManuel(e.target.value)}
+            placeholder="Ex : 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            className="w-full border border-gray-200 rounded-[10px] px-4 py-4 text-center text-sm font-mono font-bold text-gray-900 outline-none focus:border-vert-principal"
+          />
+          <Button
+            type="button"
+            variant="gold"
+            size="lg"
+            rounded="10px"
+            fullWidth
+            disabled={!codeManuel.trim()}
+            onClick={handleValiderCodeManuel}
+          >
+            Continuer
+          </Button>
+        </div>
+      )}
 
-          <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-4">
-            <h3 className="text-base font-black text-gray-900">Caméra de Validation en Direct</h3>
-            <ScannerCameraPreview scanActif={scanActif} onCodeDetecte={handleCodeDetecte} />
+      {/* ÉCRAN 2 : MONTANT REÇU (gros clavier, une seule action) */}
+      {etape === 'montant' && (
+        <div className="bg-white rounded-[16px] border border-gray-200/80 shadow-2xs p-6 sm:p-8 space-y-6 max-w-xl mx-auto text-center">
+          <button
+            type="button"
+            onClick={handleClientSuivant}
+            className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-gray-700 cursor-pointer"
+          >
+            <ArrowLeft size={14} /> Annuler
+          </button>
 
-            {scanActif ? (
-              <Button
-                type="button"
-                variant="secondary"
-                size="md"
-                rounded="8px"
-                fullWidth
-                onClick={() => setScanActif(false)}
-                className="gap-2"
-              >
-                <X size={16} />
-                <span>Arrêter le scan</span>
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="gold"
-                size="md"
-                rounded="8px"
-                fullWidth
-                onClick={handleDemarrerScan}
-                disabled={verification}
-                className="gap-2"
-              >
-                <ScanLine size={16} />
-                <span>Scanner un ticket</span>
-              </Button>
-            )}
+          <div>
+            <p className="text-sm font-bold text-gray-500">Combien le client paie sur place ?</p>
+            <p className="text-4xl font-black text-vert-principal mt-2">
+              {Number(montant).toLocaleString('fr-FR')} <span className="text-lg">FCFA</span>
+            </p>
           </div>
 
-          <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-3">
-            <label className="text-sm font-bold text-gray-900">Montant du solde restant *</label>
-            <p className="text-xs text-gray-500">
-              Obligatoire avant de scanner ou de valider un ticket : c'est le montant réglé sur place par le client.
-            </p>
-            <input
-              type="number"
-              min={0}
-              value={montantSolde}
-              onChange={(e) => setMontantSolde(e.target.value)}
-              placeholder="15000 FCFA"
-              className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-sm font-semibold text-gray-900 outline-none focus:border-vert-principal"
-            />
-            {erreurMontant && (
-              <p className="text-xs font-semibold text-red-600">{erreurMontant}</p>
-            )}
-          </div>
+          <ClavierMontant valeur={montant} onChange={setMontant} />
 
-          <div className="bg-white rounded-[12px] border border-gray-200/80 shadow-2xs p-6 space-y-3">
-            <label className="text-sm font-bold text-gray-900">Caméra indisponible ?</label>
-            <p className="text-xs text-gray-500">
-              Vous pouvez à la place saisir le code du ticket à la main (facultatif si vous scannez).
-            </p>
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                value={codeTicket}
-                onChange={(e) => setCodeTicket(e.target.value)}
-                placeholder="Ex : 3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                className="flex-1 border border-gray-200 rounded-[8px] px-4 py-3 text-sm font-mono font-semibold text-gray-900 outline-none focus:border-vert-principal"
-              />
-              <Button
-                type="button"
-                variant="primary"
-                size="md"
-                rounded="8px"
-                onClick={() => handleVerifier()}
-                disabled={verification}
-              >
-                {verification ? 'Vérification...' : 'Vérifier'}
-              </Button>
+          <Button
+            type="button"
+            variant="gold"
+            size="lg"
+            rounded="10px"
+            fullWidth
+            disabled={Number(montant) <= 0}
+            onClick={handleConfirmerMontant}
+            className="gap-2"
+          >
+            <CheckCircle2 size={18} />
+            <span>Confirmer</span>
+          </Button>
+        </div>
+      )}
+
+      {/* ÉCRAN 3 : VÉRIFICATION EN COURS */}
+      {etape === 'verification' && (
+        <div className="bg-white rounded-[16px] border border-gray-200/80 shadow-2xs p-10 max-w-xl mx-auto text-center space-y-4">
+          <div className="w-14 h-14 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-bold text-gray-600">Vérification du ticket...</p>
+        </div>
+      )}
+
+      {/* ÉCRAN 4 : RÉSULTAT */}
+      {etape === 'resultat' && resultat && (
+        <div className="max-w-xl mx-auto space-y-5">
+          {resultat.status === 'success' ? (
+            <div className="bg-white rounded-[16px] border border-emerald-200 shadow-2xs p-8 text-center space-y-4">
+              <CheckCircle2 size={64} className="text-emerald-500 mx-auto" />
+              <h2 className="text-xl font-black text-emerald-700">Ticket validé !</h2>
+              <div className="space-y-1.5 text-sm text-gray-700">
+                <p className="font-bold">{resultat.ticket.client}</p>
+                <p>{resultat.ticket.terrain} • {resultat.ticket.creneau}</p>
+                <p className="text-lg font-black text-vert-principal">
+                  {resultat.montantSaisi.toLocaleString('fr-FR')} FCFA encaissés
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="bg-white rounded-[16px] border border-red-200 shadow-2xs p-8 text-center space-y-4">
+              <XCircle size={64} className="text-red-500 mx-auto" />
+              <h2 className="text-xl font-black text-red-700">Ticket refusé</h2>
+              <p className="text-sm text-gray-600">{resultat.message}</p>
+            </div>
+          )}
 
+          <Button
+            type="button"
+            variant="gold"
+            size="lg"
+            rounded="10px"
+            fullWidth
+            onClick={handleClientSuivant}
+            className="gap-2"
+          >
+            <ScanLine size={18} />
+            <span>Client suivant</span>
+          </Button>
         </div>
+      )}
 
-        {/* COLONNE DROITE : RÉSULTAT + HISTORIQUE */}
-        <div className="space-y-5">
-          <TicketValidationResult result={resultat} />
-          <DernieresValidationsList validations={validations} />
-        </div>
-
-      </section>
+      {/* HISTORIQUE, discret sous le flow principal */}
+      <div className="max-w-xl mx-auto">
+        <DernieresValidationsList validations={validations} />
+      </div>
 
     </GerantLayout>
   );
