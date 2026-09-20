@@ -4,6 +4,14 @@ import { Calendar, LogOut } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { authService } from '../../services/authService';
 import { VILLES } from '../../utils/villes';
+import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
+
+// Le téléphone est stocké avec l'indicatif (ex: "221770000000") : on
+// n'affiche/n'édite que la partie locale à 9 chiffres.
+function extraireNumeroLocal(telephoneStocke) {
+  const chiffres = (telephoneStocke || '').replace(/\D/g, '');
+  return chiffres.startsWith('221') ? chiffres.slice(3) : chiffres.slice(-9);
+}
 
 const ONGLETS = ['Informations personnelles', 'Sécurité', 'Notifications'];
 
@@ -21,7 +29,7 @@ export default function Profil() {
 
   const [prenom, setPrenom] = useState(currentUser.prenom || '');
   const [nom, setNom] = useState(currentUser.nom || '');
-  const [telephone, setTelephone] = useState(currentUser.telephone || '');
+  const [telephone, setTelephone] = useState(extraireNumeroLocal(currentUser.telephone));
   const [villePreferee, setVillePreferee] = useState(currentUser.ville_preferee || '');
 
   const [chargement, setChargement] = useState(false);
@@ -36,12 +44,18 @@ export default function Profil() {
     e.preventDefault();
     setMessage('');
     setErreur('');
+
+    if (telephone && !estNumeroSenegalaisValide(telephone)) {
+      setErreur('Numéro de téléphone invalide (préfixe attendu : 70, 75, 76, 77 ou 78).');
+      return;
+    }
+
     setChargement(true);
 
     const resultat = await authService.modifierProfil({
       prenom,
       nom,
-      telephone,
+      telephone: telephone ? `221${telephone}` : '',
       ville_preferee: villePreferee,
     });
 
@@ -150,13 +164,24 @@ export default function Profil() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-700">Téléphone</label>
-                    <input
-                      type="tel"
-                      value={telephone}
-                      onChange={(e) => setTelephone(e.target.value)}
-                      placeholder="+221 77 000 00 00"
-                      className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm outline-none focus:border-vert-principal"
-                    />
+                    <div className="flex items-stretch border border-gray-200 rounded-[8px] overflow-hidden focus-within:border-vert-principal">
+                      <span className="flex items-center px-3 text-sm font-bold text-gray-500 bg-gray-50 border-r border-gray-200">
+                        +221
+                      </span>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        value={telephone}
+                        onChange={(e) => setTelephone(nettoyerTelephone(e.target.value))}
+                        placeholder="77 000 00 00"
+                        className="w-full px-3 py-2.5 text-sm outline-none"
+                      />
+                    </div>
+                    {telephone.length === 9 && !estNumeroSenegalaisValide(telephone) && (
+                      <p className="text-[11px] text-red-600 font-semibold">
+                        Numéro invalide (préfixe attendu : 70, 75, 76, 77 ou 78).
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1.5 sm:col-span-2">
                     <label className="text-xs font-bold text-gray-700">Ville préférée</label>

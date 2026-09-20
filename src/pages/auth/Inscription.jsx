@@ -24,6 +24,7 @@ export default function Inscription() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [envoiEnCours, setEnvoiEnCours] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,12 +35,19 @@ export default function Inscription() {
     e.preventDefault();
     setError('');
 
+    if (formData.password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
       return;
     }
 
+    setEnvoiEnCours(true);
     const resultat = await authService.register(formData);
+    setEnvoiEnCours(false);
 
     if (!resultat.success) {
       setError(resultat.error);
@@ -141,6 +149,7 @@ export default function Inscription() {
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   required
+                  minLength={8}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="........"
@@ -186,9 +195,10 @@ export default function Inscription() {
               size="md"
               rounded="8px"
               fullWidth
+              disabled={envoiEnCours}
               className="mt-4"
             >
-              S'inscrire
+              {envoiEnCours ? 'Inscription en cours...' : "S'inscrire"}
             </Button>
           </form>
 

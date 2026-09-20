@@ -6,6 +6,7 @@ import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import heroBg from '../../assets/herobg.jpeg';
 import { authService } from '../../services/authService';
+import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
 
 export default function DevenirGerant() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function DevenirGerant() {
     adresse: '',
     whatsapp: '',
     password: '',
+    confirmPassword: '',
     nomComplexe: '',
     quartier: '',
     document: null
@@ -31,22 +33,60 @@ export default function DevenirGerant() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleChangeWhatsapp = (e) => {
+    setFormData((prev) => ({ ...prev, whatsapp: nettoyerTelephone(e.target.value) }));
+  };
+
+  // Le document justificatif (registre de commerce, CNI...) doit rester
+  // raisonnable en taille et dans un format qu'un admin peut réellement
+  // ouvrir pour vérifier la demande.
+  const TYPES_DOCUMENT_ACCEPTES = ['application/pdf', 'image/png', 'image/jpeg'];
+  const TAILLE_MAX_DOCUMENT = 10 * 1024 * 1024; // 10 Mo
+
+  const validerEtDefinirDocument = (fichier) => {
+    if (!fichier) return;
+
+    if (!TYPES_DOCUMENT_ACCEPTES.includes(fichier.type)) {
+      setErreur('Format de document non accepté (PDF, JPG ou PNG uniquement).');
+      return;
+    }
+    if (fichier.size > TAILLE_MAX_DOCUMENT) {
+      setErreur('Le document dépasse la taille maximale autorisée (10 Mo).');
+      return;
+    }
+
+    setErreur('');
+    setFormData((prev) => ({ ...prev, document: fichier }));
+  };
+
   const handleFileDrop = (e) => {
     e.preventDefault();
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFormData((prev) => ({ ...prev, document: e.dataTransfer.files[0] }));
-    }
+    validerEtDefinirDocument(e.dataTransfer.files?.[0]);
   };
 
   const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, document: e.target.files[0] }));
-    }
+    validerEtDefinirDocument(e.target.files?.[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
+
+    if (formData.password.length < 8) {
+      setErreur('Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setErreur('Les mots de passe ne correspondent pas.');
+      return;
+    }
+
+    if (!estNumeroSenegalaisValide(formData.whatsapp)) {
+      setErreur('Numéro WhatsApp invalide (préfixe attendu : 70, 75, 76, 77 ou 78).');
+      return;
+    }
+
     setEnvoiEnCours(true);
 
     const resultat = await authService.devenirGerant(formData);
@@ -227,15 +267,21 @@ export default function DevenirGerant() {
                         +221
                       </span>
                       <input
-                        type="text"
+                        type="tel"
+                        inputMode="numeric"
                         name="whatsapp"
                         required
                         value={formData.whatsapp}
-                        onChange={handleChange}
+                        onChange={handleChangeWhatsapp}
                         placeholder="77 000 00 00"
                         className="w-full bg-transparent px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none"
                       />
                     </div>
+                    {formData.whatsapp.length === 9 && !estNumeroSenegalaisValide(formData.whatsapp) && (
+                      <p className="text-[11px] text-red-600 font-semibold">
+                        Numéro invalide (préfixe attendu : 70, 75, 76, 77 ou 78).
+                      </p>
+                    )}
                   </div>
 
                   {/* Mot de passe */}
@@ -247,6 +293,7 @@ export default function DevenirGerant() {
                       type="password"
                       name="password"
                       required
+                      minLength={8}
                       value={formData.password}
                       onChange={handleChange}
                       placeholder="8 caractères minimum"
@@ -256,6 +303,23 @@ export default function DevenirGerant() {
                     <p className="text-[10px] text-gray-400">
                       Ce mot de passe servira à connecter l'application de contrôle à l'accueil.
                     </p>
+                  </div>
+
+                  {/* Confirmation du mot de passe */}
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-700">
+                      Confirmer le mot de passe *
+                    </label>
+                    <Input
+                      type="password"
+                      name="confirmPassword"
+                      required
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="Ressaisissez le mot de passe"
+                      variant="gray"
+                      className="text-xs font-bold"
+                    />
                   </div>
                 </div>
 
@@ -311,6 +375,7 @@ export default function DevenirGerant() {
                     >
                       <input
                         type="file"
+                        accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
                         onChange={handleFileSelect}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
@@ -325,7 +390,7 @@ export default function DevenirGerant() {
                           <p className="text-xs text-gray-700">
                             Drop here to attach or <span className="text-sky-600 font-bold underline">upload</span>
                           </p>
-                          <p className="text-[10px] text-gray-400 mt-1">Max size: 5GB</p>
+                          <p className="text-[10px] text-gray-400 mt-1">PDF, JPG ou PNG — 10 Mo maximum</p>
                         </div>
                       )}
                     </div>
@@ -341,8 +406,9 @@ export default function DevenirGerant() {
                   formData.nom.trim() &&
                   formData.email.trim() &&
                   formData.adresse.trim() &&
-                  formData.whatsapp.trim() &&
-                  formData.password.trim() &&
+                  estNumeroSenegalaisValide(formData.whatsapp) &&
+                  formData.password.length >= 8 &&
+                  formData.password === formData.confirmPassword &&
                   formData.nomComplexe.trim() &&
                   formData.quartier &&
                   formData.document

@@ -24,6 +24,7 @@ export default function VerificationEmail() {
   const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
   const handleChange = (index, value) => {
+    value = value.replace(/\D/g, '');
     if (value.length > 1) {
       value = value[value.length - 1];
     }
@@ -119,6 +120,7 @@ export default function VerificationEmail() {
                   key={idx}
                   ref={inputRefs[idx]}
                   type="text"
+                  inputMode="numeric"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleChange(idx, e.target.value)}

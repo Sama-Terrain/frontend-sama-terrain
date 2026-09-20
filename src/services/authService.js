@@ -63,7 +63,7 @@ export const authService = {
       formData.append('nom', data.nom);
       formData.append('email', data.email);
       formData.append('password', data.password);
-      formData.append('confirmPassword', data.password);
+      formData.append('confirmPassword', data.confirmPassword);
       formData.append('nom_complexe', data.nomComplexe);
       formData.append('quartier', data.quartier);
       formData.append('adresse', data.adresse);
