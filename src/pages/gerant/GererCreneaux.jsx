@@ -105,7 +105,10 @@ export default function GererCreneaux({ onLogout }) {
   };
 
   const handleChangePrix = (creneauLabel, prix) => {
-    setPrixParCreneau((current) => ({ ...current, [creneauLabel]: prix }));
+    // Jamais de prix négatif/invalide envoyé au backend, même si l'attribut
+    // HTML `min` de l'input est contourné (saisie clavier, collage...).
+    const prixValide = Number.isFinite(prix) && prix > 0 ? prix : 0;
+    setPrixParCreneau((current) => ({ ...current, [creneauLabel]: prixValide }));
   };
 
   // Applique le tarif de chaque créneau configuré aux jours sélectionnés :

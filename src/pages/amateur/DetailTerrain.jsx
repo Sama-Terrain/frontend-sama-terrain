@@ -7,6 +7,7 @@ import { terrainService } from '../../services/terrainService';
 import { avisService } from '../../services/avisService';
 import { creneauService } from '../../services/creneauService';
 import { reservationService } from '../../services/reservationService';
+import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
 
 export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
@@ -207,7 +208,7 @@ export default function DetailTerrain({ currentUser }) {
     !isPastDate &&
     selectedCreneau &&
     nomComplet.trim() !== '' &&
-    telephone.length === 9 &&
+    estNumeroSenegalaisValide(telephone) &&
     avanceNum > MONTANT_AVANCE_MINIMUM &&
     avanceNum < currentPrix
   );
@@ -611,11 +612,16 @@ export default function DetailTerrain({ currentUser }) {
                           type="tel"
                           inputMode="numeric"
                           value={telephone}
-                          onChange={(e) => setTelephone(e.target.value.replace(/\D/g, '').slice(0, 9))}
-                          placeholder="77 777 00 00"
+                          onChange={(e) => setTelephone(nettoyerTelephone(e.target.value))}
+                          placeholder="77 000 00 00"
                           className="w-full bg-transparent px-3 py-2.5 text-xs font-bold text-gray-900 focus:outline-none"
                         />
                       </div>
+                      {telephone.length === 9 && !estNumeroSenegalaisValide(telephone) && (
+                        <p className="text-[11px] text-red-600 font-semibold">
+                          Numéro invalide (préfixe attendu : 70, 75, 76, 77 ou 78).
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

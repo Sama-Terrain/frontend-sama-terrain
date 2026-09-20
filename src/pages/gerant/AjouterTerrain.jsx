@@ -114,17 +114,47 @@ export default function AjouterTerrain({ onLogout }) {
     }));
   };
 
-  const handlePhotosSelect = (fileList) => {
-    if (!fileList) return;
-    setPhotos((prev) => [...prev, ...Array.from(fileList)].slice(0, 8));
-  };
-
   const [erreur, setErreur] = useState('');
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
+
+  const TYPES_PHOTO_ACCEPTES = ['image/png', 'image/jpeg'];
+  const TAILLE_MAX_PHOTO = 10 * 1024 * 1024; // 10 Mo
+
+  const handlePhotosSelect = (fileList) => {
+    if (!fileList) return;
+
+    const fichiersValides = [];
+    let messageErreur = '';
+    for (const fichier of Array.from(fileList)) {
+      if (!TYPES_PHOTO_ACCEPTES.includes(fichier.type)) {
+        messageErreur = 'Seules les images PNG ou JPEG sont acceptées.';
+      } else if (fichier.size > TAILLE_MAX_PHOTO) {
+        messageErreur = 'Chaque photo doit faire moins de 10 Mo.';
+      } else {
+        fichiersValides.push(fichier);
+      }
+    }
+
+    setErreur(messageErreur);
+    setPhotos((prev) => [...prev, ...fichiersValides].slice(0, 8));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
+
+    const capacite = Number(form.capacite);
+    if (!Number.isInteger(capacite) || capacite < 2 || capacite > 30) {
+      setErreur('La capacité doit être un nombre entier entre 2 et 30 joueurs.');
+      return;
+    }
+
+    const prixHeure = Number(form.prixHeure);
+    if (!Number.isFinite(prixHeure) || prixHeure < 500) {
+      setErreur('Le prix par heure doit être au moins 500 FCFA.');
+      return;
+    }
+
     setEnvoiEnCours(true);
 
     const resultat = modeEdition
@@ -222,6 +252,8 @@ export default function AjouterTerrain({ onLogout }) {
             <Input
               label="Capacité (joueurs)"
               type="number"
+              min={2}
+              max={30}
               placeholder="Ex : 10"
               value={form.capacite}
               onChange={(e) => handleField('capacite', e.target.value)}
@@ -235,6 +267,8 @@ export default function AjouterTerrain({ onLogout }) {
             <Input
               label="Prix par heure (FCFA)"
               type="number"
+              min={500}
+              step={500}
               placeholder="Ex : 15 000"
               value={form.prixHeure}
               onChange={(e) => handleField('prixHeure', e.target.value)}

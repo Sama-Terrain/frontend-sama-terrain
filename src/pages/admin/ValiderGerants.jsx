@@ -296,9 +296,11 @@ export default function ValiderGerants({ onLogout }) {
               value={motifRejet}
               onChange={(e) => setMotifRejet(e.target.value)}
               rows={4}
+              maxLength={500}
               placeholder="Ex : le document fourni n'est pas lisible, merci de le renvoyer."
               className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:border-vert-principal focus:ring-1 focus:ring-vert-principal"
             />
+            <p className="text-[11px] text-gray-400 text-right">{motifRejet.length}/500</p>
             {erreurRejet && (
               <p className="text-red-600 text-xs font-bold">{erreurRejet}</p>
             )}
