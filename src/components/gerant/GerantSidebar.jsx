@@ -34,9 +34,8 @@ export default function GerantSidebar({ onLogout, onMobileClose }) {
     { id: 'insights', label: 'Insights IA', path: '/gerant/insights', icon: Sparkles },
   ];
 
-  const handleLogoutClick = () => {
-    localStorage.removeItem('sama_current_user');
-    if (onLogout) onLogout();
+  const handleLogoutClick = async () => {
+    if (onLogout) await onLogout();
     navigate('/login', { replace: true });
   };
 

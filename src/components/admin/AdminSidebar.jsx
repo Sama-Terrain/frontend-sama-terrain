@@ -62,16 +62,13 @@ export default function AdminSidebar({ onLogout, onMobileClose }) {
   ];
 
   // Gestion de la déconnexion
-  const handleLogoutClick = () => {
-    // 1. Supprimer l'utilisateur connecté du stockage local
-    localStorage.removeItem('sama_current_user');
-    
-    // 2. Déclencher le callback parent si présent
+  const handleLogoutClick = async () => {
+    // 1. Invalider les tokens JWT (backend + localStorage) via le contexte
     if (onLogout) {
-      onLogout();
+      await onLogout();
     }
-    
-    // 3. Rediriger immédiatement vers la page de connexion
+
+    // 2. Rediriger vers la page de connexion
     navigate('/login', { replace: true });
   };
 
