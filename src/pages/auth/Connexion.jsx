@@ -45,7 +45,7 @@ export default function Connexion() {
     setChargement(false);
 
     if (!resultat.success) {
-      setError('Identifiants incorrects. Veuillez utiliser les comptes de test ci-dessous.');
+      setError('Identifiants incorrects. Veuillez réessayer.');
       return;
     }
 
