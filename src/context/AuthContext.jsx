@@ -1,4 +1,5 @@
 import React, { createContext, useState } from 'react';
+import { authService } from '../services/authService';
 
 // Contexte React qui garde en mémoire l'utilisateur connecté (amateur, gérant ou admin)
 // et le rend disponible partout dans l'application sans avoir à le faire passer
@@ -26,8 +27,9 @@ export function AuthProvider({ children }) {
     localStorage.setItem(CLE_STOCKAGE, JSON.stringify(user));
   };
 
-  // Déconnexion : on oublie l'utilisateur partout
-  const logout = () => {
+  // Déconnexion : invalide les tokens JWT (backend + localStorage) puis oublie l'utilisateur
+  const logout = async () => {
+    await authService.logout();
     setCurrentUser(null);
     localStorage.removeItem(CLE_STOCKAGE);
   };
