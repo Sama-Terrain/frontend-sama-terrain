@@ -5,6 +5,7 @@ import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
 import heroBg from '../../assets/herobg.jpeg';
+import { VILLES } from '../../utils/villes';
 import { authService } from '../../services/authService';
 import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
 
@@ -355,13 +356,9 @@ export default function DevenirGerant() {
                       onChange={handleChange}
                       className="w-full bg-[#f3f4f6] border border-transparent rounded-[8px] px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none focus:bg-white focus:border-[#004030] cursor-pointer"
                     >
-                      <option value="">Sélectionnez une zone</option>
-                      <option value="Almadies">Almadies, Dakar</option>
-                      <option value="Mermoz">Mermoz, Dakar</option>
-                      <option value="Fann">Fann, Dakar</option>
-                      <option value="Yoff">Yoff, Dakar</option>
-                      <option value="Rufisque">Rufisque, Dakar</option>
-                      <option value="Guédiawaye">Guédiawaye, Dakar</option>
+                       {VILLES.map((ville) => (
+                            <option key={ville} value={ville}>{ville}</option>
+                        ))}
                     </select>
                   </div>
 
