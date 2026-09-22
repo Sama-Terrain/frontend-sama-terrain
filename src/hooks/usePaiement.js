@@ -17,7 +17,7 @@ export function usePaiement() {
     setChargement(true);
     setErreur('');
 
-    const resultat = await paiementService.initierPaiement(reservationId);
+    const resultat = await paiementService.initierPaiement(reservationId, moyenPaiement);
 
     if (!resultat.success) {
       setChargement(false);

@@ -10,9 +10,12 @@ export const paiementService = {
   // L'appelant doit ensuite rediriger le navigateur vers cette URL
   // (window.location.href = payment_url) : PayTech n'est pas un popup,
   // c'est une vraie page externe où l'utilisateur choisit Wave/Orange Money.
-  async initierPaiement(reservationId) {
+  async initierPaiement(reservationId, moyenPaiement) {
     try {
-      const { data } = await api.post('/paiements/initier/', { reservation: reservationId });
+      const { data } = await api.post('/paiements/initier/', {
+        reservation: reservationId,
+        moyen_paiement: moyenPaiement,
+      });
       return { success: true, paymentUrl: data.payment_url };
     } catch (error) {
       return {
