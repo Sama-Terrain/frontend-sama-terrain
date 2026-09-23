@@ -5,8 +5,9 @@ import TerrainCard from '../../components/terrain/TerrainCard';
 import Button from '../../components/ui/Button';
 import { terrainService } from '../../services/terrainService';
 import { iaService } from '../../services/iaService';
-import { avisService } from '../../services/avisService';
 import { VILLES } from '../../utils/villes';
+import { FAQ_ACCUEIL } from '../../utils/faqAccueil';
+import FAQAccordion from '../../components/ui/FAQAccordion';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
@@ -17,7 +18,6 @@ export default function Accueil() {
 
   // États locaux pour les données chargées depuis les services
   const [terrainsVedettes, setTerrainsVedettes] = useState([]);
-  const [avisJoueurs, setAvisJoueurs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // État du formulaire de recherche rapide
@@ -55,17 +55,13 @@ export default function Accueil() {
     setVideoCoupee(videoRef.current.muted);
   };
 
-  // Chargement des terrains vedettes et des témoignages (backend)
+  // Chargement des terrains vedettes (backend)
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const [terrainsData, avisData] = await Promise.all([
-          terrainService.getTerrainsVedettes(),
-          avisService.getMeilleursAvis(),
-        ]);
+        const terrainsData = await terrainService.getTerrainsVedettes();
         setTerrainsVedettes(terrainsData);
-        setAvisJoueurs(avisData);
       } catch (error) {
         console.error('Erreur lors du chargement des données :', error);
       } finally {
@@ -422,47 +418,18 @@ export default function Accueil() {
         </div>
       </section>
 
-      {/* 6. SECTION "CE QUE DISENT NOS JOUEURS" */}
+      {/* 6. SECTION "QUESTIONS FRÉQUENTES" */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-vert-principal">
-            Ce que disent nos joueurs
+            Questions fréquentes
           </h2>
           <p className="text-gray-600 mt-2 text-sm sm:text-base">
-            Rejoignez des milliers de footballeurs amateurs satisfaits au Sénégal.
+            Tout ce qu'il faut savoir avant de réserver votre terrain au Sénégal.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {avisJoueurs.map((avis) => (
-            <div
-              key={avis.id}
-              className="bg-white p-6 rounded-[8px] border border-gray-200 flex flex-col justify-between"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-vert-principal text-white flex items-center justify-center font-bold text-sm">
-                    {avis.initiales}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-900">{avis.nom}</h4>
-                    <p className="text-xs text-gray-500">{avis.role}</p>
-                  </div>
-                </div>
-
-                <div className="flex text-amber-400">
-                  {[...Array(avis.note)].map((_, i) => (
-                    <span key={i} className="text-sm">★</span>
-                  ))}
-                </div>
-
-                <p className="text-sm text-gray-600 italic leading-relaxed">
-                  "{avis.commentaire}"
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <FAQAccordion items={FAQ_ACCUEIL} />
       </section>
 
       {/* 7. WIDGET ASSISTANT IA FLOTTANT */}
