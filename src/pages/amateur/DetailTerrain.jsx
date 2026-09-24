@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { MapPin, Star, Calendar as CalendarIcon, Clock, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { MapPin, Star, Calendar as CalendarIcon, Clock, CheckCircle2, AlertTriangle, X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
 import { terrainService } from '../../services/terrainService';
@@ -16,6 +16,7 @@ export default function DetailTerrain({ currentUser }) {
 
   const [terrain, setTerrain] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   // Date du jour au format YYYY-MM-DD
   const getTodayString = () => {
@@ -285,6 +286,14 @@ export default function DetailTerrain({ currentUser }) {
     );
   }
 
+  // Vraies photos du terrain (uploadées par le gérant). On retombe sur
+  // l'unique `terrain.image` seulement si aucune photo n'a été ajoutée.
+  const photosGalerie = terrain.photos?.length > 0
+    ? terrain.photos.map((p) => p.image)
+    : terrain.image
+      ? [terrain.image]
+      : [];
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-20 font-sans text-left">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -302,33 +311,114 @@ export default function DetailTerrain({ currentUser }) {
           <span className="font-bold text-vert-principal">{terrain?.nom || 'Complexe Keur Madior'}</span>
         </nav>
 
-        {/* GALERIE PHOTOS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-[8px] overflow-hidden">
-          <div className="md:col-span-2 h-72 sm:h-96 w-full overflow-hidden bg-gray-200">
-            <img
-              src={terrain?.image}
-              alt={terrain?.nom}
-              className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-            />
+        {/* GALERIE PHOTOS : les vraies photos du terrain, cliquables (plein écran) */}
+        {photosGalerie.length === 0 ? (
+          <div className="h-72 sm:h-96 w-full rounded-[8px] bg-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400">
+            <Images size={32} />
+            <p className="text-xs font-semibold">Aucune photo pour ce terrain</p>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-[8px] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setLightboxIndex(0)}
+              className="md:col-span-2 h-72 sm:h-96 w-full overflow-hidden bg-gray-200 cursor-pointer"
+            >
+              <img
+                src={photosGalerie[0]}
+                alt={terrain.nom}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </button>
 
-          <div className="grid grid-rows-2 gap-4 h-72 sm:h-96">
-            <div className="h-full w-full overflow-hidden bg-emerald-900 rounded-[8px]">
-              <img
-                src={terrain?.image}
-                alt="Détail pelouse"
-                className="w-full h-full object-cover brightness-110 hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-            <div className="h-full w-full overflow-hidden bg-emerald-800 rounded-[8px]">
-              <img
-                src={terrain?.image}
-                alt="Éclairage terrain"
-                className="w-full h-full object-cover contrast-125 hover:scale-105 transition-transform duration-500"
-              />
+            <div className="grid grid-rows-2 gap-4 h-72 sm:h-96">
+              {[1, 2].map((index) => {
+                const photo = photosGalerie[index];
+                if (!photo) {
+                  return <div key={index} className="h-full w-full rounded-[8px] bg-gray-100" />;
+                }
+                const dernieresCachees = index === 2 && photosGalerie.length > 3;
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setLightboxIndex(index)}
+                    className="relative h-full w-full overflow-hidden rounded-[8px] bg-gray-200 cursor-pointer"
+                  >
+                    <img
+                      src={photo}
+                      alt={`${terrain.nom} - photo ${index + 1}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    />
+                    {dernieresCachees && (
+                      <span className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-sm">
+                        +{photosGalerie.length - 3} photos
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
+        )}
+
+        {/* VISIONNEUSE PLEIN ÉCRAN */}
+        {lightboxIndex !== null && (
+          <div
+            className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4"
+            onClick={() => setLightboxIndex(null)}
+          >
+            <button
+              type="button"
+              onClick={() => setLightboxIndex(null)}
+              aria-label="Fermer"
+              className="absolute top-4 right-4 text-white/80 hover:text-white cursor-pointer"
+            >
+              <X size={28} />
+            </button>
+
+            {photosGalerie.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((i) => (i - 1 + photosGalerie.length) % photosGalerie.length);
+                }}
+                aria-label="Photo précédente"
+                className="absolute left-4 sm:left-6 text-white/80 hover:text-white cursor-pointer"
+              >
+                <ChevronLeft size={36} />
+              </button>
+            )}
+
+            <img
+              src={photosGalerie[lightboxIndex]}
+              alt={`${terrain.nom} - photo ${lightboxIndex + 1}`}
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-full max-h-[85vh] object-contain rounded-[8px]"
+            />
+
+            {photosGalerie.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((i) => (i + 1) % photosGalerie.length);
+                }}
+                aria-label="Photo suivante"
+                className="absolute right-4 sm:right-6 text-white/80 hover:text-white cursor-pointer"
+              >
+                <ChevronRight size={36} />
+              </button>
+            )}
+
+            {photosGalerie.length > 1 && (
+              <span className="absolute bottom-4 text-white/70 text-xs font-semibold">
+                {lightboxIndex + 1} / {photosGalerie.length}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* LAYOUT PRINCIPAL */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
