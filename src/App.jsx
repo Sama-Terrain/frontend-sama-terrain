@@ -36,7 +36,7 @@ function AppContent() {
   // Note : '/gerant' seul (page publique "Devenir Gérant") garde la Navbar ;
   // seul '/gerant/...' (espace connecté) la masque.
   const isAuthOrAdminPage =
-    ['/login', '/register', '/verify-email'].includes(location.pathname) ||
+    ['/login', '/register', '/verify-email', '/mot-de-passe-oublie'].includes(location.pathname) ||
     location.pathname.startsWith('/admin') ||
     location.pathname.startsWith('/gerant/');
 
