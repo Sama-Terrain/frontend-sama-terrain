@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, Calendar, QrCode } from 'lucide-react';
+import { Bell, Menu, Calendar, QrCode, ChevronDown, User, LogOut } from 'lucide-react';
 import Button from '../ui/Button';
 
 /**
@@ -8,8 +8,9 @@ import Button from '../ui/Button';
  * Barre supérieure de l'espace gérant : titre de page, date du jour,
  * accès rapide au scanner de ticket, notifications et profil du gérant.
  */
-export default function GerantHeader({ title = 'Tableau de bord', profile, onMenuToggle }) {
+export default function GerantHeader({ title = 'Tableau de bord', profile, onMenuToggle, onLogout }) {
   const navigate = useNavigate();
+  const [dropdownOuvert, setDropdownOuvert] = useState(false);
 
   const gerantName = profile?.name || 'Amadou Diouf';
   const initials = profile?.initials || 'A';
@@ -71,13 +72,55 @@ export default function GerantHeader({ title = 'Tableau de bord', profile, onMen
         </button>
 
         {/* PROFIL GÉRANT */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-dore flex items-center justify-center font-black text-vert-principal text-xs shadow-xs border border-[#b8952b] shrink-0">
-            {initials}
-          </div>
-          <span className="hidden sm:block text-sm font-extrabold text-gray-900 leading-tight">
-            {gerantName}
-          </span>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setDropdownOuvert(!dropdownOuvert)}
+            className="flex items-center gap-2 sm:gap-3 cursor-pointer"
+          >
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-dore flex items-center justify-center font-black text-vert-principal text-xs shadow-xs border border-[#b8952b] shrink-0">
+              {initials}
+            </div>
+            <span className="hidden sm:block text-sm font-extrabold text-gray-900 leading-tight">
+              {gerantName}
+            </span>
+            <ChevronDown size={16} className="hidden sm:block text-gray-500" />
+          </button>
+
+          {dropdownOuvert && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setDropdownOuvert(false)} />
+              <div className="absolute right-0 mt-2 w-52 bg-white rounded-[8px] border border-gray-200 shadow-lg py-2 z-50 text-left">
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <p className="text-xs font-bold text-gray-900">{gerantName}</p>
+                  {profile?.email && <p className="text-[11px] text-gray-500 truncate">{profile.email}</p>}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setDropdownOuvert(false);
+                    navigate('/gerant/profil');
+                  }}
+                  className="w-full flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-gray-700 hover:bg-emerald-50 hover:text-vert-principal text-left cursor-pointer"
+                >
+                  <User size={14} />
+                  <span>Mon profil</span>
+                </button>
+
+                <button
+                  onClick={async () => {
+                    setDropdownOuvert(false);
+                    if (onLogout) await onLogout();
+                    navigate('/login', { replace: true });
+                  }}
+                  className="w-full flex items-center space-x-2 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 text-left cursor-pointer"
+                >
+                  <LogOut size={14} />
+                  <span>Se déconnecter</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
       </div>

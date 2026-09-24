@@ -125,17 +125,26 @@ export default function Connexion() {
             </div>
 
             {/* Se souvenir de moi */}
-            <div className="flex items-center space-x-2 pt-1">
-              <input
-                type="checkbox"
-                id="remember"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-vert-principal focus:ring-vert-principal cursor-pointer"
-              />
-              <label htmlFor="remember" className="text-xs text-gray-700 font-semibold cursor-pointer">
-                Se souvenir de moi
-              </label>
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-vert-principal focus:ring-vert-principal cursor-pointer"
+                />
+                <label htmlFor="remember" className="text-xs text-gray-700 font-semibold cursor-pointer">
+                  Se souvenir de moi
+                </label>
+              </div>
+              <button
+                type="button"
+                onClick={() => navigate('/mot-de-passe-oublie')}
+                className="text-xs font-bold text-vert-principal hover:underline cursor-pointer"
+              >
+                Mot de passe oublié ?
+              </button>
             </div>
 
             {/* Bouton Se connecter */}

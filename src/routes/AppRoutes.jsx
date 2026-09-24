@@ -27,6 +27,7 @@ import Revenus from '../pages/gerant/Revenus';
 import ScannerTicket from '../pages/gerant/ScannerTicket';
 import GerantStatistiques from '../pages/gerant/Statistiques';
 import InsightsIA from '../pages/gerant/InsightsIA';
+import GerantProfil from '../pages/gerant/Profil';
 import Abonnement from '../pages/gerant/Abonnement';
 import AbonnementSucces from '../pages/gerant/AbonnementSucces';
 import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
@@ -35,6 +36,7 @@ import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
 import Connexion from '../pages/auth/Connexion';
 import Inscription from '../pages/auth/Inscription';
 import VerificationEmail from '../pages/auth/VerificationEmail';
+import MotDePasseOublie from '../pages/auth/MotDePasseOublie';
 
 // Pages Admin
 import AdminDashboard from '../pages/admin/Dashboard';
@@ -167,6 +169,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/gerant/scanner" element={pageGerant(<ScannerTicket onLogout={logout} />)} />
       <Route path="/gerant/statistiques" element={pageGerant(<GerantStatistiques onLogout={logout} />)} />
       <Route path="/gerant/insights" element={pageGerant(<InsightsIA onLogout={logout} />)} />
+      <Route path="/gerant/profil" element={pageGerant(<GerantProfil onLogout={logout} />)} />
 
       {/* Routes Administrateur : réservées au rôle admin */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -182,6 +185,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/login" element={<Connexion />} />
       <Route path="/register" element={<Inscription />} />
       <Route path="/verify-email" element={<VerificationEmail />} />
+      <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
 
       {/* Fallback route inconnue -> Redirection Accueil */}
       <Route path="*" element={<Navigate to="/" replace />} />
