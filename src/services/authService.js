@@ -183,4 +183,41 @@ export const authService = {
       width: 400,
     });
   },
+
+  // Change le mot de passe de l'utilisateur connecté (amateur ou gérant).
+  changerMotDePasse: async (ancienMotDePasse, nouveauMotDePasse) => {
+    try {
+      await api.patch('/auth/mot-de-passe', {
+        ancien_mot_de_passe: ancienMotDePasse,
+        nouveau_mot_de_passe: nouveauMotDePasse,
+      });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  // "Mot de passe oublié" — étape 1 : envoie un code à 6 chiffres par email.
+  demanderReinitialisationMotDePasse: async (email) => {
+    try {
+      await api.post('/auth/mot-de-passe-oublie', { email });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  // "Mot de passe oublié" — étape 2 : code + nouveau mot de passe.
+  reinitialiserMotDePasse: async (email, code, nouveauMotDePasse) => {
+    try {
+      await api.post('/auth/reinitialiser-mot-de-passe', {
+        email,
+        code,
+        nouveau_mot_de_passe: nouveauMotDePasse,
+      });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
 };
