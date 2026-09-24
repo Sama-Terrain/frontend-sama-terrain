@@ -206,14 +206,15 @@ export default function MotDePasseOublie() {
             </form>
           )}
 
-          <div className="pt-2">
+          <p className="text-center text-xs text-gray-500 pt-4">
+            Vous vous souvenez de votre mot de passe ?{' '}
             <button
               onClick={() => navigate('/login')}
-              className="text-xs text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
+              className="text-[#D4AF37] font-bold hover:underline cursor-pointer"
             >
-              Retourner à la <span className="font-bold text-gray-900">page de connexion</span>
+              Se connecter
             </button>
-          </div>
+          </p>
 
         </div>
       </div>
