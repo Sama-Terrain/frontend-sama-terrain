@@ -35,6 +35,7 @@ function normaliserReservation(r) {
     id: r.id,
     terrainId: r.terrain_id,
     nomTerrain: r.terrain_nom,
+    image: r.terrain_image,
     status: infosStatut.label,
     statusBadgeClass: infosStatut.badge,
     acomptePaye: r.statut !== 'en_attente',
