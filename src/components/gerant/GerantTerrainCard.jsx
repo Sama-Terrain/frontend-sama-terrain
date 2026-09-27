@@ -59,17 +59,17 @@ export default function GerantTerrainCard({ terrain, onToggleActif }) {
         <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-100 text-left">
           <div className="space-y-1">
             <p className="text-[11px] text-gray-400">Ce mois</p>
-            <p className="text-xs sm:text-sm font-extrabold text-gray-900">
+            <p className="text-[9px] sm:text-[10px] font-extrabold text-gray-900">
               {reservationsMois} {reservationsMois <= 1 ? 'réservation' : 'réservations'}
             </p>
           </div>
           <div className="space-y-1">
             <p className="text-[11px] text-gray-400">Revenus</p>
-            <p className="text-xs sm:text-sm font-extrabold text-gray-900">{revenusMois}</p>
+            <p className="text-[9px] sm:text-[10px]  font-extrabold text-gray-900">{revenusMois}</p>
           </div>
           <div className="space-y-1">
             <p className="text-[11px] text-gray-400">Note</p>
-            <p className="text-xs sm:text-sm font-extrabold text-gray-900">
+            <p className="text-[9px] sm:text-[10px]  font-extrabold text-gray-900">
               {note ? note.toFixed(1) : 'Aucune note'}
             </p>
           </div>
