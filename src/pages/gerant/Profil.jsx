@@ -5,6 +5,7 @@ import GerantLayout from '../../components/gerant/GerantLayout';
 import { useAuth } from '../../hooks/useAuth';
 import { authService } from '../../services/authService';
 import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
+import { validerTexteObligatoire, validerMotDePasse, validerConfirmationMotDePasse, estVide } from '../../utils/validation';
 
 // Le téléphone est stocké avec l'indicatif (ex: "221770000000") : on
 // n'affiche/n'édite que la partie locale à 9 chiffres.
@@ -34,6 +35,7 @@ export default function GerantProfil({ onLogout }) {
   const [chargement, setChargement] = useState(false);
   const [message, setMessage] = useState('');
   const [erreur, setErreur] = useState('');
+  const [erreursChamps, setErreursChamps] = useState({});
 
   const [ancienMotDePasse, setAncienMotDePasse] = useState('');
   const [nouveauMotDePasse, setNouveauMotDePasse] = useState('');
@@ -41,6 +43,7 @@ export default function GerantProfil({ onLogout }) {
   const [chargementMotDePasse, setChargementMotDePasse] = useState(false);
   const [messageMotDePasse, setMessageMotDePasse] = useState('');
   const [erreurMotDePasse, setErreurMotDePasse] = useState('');
+  const [erreursChampsMotDePasse, setErreursChampsMotDePasse] = useState({});
 
   const profileHeader = {
     name: `${currentUser?.prenom || ''} ${currentUser?.nom || ''}`.trim(),
@@ -52,15 +55,21 @@ export default function GerantProfil({ onLogout }) {
     setMessage('');
     setErreur('');
 
-    if (telephone && !estNumeroSenegalaisValide(telephone)) {
-      setErreur('Numéro de téléphone invalide (préfixe attendu : 70, 75, 76, 77 ou 78).');
-      return;
-    }
+    const erreurs = {
+      prenom: validerTexteObligatoire(prenom, 'Le prénom', { max: 150 }),
+      nom: validerTexteObligatoire(nom, 'Le nom', { max: 150 }),
+      telephone: telephone && !estNumeroSenegalaisValide(telephone)
+        ? 'Numéro de téléphone invalide (préfixe attendu : 70, 75, 76, 77 ou 78).'
+        : '',
+    };
+    const erreursPresentes = Object.fromEntries(Object.entries(erreurs).filter(([, m]) => m));
+    setErreursChamps(erreursPresentes);
+    if (Object.keys(erreursPresentes).length > 0) return;
 
     setChargement(true);
     const resultat = await authService.modifierProfil({
-      prenom,
-      nom,
+      prenom: prenom.trim(),
+      nom: nom.trim(),
       telephone: telephone ? `221${telephone}` : '',
       ville_preferee: currentUser?.ville_preferee || '',
     });
@@ -68,6 +77,7 @@ export default function GerantProfil({ onLogout }) {
 
     if (!resultat.success) {
       setErreur(resultat.error);
+      if (resultat.erreursChamps) setErreursChamps((prev) => ({ ...prev, ...resultat.erreursChamps }));
       return;
     }
 
@@ -80,10 +90,14 @@ export default function GerantProfil({ onLogout }) {
     setMessageMotDePasse('');
     setErreurMotDePasse('');
 
-    if (nouveauMotDePasse !== confirmationMotDePasse) {
-      setErreurMotDePasse('Les deux mots de passe ne correspondent pas.');
-      return;
-    }
+    const erreurs = {
+      ancienMotDePasse: estVide(ancienMotDePasse) ? 'Le mot de passe actuel est obligatoire.' : '',
+      nouveauMotDePasse: validerMotDePasse(nouveauMotDePasse),
+      confirmationMotDePasse: validerConfirmationMotDePasse(nouveauMotDePasse, confirmationMotDePasse),
+    };
+    const erreursPresentes = Object.fromEntries(Object.entries(erreurs).filter(([, m]) => m));
+    setErreursChampsMotDePasse(erreursPresentes);
+    if (Object.keys(erreursPresentes).length > 0) return;
 
     setChargementMotDePasse(true);
     const resultat = await authService.changerMotDePasse(ancienMotDePasse, nouveauMotDePasse);
@@ -151,18 +165,30 @@ export default function GerantProfil({ onLogout }) {
                     <input
                       type="text"
                       value={prenom}
-                      onChange={(e) => setPrenom(e.target.value)}
-                      className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm outline-none focus:border-vert-principal"
+                      onChange={(e) => {
+                        setPrenom(e.target.value);
+                        setErreursChamps((prev) => (prev.prenom ? { ...prev, prenom: '' } : prev));
+                      }}
+                      className={`w-full border rounded-[8px] px-3 py-2.5 text-sm outline-none ${
+                        erreursChamps.prenom ? 'border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                      }`}
                     />
+                    {erreursChamps.prenom && <p className="text-[11px] text-red-600 font-semibold">{erreursChamps.prenom}</p>}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-700">Nom</label>
                     <input
                       type="text"
                       value={nom}
-                      onChange={(e) => setNom(e.target.value)}
-                      className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm outline-none focus:border-vert-principal"
+                      onChange={(e) => {
+                        setNom(e.target.value);
+                        setErreursChamps((prev) => (prev.nom ? { ...prev, nom: '' } : prev));
+                      }}
+                      className={`w-full border rounded-[8px] px-3 py-2.5 text-sm outline-none ${
+                        erreursChamps.nom ? 'border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                      }`}
                     />
+                    {erreursChamps.nom && <p className="text-[11px] text-red-600 font-semibold">{erreursChamps.nom}</p>}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-700">Email</label>
@@ -217,30 +243,54 @@ export default function GerantProfil({ onLogout }) {
                     <input
                       type="password"
                       value={ancienMotDePasse}
-                      onChange={(e) => setAncienMotDePasse(e.target.value)}
+                      onChange={(e) => {
+                        setAncienMotDePasse(e.target.value);
+                        setErreursChampsMotDePasse((prev) => (prev.ancienMotDePasse ? { ...prev, ancienMotDePasse: '' } : prev));
+                      }}
                       required
-                      className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm outline-none focus:border-vert-principal"
+                      className={`w-full border rounded-[8px] px-3 py-2.5 text-sm outline-none ${
+                        erreursChampsMotDePasse.ancienMotDePasse ? 'border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                      }`}
                     />
+                    {erreursChampsMotDePasse.ancienMotDePasse && (
+                      <p className="text-[11px] text-red-600 font-semibold">{erreursChampsMotDePasse.ancienMotDePasse}</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-700">Nouveau mot de passe</label>
                     <input
                       type="password"
                       value={nouveauMotDePasse}
-                      onChange={(e) => setNouveauMotDePasse(e.target.value)}
+                      onChange={(e) => {
+                        setNouveauMotDePasse(e.target.value);
+                        setErreursChampsMotDePasse((prev) => (prev.nouveauMotDePasse ? { ...prev, nouveauMotDePasse: '' } : prev));
+                      }}
                       required
-                      className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm outline-none focus:border-vert-principal"
+                      className={`w-full border rounded-[8px] px-3 py-2.5 text-sm outline-none ${
+                        erreursChampsMotDePasse.nouveauMotDePasse ? 'border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                      }`}
                     />
+                    {erreursChampsMotDePasse.nouveauMotDePasse && (
+                      <p className="text-[11px] text-red-600 font-semibold">{erreursChampsMotDePasse.nouveauMotDePasse}</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-gray-700">Confirmer le nouveau mot de passe</label>
                     <input
                       type="password"
                       value={confirmationMotDePasse}
-                      onChange={(e) => setConfirmationMotDePasse(e.target.value)}
+                      onChange={(e) => {
+                        setConfirmationMotDePasse(e.target.value);
+                        setErreursChampsMotDePasse((prev) => (prev.confirmationMotDePasse ? { ...prev, confirmationMotDePasse: '' } : prev));
+                      }}
                       required
-                      className="w-full border border-gray-200 rounded-[8px] px-3 py-2.5 text-sm outline-none focus:border-vert-principal"
+                      className={`w-full border rounded-[8px] px-3 py-2.5 text-sm outline-none ${
+                        erreursChampsMotDePasse.confirmationMotDePasse ? 'border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                      }`}
                     />
+                    {erreursChampsMotDePasse.confirmationMotDePasse && (
+                      <p className="text-[11px] text-red-600 font-semibold">{erreursChampsMotDePasse.confirmationMotDePasse}</p>
+                    )}
                   </div>
                 </div>
 

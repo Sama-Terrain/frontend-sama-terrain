@@ -146,7 +146,7 @@ export const terrainService = {
       const { data } = await api.post('/terrains/', formData);
       return { success: true, terrain: normaliserTerrainGerant(data) };
     } catch (error) {
-      return { success: false, error: extraireErreurTerrain(error) };
+      return { success: false, error: extraireErreurTerrain(error), erreursChamps: extraireErreursChampsTerrain(error) };
     }
   },
 
@@ -157,7 +157,7 @@ export const terrainService = {
       const { data } = await api.patch(`/terrains/${id}/`, formData);
       return { success: true, terrain: normaliserTerrainGerant(data) };
     } catch (error) {
-      return { success: false, error: extraireErreurTerrain(error) };
+      return { success: false, error: extraireErreurTerrain(error), erreursChamps: extraireErreursChampsTerrain(error) };
     }
   },
 
@@ -179,4 +179,26 @@ function extraireErreurTerrain(error) {
   if (!donnees) return 'Une erreur réseau est survenue.';
   const premierChamp = Object.values(donnees)[0];
   return Array.isArray(premierChamp) ? premierChamp[0] : "Impossible d'enregistrer ce terrain.";
+}
+
+// Champs backend (snake_case) -> champs du formulaire AjouterTerrain.jsx
+// (camelCase), pour pouvoir afficher l'erreur backend directement sous le
+// bon champ plutôt que seulement dans l'alerte générique.
+const CHAMPS_BACKEND_VERS_FORMULAIRE = {
+  prix_heure: 'prixHeure',
+  heure_ouverture: 'heures',
+  heure_fermeture: 'heures',
+};
+
+function extraireErreursChampsTerrain(error) {
+  const donnees = error.response?.data;
+  if (!donnees || typeof donnees !== 'object') return {};
+
+  const erreursChamps = {};
+  for (const [champ, messages] of Object.entries(donnees)) {
+    if (!Array.isArray(messages) || messages.length === 0) continue;
+    const champFormulaire = CHAMPS_BACKEND_VERS_FORMULAIRE[champ] || champ;
+    erreursChamps[champFormulaire] = messages[0];
+  }
+  return erreursChamps;
 }
