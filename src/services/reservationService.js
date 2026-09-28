@@ -101,4 +101,30 @@ export const reservationService = {
     });
     return normaliserReservation(data);
   },
+
+  // Réserve plusieurs créneaux d'un même terrain en une seule fois (avance
+  // globale répartie au prorata côté backend). Renvoie l'id de la Commande
+  // créée et les réservations qui la composent (une par créneau).
+  creerReservationGroupe: async ({ creneauIds, nomComplet, telephone, montantAvance }) => {
+    const { data } = await api.post('/reservations/groupe/', {
+      creneaux: creneauIds,
+      nom_complet: nomComplet,
+      telephone,
+      montant_avance: montantAvance,
+    });
+    return {
+      commandeId: data.commande,
+      reservations: data.reservations.map(normaliserReservation),
+    };
+  },
+
+  // Détail d'une commande (utilisé sur la page de paiement et la page de
+  // succès, pour connaître/vérifier l'état de TOUTES ses réservations).
+  getCommandeById: async (commandeId) => {
+    const { data } = await api.get(`/reservations/commande/${commandeId}/`);
+    return {
+      commandeId: data.commande,
+      reservations: data.reservations.map(normaliserReservation),
+    };
+  },
 };

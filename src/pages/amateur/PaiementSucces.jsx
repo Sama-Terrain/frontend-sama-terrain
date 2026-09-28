@@ -11,21 +11,21 @@ const DELAI_ENTRE_TENTATIVES_MS = 2000;
  * Page Paiement Succès (Espace Amateur)
  *
  * PayTech redirige ici après un paiement réussi (voir success_url dans
- * backend/paiements/views.py). La confirmation réelle de la réservation
- * arrive de façon ASYNCHRONE via l'IPN (webhook serveur-à-serveur de
- * PayTech vers notre backend) : elle peut donc ne pas être encore arrivée
+ * backend/paiements/views.py). La confirmation réelle des réservations de
+ * la commande arrive de façon ASYNCHRONE via l'IPN (webhook serveur-à-serveur
+ * de PayTech vers notre backend) : elle peut donc ne pas être encore arrivée
  * au moment où l'utilisateur revient sur le site. On "poll" (revérifie)
  * quelques secondes avant d'abandonner et de proposer un lien de secours.
  */
 export default function PaiementSucces() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const reservationId = searchParams.get('reservation');
+  const commandeId = searchParams.get('commande');
 
   const [statut, setStatut] = useState('verification'); // 'verification' | 'confirmee' | 'en_attente'
 
   useEffect(() => {
-    if (!reservationId) {
+    if (!commandeId) {
       navigate('/terrains', { replace: true });
       return;
     }
@@ -34,13 +34,15 @@ export default function PaiementSucces() {
 
     async function verifier(tentative) {
       try {
-        const reservation = await reservationService.getReservationById(reservationId);
+        const { reservations } = await reservationService.getCommandeById(commandeId);
 
         if (annule) return;
 
-        if (reservation.statut === 'confirmee') {
+        // On attend que TOUTES les réservations du groupe soient confirmées
+        // (l'IPN les confirme toutes ensemble, mais on reste prudent).
+        if (reservations.length > 0 && reservations.every((r) => r.statut === 'confirmee')) {
           setStatut('confirmee');
-          navigate('/confirmation', { state: { reservation }, replace: true });
+          navigate('/confirmation', { state: { reservations }, replace: true });
           return;
         }
 
@@ -60,7 +62,7 @@ export default function PaiementSucces() {
     return () => {
       annule = true;
     };
-  }, [reservationId, navigate]);
+  }, [commandeId, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 font-sans text-center">

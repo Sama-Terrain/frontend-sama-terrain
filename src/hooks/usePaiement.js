@@ -11,13 +11,14 @@ export function usePaiement() {
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState('');
 
-  // Démarre le paiement PayTech de la réservation donnée : redirige le
-  // navigateur vers la page de paiement externe (Wave/Orange Money réels).
-  async function payer(reservationId) {
+  // Démarre le paiement PayTech de la commande donnée (un ou plusieurs
+  // créneaux réservés ensemble) : redirige le navigateur vers la page de
+  // paiement externe (Wave/Orange Money réels).
+  async function payer(commandeId) {
     setChargement(true);
     setErreur('');
 
-    const resultat = await paiementService.initierPaiement(reservationId, moyenPaiement);
+    const resultat = await paiementService.initierPaiementGroupe(commandeId, moyenPaiement);
 
     if (!resultat.success) {
       setChargement(false);

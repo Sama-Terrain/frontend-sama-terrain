@@ -13,7 +13,7 @@ import Button from '../../components/ui/Button';
 export default function PaiementAnnule() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const reservationId = searchParams.get('reservation');
+  const commandeId = searchParams.get('commande');
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 font-sans text-center">
@@ -25,9 +25,9 @@ export default function PaiementAnnule() {
           le temps de réessayer si vous le souhaitez.
         </p>
         <div className="space-y-2">
-          {reservationId && (
+          {commandeId && (
             <Button
-              onClick={() => navigate('/paiement', { state: { reservationId } })}
+              onClick={() => navigate('/paiement', { state: { commandeId } })}
               variant="gold"
               size="md"
               rounded="8px"

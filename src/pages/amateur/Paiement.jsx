@@ -35,11 +35,12 @@ export default function Paiement() {
     return null;
   }
 
-  // La réservation existe déjà en base (créée par DetailTerrain.jsx, ce qui
-  // bloque le créneau) : il ne reste qu'à démarrer le paiement PayTech, qui
-  // va rediriger l'utilisateur hors du site pour payer avec Wave/Orange Money.
+  // La/les réservation(s) existent déjà en base, regroupées dans une
+  // Commande (créée par DetailTerrain.jsx, ce qui bloque le(s) créneau(x)) :
+  // il ne reste qu'à démarrer le paiement PayTech, qui va rediriger
+  // l'utilisateur hors du site pour payer avec Wave/Orange Money.
   const handlePayer = async () => {
-    await payer(reservationData.reservationId);
+    await payer(reservationData.commandeId);
   };
 
   return (

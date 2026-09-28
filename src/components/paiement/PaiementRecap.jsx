@@ -1,11 +1,11 @@
 import React from 'react';
 import { MapPin, Calendar, Clock } from 'lucide-react';
 
-// Affiche le récapitulatif de la réservation avant paiement (terrain, date, créneau, montants).
+// Affiche le récapitulatif de la réservation avant paiement (terrain, date, créneau(x), montants).
 // `reservation` vient du formulaire de la page détail terrain :
-// { terrain, date, creneau, avance, resteSurPlace }
+// { terrain, date, creneaux, avance, resteSurPlace }
 export default function PaiementRecap({ reservation }) {
-  const { terrain, date, creneau, avance, resteSurPlace } = reservation;
+  const { terrain, date, creneaux, avance, resteSurPlace } = reservation;
 
   return (
     <div className="bg-white rounded-[8px] p-6 border border-gray-200 space-y-4">
@@ -20,10 +20,13 @@ export default function PaiementRecap({ reservation }) {
           <Calendar size={15} className="text-vert-principal shrink-0" />
           <span>{date}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Clock size={15} className="text-vert-principal shrink-0" />
-          <span>{creneau?.heure}</span>
-        </div>
+        {/* Un ou plusieurs créneaux réservés ensemble (ex: 18h ET 19h) */}
+        {creneaux?.map((creneau) => (
+          <div key={creneau.id} className="flex items-center gap-2">
+            <Clock size={15} className="text-vert-principal shrink-0" />
+            <span>{creneau.heure}{creneaux.length > 1 && ` — ${creneau.prix.toLocaleString('fr-FR')} FCFA`}</span>
+          </div>
+        ))}
       </div>
 
       <div className="pt-3 border-t border-gray-100 space-y-2 text-xs">
