@@ -17,9 +17,22 @@ import { VILLES } from '../../utils/villes';
 import { EQUIPEMENTS_DISPONIBLES } from '../../utils/equipements';
 import Alert from '../../components/ui/Alert';
 import { terrainService } from '../../services/terrainService';
+import { validerTexteObligatoire, validerNombre } from '../../utils/validation';
 
 const TYPES_TERRAIN = ['Foot à 5', 'Foot à 6', 'Foot à 7', 'Foot à 11'];
 const SURFACES = ['Synthétique', 'Gazon naturel', 'Bitume'];
+
+// Fourchette de capacité (nombre de joueurs) plausible pour chaque type de
+// terrain, déduite directement du format annoncé par le type lui-même
+// (ex: "Foot à 5" = 5 joueurs par équipe, donc 10 sur le terrain), avec un
+// peu de marge pour les remplaçants. Même règle appliquée côté backend
+// (voir terrains/serializers.py).
+const CAPACITE_PAR_TYPE = {
+  'Foot à 5': { min: 10, max: 14 },
+  'Foot à 6': { min: 12, max: 16 },
+  'Foot à 7': { min: 14, max: 18 },
+  'Foot à 11': { min: 22, max: 30 },
+};
 
 // En-tête réutilisé pour chaque section du formulaire (icône + titre)
 function SectionTitle({ icon: Icon, children }) {
@@ -33,20 +46,24 @@ function SectionTitle({ icon: Icon, children }) {
   );
 }
 
-// Champ select stylé de façon cohérente avec les Input du projet
-function SelectField({ label, value, onChange, options }) {
+// Champ select stylé de façon cohérente avec les Input du projet (même
+// traitement d'erreur : bordure rouge + message sous le champ).
+function SelectField({ label, value, onChange, options, errorMessage = '' }) {
   return (
     <div className="flex flex-col gap-1 w-full">
       <label className="text-sm font-medium text-gray-800">{label}</label>
       <select
         value={value}
         onChange={onChange}
-        className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 outline-none bg-white focus:border-vert-principal cursor-pointer"
+        className={`w-full border rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 outline-none bg-white cursor-pointer ${
+          errorMessage ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-vert-principal'
+        }`}
       >
         {options.map((option) => (
           <option key={option} value={option}>{option}</option>
         ))}
       </select>
+      {errorMessage && <span className="text-sm text-red-600">{errorMessage}</span>}
     </div>
   );
 }
@@ -101,8 +118,27 @@ export default function AjouterTerrain({ onLogout }) {
     chargerTerrain();
   }, [id, modeEdition]);
 
+  // Erreurs par champ (affichées directement sous chaque input concerné,
+  // via la prop errorMessage déjà supportée par Input/SelectField).
+  const [erreursChamps, setErreursChamps] = useState({});
+
   const handleField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    // L'erreur disparaît dès que l'utilisateur corrige le champ. Le type
+    // conditionne la fourchette de capacité valide : on efface aussi
+    // l'erreur de capacité quand le type change, pour la laisser être
+    // réévaluée à la prochaine soumission plutôt que d'afficher un message
+    // obsolète.
+    const champsHoraires = ['heureOuverture', 'heureFermeture'];
+    setErreursChamps((prev) => {
+      const doitEffacerHeures = champsHoraires.includes(field) && prev.heures;
+      const doitEffacerCapacite = field === 'type' && prev.capacite;
+      if (!prev[field] && !doitEffacerHeures && !doitEffacerCapacite) return prev;
+      const next = { ...prev, [field]: '' };
+      if (doitEffacerCapacite) next.capacite = '';
+      if (doitEffacerHeures) next.heures = '';
+      return next;
+    });
   };
 
   const toggleEquipement = (equipement) => {
@@ -139,32 +175,72 @@ export default function AjouterTerrain({ onLogout }) {
     setPhotos((prev) => [...prev, ...fichiersValides].slice(0, 8));
   };
 
+  // Valide tous les champs du formulaire et renvoie l'objet des erreurs
+  // ({} si tout est valide). Centralisé ici pour être appelé une seule
+  // fois à la soumission, sur l'ensemble des champs en même temps.
+  const validerFormulaire = () => {
+    const erreurs = {};
+
+    erreurs.nom = validerTexteObligatoire(form.nom, 'Le nom du terrain', { max: 150 });
+    erreurs.adresse = validerTexteObligatoire(form.adresse, "L'adresse", { max: 255 });
+
+    // On valide d'abord que c'est un nombre entier positif, puis on vérifie
+    // séparément la cohérence avec le type de terrain choisi, pour pouvoir
+    // afficher un message explicite dédié à cette incohérence.
+    erreurs.capacite = validerNombre(form.capacite, 'La capacité', { min: 1, entier: true });
+    if (!erreurs.capacite) {
+      const bornesCapacite = CAPACITE_PAR_TYPE[form.type];
+      const capaciteNum = Number(form.capacite);
+      if (capaciteNum < bornesCapacite.min || capaciteNum > bornesCapacite.max) {
+        erreurs.capacite = `La capacité renseignée n'est pas compatible avec le type "${form.type}" (attendu : entre ${bornesCapacite.min} et ${bornesCapacite.max} joueurs).`;
+      }
+    }
+
+    erreurs.prixHeure = validerNombre(form.prixHeure, 'Le prix par heure', { min: 500 });
+
+    if (form.heureOuverture && form.heureFermeture && form.heureOuverture >= form.heureFermeture) {
+      erreurs.heures = "L'heure de fermeture doit être après l'heure d'ouverture.";
+    }
+
+    if (!modeEdition && photos.length === 0) {
+      erreurs.photos = 'Ajoutez au moins une photo du terrain.';
+    }
+
+    // On ne garde que les champs qui contiennent réellement une erreur.
+    return Object.fromEntries(Object.entries(erreurs).filter(([, message]) => message));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
 
-    const capacite = Number(form.capacite);
-    if (!Number.isInteger(capacite) || capacite < 2 || capacite > 30) {
-      setErreur('La capacité doit être un nombre entier entre 2 et 30 joueurs.');
-      return;
-    }
-
-    const prixHeure = Number(form.prixHeure);
-    if (!Number.isFinite(prixHeure) || prixHeure < 500) {
-      setErreur('Le prix par heure doit être au moins 500 FCFA.');
+    const erreurs = validerFormulaire();
+    setErreursChamps(erreurs);
+    if (Object.keys(erreurs).length > 0) {
+      setErreur('Veuillez corriger les erreurs signalées ci-dessous avant de continuer.');
       return;
     }
 
     setEnvoiEnCours(true);
 
+    // On envoie le nom/adresse "nettoyés" (sans espaces en trop en début/fin),
+    // même si l'utilisateur les a saisis avec ces espaces.
+    const formNettoye = { ...form, nom: form.nom.trim(), adresse: form.adresse.trim() };
+
     const resultat = modeEdition
-      ? await terrainService.modifierTerrain(id, { ...form, photos })
-      : await terrainService.creerTerrain({ ...form, photos });
+      ? await terrainService.modifierTerrain(id, { ...formNettoye, photos })
+      : await terrainService.creerTerrain({ ...formNettoye, photos });
 
     setEnvoiEnCours(false);
 
     if (!resultat.success) {
       setErreur(resultat.error);
+      // Le backend a parfois ses propres règles (ex: cohérence type/capacité
+      // vérifiée à nouveau côté serveur) : on affiche ses messages sous les
+      // bons champs, comme pour les erreurs détectées côté client.
+      if (resultat.erreursChamps && Object.keys(resultat.erreursChamps).length > 0) {
+        setErreursChamps((prev) => ({ ...prev, ...resultat.erreursChamps }));
+      }
       return;
     }
 
@@ -223,6 +299,7 @@ export default function AjouterTerrain({ onLogout }) {
               placeholder="Ex : Elite Arena"
               value={form.nom}
               onChange={(e) => handleField('nom', e.target.value)}
+              errorMessage={erreursChamps.nom}
             />
             <SelectField
               label="Type de terrain"
@@ -241,6 +318,7 @@ export default function AjouterTerrain({ onLogout }) {
               placeholder="Ex : Route de Ouakam, Dakar"
               value={form.adresse}
               onChange={(e) => handleField('adresse', e.target.value)}
+              errorMessage={erreursChamps.adresse}
             />
           </div>
         </div>
@@ -252,11 +330,12 @@ export default function AjouterTerrain({ onLogout }) {
             <Input
               label="Capacité (joueurs)"
               type="number"
-              min={2}
-              max={30}
-              placeholder="Ex : 10"
+              min={CAPACITE_PAR_TYPE[form.type].min}
+              max={CAPACITE_PAR_TYPE[form.type].max}
+              placeholder={`Ex : ${CAPACITE_PAR_TYPE[form.type].min}`}
               value={form.capacite}
               onChange={(e) => handleField('capacite', e.target.value)}
+              errorMessage={erreursChamps.capacite}
             />
             <SelectField
               label="Surface"
@@ -272,6 +351,7 @@ export default function AjouterTerrain({ onLogout }) {
               placeholder="Ex : 15 000"
               value={form.prixHeure}
               onChange={(e) => handleField('prixHeure', e.target.value)}
+              errorMessage={erreursChamps.prixHeure}
             />
             <div className="flex flex-col gap-1 w-full">
               <label className="text-sm font-medium text-gray-800">Horaires d'ouverture</label>
@@ -280,16 +360,21 @@ export default function AjouterTerrain({ onLogout }) {
                   type="time"
                   value={form.heureOuverture}
                   onChange={(e) => handleField('heureOuverture', e.target.value)}
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 outline-none focus:border-vert-principal"
+                  className={`w-full border rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 outline-none ${
+                    erreursChamps.heures ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                  }`}
                 />
                 <span className="text-xs text-gray-500 shrink-0">à</span>
                 <input
                   type="time"
                   value={form.heureFermeture}
                   onChange={(e) => handleField('heureFermeture', e.target.value)}
-                  className="w-full border border-gray-200 rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 outline-none focus:border-vert-principal"
+                  className={`w-full border rounded-[8px] px-4 py-3 text-xs font-semibold text-gray-900 outline-none ${
+                    erreursChamps.heures ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-vert-principal'
+                  }`}
                 />
               </div>
+              {erreursChamps.heures && <span className="text-sm text-red-600">{erreursChamps.heures}</span>}
             </div>
           </div>
         </div>
@@ -334,13 +419,18 @@ export default function AjouterTerrain({ onLogout }) {
               e.preventDefault();
               handlePhotosSelect(e.dataTransfer.files);
             }}
-            className="relative border-2 border-dashed border-gray-300 rounded-[12px] py-12 px-6 text-center space-y-3 hover:bg-gray-50/60 transition-colors cursor-pointer"
+            className={`relative border-2 border-dashed rounded-[12px] py-12 px-6 text-center space-y-3 hover:bg-gray-50/60 transition-colors cursor-pointer ${
+              erreursChamps.photos ? 'border-red-400' : 'border-gray-300'
+            }`}
           >
             <input
               type="file"
               accept="image/png,image/jpeg"
               multiple
-              onChange={(e) => handlePhotosSelect(e.target.files)}
+              onChange={(e) => {
+                handlePhotosSelect(e.target.files);
+                setErreursChamps((prev) => (prev.photos ? { ...prev, photos: '' } : prev));
+              }}
               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
             />
             <div className="w-11 h-11 rounded-full bg-vert-principal text-white flex items-center justify-center mx-auto">
@@ -356,6 +446,7 @@ export default function AjouterTerrain({ onLogout }) {
               </p>
             )}
           </div>
+          {erreursChamps.photos && <p className="text-sm text-red-600">{erreursChamps.photos}</p>}
         </div>
 
         {/* SECTION 5 : DESCRIPTION */}

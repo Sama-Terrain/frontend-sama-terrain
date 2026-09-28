@@ -9,6 +9,7 @@ import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { getHomeRouteForRole, ROLES } from '../../utils/roles';
+import { validerEmail, estVide } from '../../utils/validation';
 
 export default function Connexion() {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function Connexion() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [chargement, setChargement] = useState(false);
+  const [erreursChamps, setErreursChamps] = useState({});
 
   // Commun à la connexion classique et à la connexion Google : une fois
   // connecté, on mémorise l'utilisateur puis on l'envoie au bon endroit.
@@ -39,6 +41,15 @@ export default function Connexion() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const erreurs = {
+      email: validerEmail(email),
+      password: estVide(password) ? 'Le mot de passe est obligatoire.' : '',
+    };
+    const erreursPresentes = Object.fromEntries(Object.entries(erreurs).filter(([, m]) => m));
+    setErreursChamps(erreursPresentes);
+    if (Object.keys(erreursPresentes).length > 0) return;
+
     setChargement(true);
 
     const resultat = await authService.login(email, password);
@@ -96,9 +107,13 @@ export default function Connexion() {
                 type="email"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErreursChamps((prev) => (prev.email ? { ...prev, email: '' } : prev));
+                }}
                 placeholder="prenom.nom@exemple.com"
                 className="text-xs font-semibold"
+                errorMessage={erreursChamps.email}
               />
             </div>
 
@@ -110,9 +125,13 @@ export default function Connexion() {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErreursChamps((prev) => (prev.password ? { ...prev, password: '' } : prev));
+                  }}
                   placeholder="........"
                   className="text-xs font-semibold pr-10"
+                  errorMessage={erreursChamps.password}
                 />
                 <button
                   type="button"

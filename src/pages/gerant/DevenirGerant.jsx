@@ -8,6 +8,7 @@ import heroBg from '../../assets/herobg.jpeg';
 import { VILLES } from '../../utils/villes';
 import { authService } from '../../services/authService';
 import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
+import { validerTexteObligatoire, validerEmail, validerMotDePasse, validerConfirmationMotDePasse } from '../../utils/validation';
 
 export default function DevenirGerant() {
   const navigate = useNavigate();
@@ -28,14 +29,17 @@ export default function DevenirGerant() {
 
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [erreur, setErreur] = useState('');
+  const [erreursChamps, setErreursChamps] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErreursChamps((prev) => (prev[name] ? { ...prev, [name]: '' } : prev));
   };
 
   const handleChangeWhatsapp = (e) => {
     setFormData((prev) => ({ ...prev, whatsapp: nettoyerTelephone(e.target.value) }));
+    setErreursChamps((prev) => (prev.whatsapp ? { ...prev, whatsapp: '' } : prev));
   };
 
   // Le document justificatif (registre de commerce, CNI...) doit rester
@@ -69,24 +73,30 @@ export default function DevenirGerant() {
     validerEtDefinirDocument(e.target.files?.[0]);
   };
 
+  const validerFormulaire = () => {
+    const erreurs = {
+      prenom: validerTexteObligatoire(formData.prenom, 'Le prénom', { max: 150 }),
+      nom: validerTexteObligatoire(formData.nom, 'Le nom', { max: 150 }),
+      email: validerEmail(formData.email),
+      adresse: validerTexteObligatoire(formData.adresse, "L'adresse", { max: 255 }),
+      whatsapp: estNumeroSenegalaisValide(formData.whatsapp)
+        ? ''
+        : 'Numéro WhatsApp invalide (préfixe attendu : 70, 75, 76, 77 ou 78).',
+      password: validerMotDePasse(formData.password),
+      confirmPassword: validerConfirmationMotDePasse(formData.password, formData.confirmPassword),
+      nomComplexe: validerTexteObligatoire(formData.nomComplexe, 'Le nom du complexe', { max: 150 }),
+      document: formData.document ? '' : 'Le document justificatif est obligatoire.',
+    };
+    return Object.fromEntries(Object.entries(erreurs).filter(([, message]) => message));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErreur('');
 
-    if (formData.password.length < 8) {
-      setErreur('Le mot de passe doit contenir au moins 8 caractères.');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setErreur('Les mots de passe ne correspondent pas.');
-      return;
-    }
-
-    if (!estNumeroSenegalaisValide(formData.whatsapp)) {
-      setErreur('Numéro WhatsApp invalide (préfixe attendu : 70, 75, 76, 77 ou 78).');
-      return;
-    }
+    const erreurs = validerFormulaire();
+    setErreursChamps(erreurs);
+    if (Object.keys(erreurs).length > 0) return;
 
     setEnvoiEnCours(true);
 
@@ -96,6 +106,7 @@ export default function DevenirGerant() {
 
     if (!resultat.success) {
       setErreur(resultat.error);
+      if (resultat.erreursChamps) setErreursChamps((prev) => ({ ...prev, ...resultat.erreursChamps }));
       return;
     }
 
@@ -207,6 +218,7 @@ export default function DevenirGerant() {
                         placeholder="Moussa"
                         variant="gray"
                         className="text-xs font-bold"
+                        errorMessage={erreursChamps.prenom}
                       />
                     </div>
 
@@ -221,6 +233,7 @@ export default function DevenirGerant() {
                         placeholder="Diallo"
                         variant="gray"
                         className="text-xs font-bold"
+                        errorMessage={erreursChamps.nom}
                       />
                     </div>
                   </div>
@@ -237,6 +250,7 @@ export default function DevenirGerant() {
                       placeholder="moussa.diallo@exemple.com"
                       variant="gray"
                       className="text-xs font-bold"
+                      errorMessage={erreursChamps.email}
                     />
                     <p className="text-[10px] text-gray-400">
                       Servira à vous connecter à votre espace gérant.
@@ -255,6 +269,7 @@ export default function DevenirGerant() {
                       placeholder="Rufisque"
                       variant="gray"
                       className="text-xs font-bold"
+                      errorMessage={erreursChamps.adresse}
                     />
                   </div>
 
@@ -263,7 +278,9 @@ export default function DevenirGerant() {
                     <label className="text-xs font-semibold text-gray-700">
                       Numéro WhatsApp (Notifications réservations) *
                     </label>
-                    <div className="flex items-center bg-[#f3f4f6] rounded-[8px] border border-transparent focus-within:bg-white focus-within:border-vert-principal overflow-hidden">
+                    <div className={`flex items-center bg-[#f3f4f6] rounded-[8px] border overflow-hidden ${
+                      erreursChamps.whatsapp ? 'border-red-500' : 'border-transparent focus-within:bg-white focus-within:border-vert-principal'
+                    }`}>
                       <span className="px-3.5 py-3 text-xs font-bold text-gray-500 bg-gray-200/60 border-r border-gray-300">
                         +221
                       </span>
@@ -278,9 +295,9 @@ export default function DevenirGerant() {
                         className="w-full bg-transparent px-4 py-3 text-xs font-bold text-gray-900 focus:outline-none"
                       />
                     </div>
-                    {formData.whatsapp.length === 9 && !estNumeroSenegalaisValide(formData.whatsapp) && (
+                    {(erreursChamps.whatsapp || (formData.whatsapp.length === 9 && !estNumeroSenegalaisValide(formData.whatsapp))) && (
                       <p className="text-[11px] text-red-600 font-semibold">
-                        Numéro invalide (préfixe attendu : 70, 75, 76, 77 ou 78).
+                        {erreursChamps.whatsapp || 'Numéro invalide (préfixe attendu : 70, 75, 76, 77 ou 78).'}
                       </p>
                     )}
                   </div>
@@ -300,6 +317,7 @@ export default function DevenirGerant() {
                       placeholder="8 caractères minimum"
                       variant="gray"
                       className="text-xs font-bold"
+                      errorMessage={erreursChamps.password}
                     />
                     <p className="text-[10px] text-gray-400">
                       Ce mot de passe servira à connecter l'application de contrôle à l'accueil.
@@ -320,6 +338,7 @@ export default function DevenirGerant() {
                       placeholder="Ressaisissez le mot de passe"
                       variant="gray"
                       className="text-xs font-bold"
+                      errorMessage={erreursChamps.confirmPassword}
                     />
                   </div>
                 </div>
@@ -343,6 +362,7 @@ export default function DevenirGerant() {
                       placeholder="ex: Olympique Club Almadies"
                       variant="gray"
                       className="text-xs font-bold"
+                      errorMessage={erreursChamps.nomComplexe}
                     />
                   </div>
 
@@ -368,16 +388,21 @@ export default function DevenirGerant() {
                     <div
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={handleFileDrop}
-                      className="border-2 border-dashed border-sky-300 bg-sky-50/20 rounded-[8px] p-6 text-center space-y-2 hover:bg-sky-50/50 transition-colors cursor-pointer relative"
+                      className={`border-2 border-dashed rounded-[8px] p-6 text-center space-y-2 hover:bg-sky-50/50 transition-colors cursor-pointer relative ${
+                        erreursChamps.document ? 'border-red-400 bg-red-50/20' : 'border-sky-300 bg-sky-50/20'
+                      }`}
                     >
                       <input
                         type="file"
                         accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
-                        onChange={handleFileSelect}
+                        onChange={(e) => {
+                          handleFileSelect(e);
+                          setErreursChamps((prev) => (prev.document ? { ...prev, document: '' } : prev));
+                        }}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
                       <Upload size={24} className="text-sky-500 mx-auto" />
-                      
+
                       {formData.document ? (
                         <p className="text-xs font-bold text-emerald-700">
                           Fichier sélectionné : {formData.document.name}
@@ -391,6 +416,9 @@ export default function DevenirGerant() {
                         </div>
                       )}
                     </div>
+                    {erreursChamps.document && (
+                      <p className="text-[11px] text-red-600 font-semibold">{erreursChamps.document}</p>
+                    )}
                   </div>
                 </div>
 

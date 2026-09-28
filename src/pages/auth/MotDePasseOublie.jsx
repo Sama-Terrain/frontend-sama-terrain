@@ -6,6 +6,7 @@ import Alert from '../../components/ui/Alert';
 import RetourAccueilButton from '../../components/auth/RetourAccueilButton';
 import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';
+import { validerEmail, validerMotDePasse, validerConfirmationMotDePasse } from '../../utils/validation';
 
 /**
  * Page "Mot de passe oublié" (accessible aux amateurs et gérants).
@@ -50,6 +51,13 @@ export default function MotDePasseOublie() {
   const handleDemanderCode = async (e) => {
     e.preventDefault();
     setErreur('');
+
+    const erreurEmail = validerEmail(email);
+    if (erreurEmail) {
+      setErreur(erreurEmail);
+      return;
+    }
+
     setChargement(true);
 
     const resultat = await authService.demanderReinitialisationMotDePasse(email);
@@ -73,8 +81,15 @@ export default function MotDePasseOublie() {
       return;
     }
 
-    if (nouveauMotDePasse !== confirmationMotDePasse) {
-      setErreur('Les deux mots de passe ne correspondent pas.');
+    const erreurMotDePasse = validerMotDePasse(nouveauMotDePasse);
+    if (erreurMotDePasse) {
+      setErreur(erreurMotDePasse);
+      return;
+    }
+
+    const erreurConfirmation = validerConfirmationMotDePasse(nouveauMotDePasse, confirmationMotDePasse);
+    if (erreurConfirmation) {
+      setErreur(erreurConfirmation);
       return;
     }
 

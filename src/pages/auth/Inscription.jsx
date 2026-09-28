@@ -9,6 +9,7 @@ import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { getHomeRouteForRole } from '../../utils/roles';
+import { validerTexteObligatoire, validerEmail, validerMotDePasse, validerConfirmationMotDePasse } from '../../utils/validation';
 
 export default function Inscription() {
   const navigate = useNavigate();
@@ -24,26 +25,33 @@ export default function Inscription() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [erreursChamps, setErreursChamps] = useState({});
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErreursChamps((prev) => (prev[name] ? { ...prev, [name]: '' } : prev));
+  };
+
+  const validerFormulaire = () => {
+    const erreurs = {
+      prenom: validerTexteObligatoire(formData.prenom, 'Le prénom', { max: 150 }),
+      nom: validerTexteObligatoire(formData.nom, 'Le nom', { max: 150 }),
+      email: validerEmail(formData.email),
+      password: validerMotDePasse(formData.password),
+      confirmPassword: validerConfirmationMotDePasse(formData.password, formData.confirmPassword),
+    };
+    return Object.fromEntries(Object.entries(erreurs).filter(([, message]) => message));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (formData.password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.');
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
-      return;
-    }
+    const erreurs = validerFormulaire();
+    setErreursChamps(erreurs);
+    if (Object.keys(erreurs).length > 0) return;
 
     setEnvoiEnCours(true);
     const resultat = await authService.register(formData);
@@ -51,6 +59,7 @@ export default function Inscription() {
 
     if (!resultat.success) {
       setError(resultat.error);
+      if (resultat.erreursChamps) setErreursChamps((prev) => ({ ...prev, ...resultat.erreursChamps }));
       return;
     }
 
@@ -110,6 +119,7 @@ export default function Inscription() {
                   onChange={handleChange}
                   placeholder="Votre prenom"
                   className="text-xs font-semibold"
+                  errorMessage={erreursChamps.prenom}
                 />
               </div>
 
@@ -123,6 +133,7 @@ export default function Inscription() {
                   onChange={handleChange}
                   placeholder="Votre nom"
                   className="text-xs font-semibold"
+                  errorMessage={erreursChamps.nom}
                 />
               </div>
             </div>
@@ -138,6 +149,7 @@ export default function Inscription() {
                 onChange={handleChange}
                 placeholder="exemple@gmail.com"
                 className="text-xs font-semibold"
+                errorMessage={erreursChamps.email}
               />
             </div>
 
@@ -154,6 +166,7 @@ export default function Inscription() {
                   onChange={handleChange}
                   placeholder="........"
                   className="text-xs font-semibold pr-10"
+                  errorMessage={erreursChamps.password}
                 />
                 <button
                   type="button"
@@ -177,6 +190,7 @@ export default function Inscription() {
                   onChange={handleChange}
                   placeholder="........"
                   className="text-xs font-semibold pr-10"
+                  errorMessage={erreursChamps.confirmPassword}
                 />
                 <button
                   type="button"

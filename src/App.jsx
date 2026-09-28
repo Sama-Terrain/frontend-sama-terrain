@@ -12,24 +12,36 @@ import { useAuth } from './hooks/useAuth';
 const SPLASH_DEJA_VU = 'sama_splash_vu';
 
 function AppContent() {
-  const location = useLocation();
-  const { currentUser, logout } = useAuth();
+    // Récupère les informations sur l'URL et la page actuellement visitée.
+    // useLocation() est un hook fourni par React Router.
+    const location = useLocation();
 
-  const [searchParams, setSearchParams] = useState({});
-  const [splashTermine, setSplashTermine] = useState(
-    () => sessionStorage.getItem(SPLASH_DEJA_VU) === 'true'
-  );
+    // Récupère l'utilisateur actuellement connecté ainsi que la fonction
+    // permettant de le déconnecter depuis le contexte d'authentification.
+    const { currentUser, logout } = useAuth();
 
-  if (!splashTermine) {
-    return (
-      <Splash
-        onTermine={() => {
-          sessionStorage.setItem(SPLASH_DEJA_VU, 'true');
-          setSplashTermine(true);
-        }}
-      />
+    // Crée une variable d'état appelée "searchParams".
+    // Elle permet de stocker les paramètres de recherche.
+    const [searchParams, setSearchParams] = useState({});
+
+    // Crée une variable d'état "splashTermine" qui indique si l'écran
+    // de démarrage (Splash Screen) a déjà été affiché.
+    const [splashTermine, setSplashTermine] = useState(
+      // Récupère dans le sessionStorage la valeur associée à
+      // SPLASH_DEJA_VU et vérifie si elle vaut "true".
+      () => sessionStorage.getItem(SPLASH_DEJA_VU) === 'true'
     );
-  }
+
+    if (!splashTermine) {
+      return (
+        <Splash
+          onTermine={() => {
+            sessionStorage.setItem(SPLASH_DEJA_VU, 'true');
+            setSplashTermine(true);
+          }}
+        />
+      );
+    }
 
   // Masquer la Navbar et le Footer grand public sur les pages auth et les espaces
   // admin / gérant connectés (qui ont leur propre sidebar + header dédiés).

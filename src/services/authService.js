@@ -25,6 +25,24 @@ function extraireMessageErreur(error) {
   return 'Une erreur est survenue.';
 }
 
+// Comme extraireMessageErreur, mais renvoie un objet {champ: message} pour
+// que le formulaire puisse afficher chaque erreur backend sous le bon
+// champ (ex: {email: "Un compte existe déjà avec cet email."}), plutôt que
+// juste la première erreur dans une alerte générique.
+function extraireErreursChamps(error) {
+  const donnees = error.response?.data;
+  if (!donnees || typeof donnees !== 'object') return {};
+
+  const erreursChamps = {};
+  for (const [champ, messages] of Object.entries(donnees)) {
+    if (champ === 'detail') continue;
+    if (Array.isArray(messages) && messages.length > 0) {
+      erreursChamps[champ] = messages[0];
+    }
+  }
+  return erreursChamps;
+}
+
 export const authService = {
   login: async (email, password) => {
     try {
@@ -50,7 +68,7 @@ export const authService = {
       });
       return { success: true, email: reponse.data.email };
     } catch (error) {
-      return { success: false, error: extraireMessageErreur(error) };
+      return { success: false, error: extraireMessageErreur(error), erreursChamps: extraireErreursChamps(error) };
     }
   },
 
@@ -73,7 +91,7 @@ export const authService = {
       const { data: reponse } = await api.post('/auth/devenir-gerant', formData);
       return { success: true, email: reponse.email };
     } catch (error) {
-      return { success: false, error: extraireMessageErreur(error) };
+      return { success: false, error: extraireMessageErreur(error), erreursChamps: extraireErreursChamps(error) };
     }
   },
 
@@ -135,7 +153,7 @@ export const authService = {
       const { data } = await api.patch('/auth/me', { prenom, nom, telephone, ville_preferee });
       return { success: true, user: ajouterInitiales(data) };
     } catch (error) {
-      return { success: false, error: extraireMessageErreur(error) };
+      return { success: false, error: extraireMessageErreur(error), erreursChamps: extraireErreursChamps(error) };
     }
   },
 
