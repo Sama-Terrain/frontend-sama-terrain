@@ -88,18 +88,27 @@ export default function Accueil() {
     setAiEnAttente(true);
 
     let texteReponse;
+    let liensReponse = [];
     try {
       const reponse = await iaService.envoyerMessageChatbot(messageEnvoye);
       texteReponse = reponse.texte;
+      liensReponse = reponse.liens;
     } catch {
       texteReponse = "Désolé, je ne suis pas disponible pour le moment. Réessayez dans un instant.";
     }
 
     setAiMessages((prev) => [
       ...prev,
-      { id: Date.now() + 1, sender: 'bot', text: texteReponse }
+      { id: Date.now() + 1, sender: 'bot', text: texteReponse, liens: liensReponse }
     ]);
     setAiEnAttente(false);
+  };
+
+  // Clic sur un lien de redirection suggéré par le chatbot : on ferme le
+  // panneau et on navigue vers la vraie page (fiche terrain, recherche...).
+  const handleClicLienChatbot = (url) => {
+    setIsAiOpen(false);
+    navigate(url);
   };
 
   const handleSendAiMessage = (e) => {
@@ -480,7 +489,7 @@ export default function Accueil() {
             {aiMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
               >
                 <div
                   className={`max-w-[80%] px-4 py-2.5 rounded-2xl leading-relaxed ${
@@ -491,6 +500,23 @@ export default function Accueil() {
                 >
                   {msg.text}
                 </div>
+
+                {/* Liens de redirection suggérés par le chatbot (vers de vraies
+                    pages : fiche terrain, recherche, réservations...) */}
+                {msg.liens?.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 max-w-[80%]">
+                    {msg.liens.map((lien) => (
+                      <button
+                        key={lien.url}
+                        type="button"
+                        onClick={() => handleClicLienChatbot(lien.url)}
+                        className="px-3 py-1.5 rounded-full bg-white border border-vert-principal text-vert-principal text-[11px] font-bold hover:bg-vert-clair transition-colors cursor-pointer"
+                      >
+                        {lien.label} →
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
 
