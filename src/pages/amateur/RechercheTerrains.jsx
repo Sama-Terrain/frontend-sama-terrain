@@ -27,6 +27,8 @@ export default function RechercheTerrains() {
   });
 
   const [sortBy, setSortBy] = useState('Recommandé');
+  const [page, setPage] = useState(1);
+  const TERRAINS_PAR_PAGE = 6;
 
   useEffect(() => {
     async function fetchTerrains() {
@@ -96,6 +98,19 @@ export default function RechercheTerrains() {
     return b.nombreAvis - a.nombreAvis;
   });
 
+  // Revient à la page 1 dès que les filtres/tri changent le résultat, pour
+  // ne jamais rester bloqué sur une page devenue vide.
+  useEffect(() => {
+    setPage(1);
+  }, [filters, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedTerrains.length / TERRAINS_PAR_PAGE));
+  const pageAffichee = Math.min(page, totalPages);
+  const terrainsPage = sortedTerrains.slice(
+    (pageAffichee - 1) * TERRAINS_PAR_PAGE,
+    pageAffichee * TERRAINS_PAR_PAGE
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-20 font-sans text-left">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -158,7 +173,7 @@ export default function RechercheTerrains() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {sortedTerrains.map((terrain) => (
+                {terrainsPage.map((terrain) => (
                   <TerrainCard
                     key={terrain.id}
                     terrain={terrain}
@@ -168,19 +183,37 @@ export default function RechercheTerrains() {
               </div>
             )}
 
-            {/* Pagination (1 2 3 >) identique Figma */}
+            {/* Pagination (1 2 3 >) réelle : navigue dans sortedTerrains */}
             {!loading && sortedTerrains.length > 0 && (
               <div className="flex justify-center items-center space-x-2 pt-6">
-                <button className="w-8 h-8 rounded-[8px] bg-vert-principal text-white font-bold text-xs flex items-center justify-center">
-                  1
+                <button
+                  type="button"
+                  disabled={pageAffichee === 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                >
+                  ‹
                 </button>
-                <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
-                  2
-                </button>
-                <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
-                  3
-                </button>
-                <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((numeroPage) => (
+                  <button
+                    key={numeroPage}
+                    type="button"
+                    onClick={() => setPage(numeroPage)}
+                    className={`w-8 h-8 rounded-[8px] font-bold text-xs flex items-center justify-center ${
+                      pageAffichee === numeroPage
+                        ? 'bg-vert-principal text-white'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {numeroPage}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  disabled={pageAffichee === totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                >
                   ›
                 </button>
               </div>

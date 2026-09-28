@@ -31,6 +31,7 @@ export default function TerrainDetail({ onLogout }) {
     async function loadTerrainDetail() {
       try {
         setLoading(true);
+        setPage(1);
         const [terrainData, reservationsData, avisData, profileData] = await Promise.all([
           gerantService.getTerrainDetail(Number(id)),
           gerantService.getProchainesReservations(Number(id)),
@@ -61,6 +62,14 @@ export default function TerrainDetail({ onLogout }) {
       </GerantLayout>
     );
   }
+
+  const RESERVATIONS_PAR_PAGE = 5;
+  const totalPages = Math.max(1, Math.ceil(reservations.length / RESERVATIONS_PAR_PAGE));
+  const pageAffichee = Math.min(page, totalPages);
+  const reservationsPage = reservations.slice(
+    (pageAffichee - 1) * RESERVATIONS_PAR_PAGE,
+    pageAffichee * RESERVATIONS_PAR_PAGE
+  );
 
   if (!terrain) {
     return (
@@ -115,10 +124,10 @@ export default function TerrainDetail({ onLogout }) {
 
       {/* PROCHAINES RÉSERVATIONS */}
       <ProchainesReservationsTable
-        reservations={reservations}
+        reservations={reservationsPage}
         totalReservations={reservations.length}
-        page={page}
-        totalPages={1}
+        page={pageAffichee}
+        totalPages={totalPages}
         onPageChange={setPage}
         onVoirTout={() => navigate('/gerant/reservations')}
       />
