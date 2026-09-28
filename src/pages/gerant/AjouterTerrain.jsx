@@ -22,16 +22,16 @@ import { validerTexteObligatoire, validerNombre } from '../../utils/validation';
 const TYPES_TERRAIN = ['Foot à 5', 'Foot à 6', 'Foot à 7', 'Foot à 11'];
 const SURFACES = ['Synthétique', 'Gazon naturel', 'Bitume'];
 
-// Fourchette de capacité (nombre de joueurs) plausible pour chaque type de
-// terrain, déduite directement du format annoncé par le type lui-même
-// (ex: "Foot à 5" = 5 joueurs par équipe, donc 10 sur le terrain), avec un
-// peu de marge pour les remplaçants. Même règle appliquée côté backend
-// (voir terrains/serializers.py).
+// Capacité exacte (nombre de joueurs sur le terrain) attendue pour chaque
+// type, déduite directement du format annoncé par le type lui-même : un
+// terrain "Foot à 7" se joue à 7 contre 7, donc 14 joueurs maximum sur le
+// terrain — pas plus. Même règle appliquée côté backend (voir
+// terrains/serializers.py).
 const CAPACITE_PAR_TYPE = {
-  'Foot à 5': { min: 10, max: 14 },
-  'Foot à 6': { min: 12, max: 16 },
-  'Foot à 7': { min: 14, max: 18 },
-  'Foot à 11': { min: 22, max: 30 },
+  'Foot à 5': 10,
+  'Foot à 6': 12,
+  'Foot à 7': 14,
+  'Foot à 11': 22,
 };
 
 // En-tête réutilisé pour chaque section du formulaire (icône + titre)
@@ -189,10 +189,10 @@ export default function AjouterTerrain({ onLogout }) {
     // afficher un message explicite dédié à cette incohérence.
     erreurs.capacite = validerNombre(form.capacite, 'La capacité', { min: 1, entier: true });
     if (!erreurs.capacite) {
-      const bornesCapacite = CAPACITE_PAR_TYPE[form.type];
+      const capaciteAttendue = CAPACITE_PAR_TYPE[form.type];
       const capaciteNum = Number(form.capacite);
-      if (capaciteNum < bornesCapacite.min || capaciteNum > bornesCapacite.max) {
-        erreurs.capacite = `La capacité renseignée n'est pas compatible avec le type "${form.type}" (attendu : entre ${bornesCapacite.min} et ${bornesCapacite.max} joueurs).`;
+      if (capaciteNum > capaciteAttendue) {
+        erreurs.capacite = `La capacité renseignée n'est pas compatible avec le type "${form.type}" (maximum ${capaciteAttendue} joueurs).`;
       }
     }
 
@@ -330,9 +330,9 @@ export default function AjouterTerrain({ onLogout }) {
             <Input
               label="Capacité (joueurs)"
               type="number"
-              min={CAPACITE_PAR_TYPE[form.type].min}
-              max={CAPACITE_PAR_TYPE[form.type].max}
-              placeholder={`Ex : ${CAPACITE_PAR_TYPE[form.type].min}`}
+              min={1}
+              max={CAPACITE_PAR_TYPE[form.type]}
+              placeholder={`Ex : ${CAPACITE_PAR_TYPE[form.type]}`}
               value={form.capacite}
               onChange={(e) => handleField('capacite', e.target.value)}
               errorMessage={erreursChamps.capacite}
