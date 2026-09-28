@@ -24,4 +24,21 @@ export const paiementService = {
       };
     }
   },
+
+  // Comme initierPaiement, mais pour une Commande regroupant plusieurs
+  // créneaux réservés en une fois (un seul paiement pour la somme des avances).
+  async initierPaiementGroupe(commandeId, moyenPaiement) {
+    try {
+      const { data } = await api.post('/paiements/initier-groupe/', {
+        commande: commandeId,
+        moyen_paiement: moyenPaiement,
+      });
+      return { success: true, paymentUrl: data.payment_url };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.detail || "Impossible de démarrer le paiement. Réessayez.",
+      };
+    }
+  },
 };

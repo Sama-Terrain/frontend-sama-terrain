@@ -54,7 +54,9 @@ export default function DetailTerrain({ currentUser }) {
 
   // État de sélection Date & Créneau (Initialisé sur aujourd'hui)
   const [selectedDate, setSelectedDate] = useState(todayStr);
-  const [selectedCreneau, setSelectedCreneau] = useState(null);
+  // Plusieurs créneaux peuvent être sélectionnés ensemble (ex: 18h ET 19h
+  // le même jour), pour être réservés et payés en une seule fois.
+  const [selectedCreneaux, setSelectedCreneaux] = useState([]);
 
   // Coordonnées utilisateur (Placeholders)
   const [nomComplet, setNomComplet] = useState('');
@@ -188,16 +190,21 @@ export default function DetailTerrain({ currentUser }) {
   const isPastDate = selectedDate && selectedDate < todayStr;
 
   // Conditions d'affichage & Validation
-  const hasChosenDateAndSlot = Boolean(selectedDate && !isPastDate && selectedCreneau);
+  const hasChosenDateAndSlot = Boolean(selectedDate && !isPastDate && selectedCreneaux.length > 0);
   const avanceNum = Number(avance) || 0;
 
   const MONTANT_AVANCE_MINIMUM = 10000;
-  const currentPrix = selectedCreneau ? selectedCreneau.prix : (terrain?.prixHeure || 30000);
+  // Prix total de TOUS les créneaux sélectionnés (un seul ou plusieurs, ex:
+  // 18h ET 19h le même jour) : l'avance et le reste à payer portent sur
+  // l'ensemble, pas sur un seul créneau.
+  const currentPrix = selectedCreneaux.length > 0
+    ? selectedCreneaux.reduce((total, c) => total + c.prix, 0)
+    : (terrain?.prixHeure || 30000);
 
   const isFormComplete = Boolean(
     selectedDate &&
     !isPastDate &&
-    selectedCreneau &&
+    selectedCreneaux.length > 0 &&
     nomComplet.trim() !== '' &&
     estNumeroSenegalaisValide(telephone) &&
     avanceNum > MONTANT_AVANCE_MINIMUM &&
@@ -221,11 +228,12 @@ export default function DetailTerrain({ currentUser }) {
     setCreationEnCours(true);
 
     try {
-      // On crée réellement la réservation en base : ça bloque le créneau
+      // On crée réellement les réservations en base (une par créneau,
+      // regroupées dans une Commande) : ça bloque chaque créneau
       // ("en_attente") pour que personne d'autre ne puisse le réserver
       // pendant que l'amateur va payer son avance sur PayTech.
-      const reservationCreee = await reservationService.creerReservation({
-        creneauId: selectedCreneau.id,
+      const { commandeId } = await reservationService.creerReservationGroupe({
+        creneauIds: selectedCreneaux.map((c) => c.id),
         nomComplet,
         telephone: telephoneComplet,
         montantAvance: avanceNum,
@@ -234,14 +242,14 @@ export default function DetailTerrain({ currentUser }) {
       const reservationData = {
         terrain: terrain || [],
         date: selectedDate,
-        creneau: selectedCreneau,
+        creneaux: selectedCreneaux,
         nomComplet,
         telephone: telephoneComplet,
         avance: avanceNum,
         resteSurPlace: resteAPayer,
-        // Id de la vraie réservation backend : nécessaire à Paiement.jsx
-        // pour démarrer le paiement PayTech de CETTE réservation précise.
-        reservationId: reservationCreee.id,
+        // Id de la Commande backend : nécessaire à Paiement.jsx pour
+        // démarrer le paiement PayTech de CE groupe de créneaux précis.
+        commandeId,
       };
 
       // On transmet les infos de la réservation à la page de paiement via la
@@ -250,16 +258,16 @@ export default function DetailTerrain({ currentUser }) {
       navigate('/paiement', { state: reservationData });
     } catch (error) {
       setErreurReservation(
-        error.response?.data?.creneau?.[0] ||
+        error.response?.data?.creneaux?.[0] ||
         error.response?.data?.montant_avance?.[0] ||
         error.response?.data?.detail ||
-        "Impossible de réserver ce créneau. Il a peut-être déjà été pris, veuillez réessayer."
+        "Impossible de réserver ce(s) créneau(x). Il(s) a/ont peut-être déjà été pris, veuillez réessayer."
       );
-      // Le créneau a peut-être été pris entre-temps par quelqu'un d'autre :
+      // Un créneau a peut-être été pris entre-temps par quelqu'un d'autre :
       // on recharge la liste pour refléter son vrai statut.
       const data = await creneauService.getCreneauxByTerrainAndDate(terrainId, selectedDate);
       setCreneauxHoraires(data);
-      setSelectedCreneau(null);
+      setSelectedCreneaux([]);
     } finally {
       setCreationEnCours(false);
     }
@@ -493,7 +501,7 @@ export default function DetailTerrain({ currentUser }) {
                     value={selectedDate}
                     onChange={(e) => {
                       setSelectedDate(e.target.value);
-                      setSelectedCreneau(null);
+                      setSelectedCreneaux([]);
                     }}
                     className="bg-gray-50 border border-gray-200 rounded-[8px] px-3 py-1.5 text-xs font-bold text-vert-principal focus:outline-none focus:border-vert-principal cursor-pointer"
                   />
@@ -509,7 +517,7 @@ export default function DetailTerrain({ currentUser }) {
                       key={item.id}
                       onClick={() => {
                         setSelectedDate(item.id);
-                        setSelectedCreneau(null);
+                        setSelectedCreneaux([]);
                       }}
                       className={`p-3 rounded-[8px] text-center flex flex-col items-center justify-center transition-all cursor-pointer ${
                         isSelected
@@ -564,7 +572,7 @@ export default function DetailTerrain({ currentUser }) {
 
                     {creneauxHoraires.map((slot) => {
 
-                      const isSelected = selectedCreneau?.id === slot.id;
+                      const isSelected = selectedCreneaux.some((c) => c.id === slot.id);
 
                       /* Créneau indisponible */
                       if (!slot.disponible) {
@@ -607,7 +615,11 @@ export default function DetailTerrain({ currentUser }) {
                         <button
                           key={slot.id}
                           type="button"
-                          onClick={() => setSelectedCreneau(slot)}
+                          onClick={() => {
+                            setSelectedCreneaux((prev) =>
+                              isSelected ? prev.filter((c) => c.id !== slot.id) : [...prev, slot]
+                            );
+                          }}
                           className={`
                             min-h-[64px]
                             px-2.5 py-2
@@ -742,7 +754,7 @@ export default function DetailTerrain({ currentUser }) {
 
                   {avance !== '' && avanceNum >= currentPrix && (
                     <p className="text-xs font-semibold text-red-600">
-                      L'avance ne peut pas dépasser le prix total du créneau ({currentPrix.toLocaleString()} FCFA).
+                      L'avance ne peut pas dépasser le prix total {selectedCreneaux.length > 1 ? 'des créneaux' : 'du créneau'} ({currentPrix.toLocaleString()} FCFA).
                     </p>
                   )}
 
@@ -871,7 +883,13 @@ export default function DetailTerrain({ currentUser }) {
 
                 <div className="flex items-center space-x-2 text-gray-700">
                   <Clock size={16} className="text-vert-principal shrink-0" />
-                  <span>{selectedCreneau ? `${selectedCreneau.heure} (1 Heure)` : 'Veuillez choisir un créneau'}</span>
+                  <span>
+                    {selectedCreneaux.length === 0
+                      ? 'Veuillez choisir un créneau'
+                      : selectedCreneaux.length === 1
+                      ? `${selectedCreneaux[0].heure} (1 Heure)`
+                      : `${selectedCreneaux.length} créneaux : ${selectedCreneaux.map((c) => c.heure).join(', ')}`}
+                  </span>
                 </div>
               </div>
 
