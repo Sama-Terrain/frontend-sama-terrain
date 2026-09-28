@@ -67,6 +67,14 @@ export default function Reservations({ onLogout }) {
     setPage(1);
   }, [terrainSelectionne, statutSelectionne]);
 
+  const RESERVATIONS_PAR_PAGE = 10;
+  const totalPages = Math.max(1, Math.ceil(reservationsFiltrees.length / RESERVATIONS_PAR_PAGE));
+  const pageAffichee = Math.min(page, totalPages);
+  const reservationsPage = reservationsFiltrees.slice(
+    (pageAffichee - 1) * RESERVATIONS_PAR_PAGE,
+    pageAffichee * RESERVATIONS_PAR_PAGE
+  );
+
   if (loading) {
     return (
       <GerantLayout title="Réservations" profile={profile} onLogout={onLogout}>
@@ -96,10 +104,10 @@ export default function Reservations({ onLogout }) {
       />
 
       <ReservationsTable
-        reservations={reservationsFiltrees}
-        totalReservations={activite?.totalMois || reservationsFiltrees.length}
-        page={page}
-        totalPages={1}
+        reservations={reservationsPage}
+        totalReservations={reservationsFiltrees.length}
+        page={pageAffichee}
+        totalPages={totalPages}
         onPageChange={setPage}
       />
 

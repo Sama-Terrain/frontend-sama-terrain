@@ -11,6 +11,8 @@ export default function MesReservations() {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [ticketModal, setTicketModal] = useState(null);
+  const [page, setPage] = useState(1);
+  const RESERVATIONS_PAR_PAGE = 5;
 
   useEffect(() => {
     async function loadReservations() {
@@ -49,6 +51,19 @@ export default function MesReservations() {
 
   const filteredReservations = reservations.filter(
     (res) => res.tabCategory === activeTab
+  );
+
+  // Revient à la page 1 dès qu'on change d'onglet, pour ne jamais rester
+  // bloqué sur une page devenue vide.
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredReservations.length / RESERVATIONS_PAR_PAGE));
+  const pageAffichee = Math.min(page, totalPages);
+  const reservationsPage = filteredReservations.slice(
+    (pageAffichee - 1) * RESERVATIONS_PAR_PAGE,
+    pageAffichee * RESERVATIONS_PAR_PAGE
   );
 
   // Reprend le paiement d'une réservation "en attente" (créneau bloqué mais
@@ -149,7 +164,7 @@ export default function MesReservations() {
           </div>
         ) : (
           <div className="space-y-5">
-            {filteredReservations.map((item) => (
+            {reservationsPage.map((item) => (
               <div
                 key={item.id}
                 className="bg-white rounded-2xl p-5 sm:p-6 border border-gray-200 hover:border-gray-300 transition-shadow flex flex-col md:flex-row md:items-center justify-between gap-6"
@@ -248,16 +263,29 @@ export default function MesReservations() {
           </div>
         )}
 
-        {/* PAGINATION (1 2 >) */}
+        {/* PAGINATION (1 2 >) réelle : navigue dans filteredReservations */}
         {!loading && filteredReservations.length > 0 && (
           <div className="flex justify-center items-center space-x-2 pt-6">
-            <button className="w-8 h-8 rounded-[8px] bg-vert-clair text-vert-principal font-bold text-xs flex items-center justify-center">
-              1
-            </button>
-            <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
-              2
-            </button>
-            <button className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((numeroPage) => (
+              <button
+                key={numeroPage}
+                type="button"
+                onClick={() => setPage(numeroPage)}
+                className={`w-8 h-8 rounded-[8px] font-bold text-xs flex items-center justify-center ${
+                  pageAffichee === numeroPage
+                    ? 'bg-vert-clair text-vert-principal'
+                    : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                {numeroPage}
+              </button>
+            ))}
+            <button
+              type="button"
+              disabled={pageAffichee === totalPages}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              className="w-8 h-8 rounded-[8px] bg-white border border-gray-200 text-gray-700 font-bold text-xs flex items-center justify-center hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+            >
               <ChevronRight size={14} />
             </button>
           </div>
