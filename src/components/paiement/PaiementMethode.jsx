@@ -1,9 +1,11 @@
 import React from 'react';
+import logoWave from '../../assets/logo-wave.png';
+import logoOrangeMoney from '../../assets/logo-orange-money.jpeg';
 
 // Les deux moyens de paiement mobile agrégés par PayDunya
 const MOYENS = [
-  { id: 'Wave', description: 'Paiement instantané via l\'application Wave' },
-  { id: 'Orange Money', description: 'Paiement instantané via Orange Money' },
+  { id: 'Wave', logo: logoWave, description: 'Paiement instantané via l\'application Wave' },
+  { id: 'Orange Money', logo: logoOrangeMoney, description: 'Paiement instantané via Orange Money' },
 ];
 
 // Props du composant :
@@ -28,8 +30,12 @@ export default function PaiementMethode({ value, onChange }) {
                   : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
             >
-              <p className="text-sm font-extrabold text-gray-900">{methode.id}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{methode.description}</p>
+              <img
+                src={methode.logo}
+                alt={methode.id}
+                className="h-8 w-auto object-contain rounded-[4px]"
+              />
+              <p className="text-xs text-gray-500 mt-1.5">{methode.description}</p>
             </button>
           );
         })}
