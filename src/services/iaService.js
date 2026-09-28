@@ -10,6 +10,8 @@ import api from './api';
 export const iaService = {
   async envoyerMessageChatbot(message) {
     const { data } = await api.post('/ia/chatbot/', { message });
-    return { texte: data.texte };
+    // "liens" est facultatif : le service IA le renvoie seulement quand un
+    // vrai terrain ou une vraie page a été identifié pour la question posée.
+    return { texte: data.texte, liens: data.liens || [] };
   },
 };
