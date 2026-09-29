@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { MapPin, Star, Calendar as CalendarIcon, Clock, CheckCircle2, AlertTriangle, X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Badge from '../../components/ui/Badge';
@@ -52,8 +52,22 @@ export default function DetailTerrain({ currentUser }) {
 
   const joursSemaine = generateUpcomingDays();
 
-  // État de sélection Date & Créneau (Initialisé sur aujourd'hui)
-  const [selectedDate, setSelectedDate] = useState(todayStr);
+  // Date et créneau éventuellement proposés par l'assistant IA (lien du
+  // chatbot : /terrains/:id?date=AAAA-MM-JJ&creneau=ID). Ils sont seulement
+  // présélectionnés : l'amateur vérifie, complète et confirme lui-même.
+  const [searchParams] = useSearchParams();
+  const dateSuggeree = searchParams.get('date');
+  const creneauSuggereId = Number(searchParams.get('creneau')) || null;
+  const suggestionAppliquee = useRef(false);
+  const [infoSuggestion, setInfoSuggestion] = useState('');
+
+  // État de sélection Date & Créneau (Initialisé sur aujourd'hui, ou sur la
+  // date proposée par l'assistant si elle est valide et pas encore passée)
+  const [selectedDate, setSelectedDate] = useState(
+    dateSuggeree && /^\d{4}-\d{2}-\d{2}$/.test(dateSuggeree) && dateSuggeree >= todayStr
+      ? dateSuggeree
+      : todayStr
+  );
   // Plusieurs créneaux peuvent être sélectionnés ensemble (ex: 18h ET 19h
   // le même jour), pour être réservés et payés en une seule fois.
   const [selectedCreneaux, setSelectedCreneaux] = useState([]);
@@ -121,6 +135,19 @@ export default function DetailTerrain({ currentUser }) {
         setLoadingCreneaux(true);
         const data = await creneauService.getCreneauxByTerrainAndDate(terrainId, selectedDate);
         setCreneauxHoraires(data);
+
+        // Une seule fois, au premier chargement : on présélectionne le
+        // créneau proposé par l'assistant s'il est toujours disponible.
+        if (creneauSuggereId && !suggestionAppliquee.current) {
+          suggestionAppliquee.current = true;
+          const suggere = data.find((c) => c.id === creneauSuggereId && c.disponible);
+          if (suggere) {
+            setSelectedCreneaux([suggere]);
+            setInfoSuggestion("Créneau proposé par l'assistant : vérifiez-le, complétez vos informations puis confirmez votre réservation.");
+          } else {
+            setInfoSuggestion("Le créneau proposé par l'assistant n'est plus disponible. Choisissez un autre horaire ci-dessous.");
+          }
+        }
       } catch (error) {
         console.error('Erreur chargement créneaux :', error);
         setCreneauxHoraires([]);
@@ -129,7 +156,7 @@ export default function DetailTerrain({ currentUser }) {
       }
     }
     chargerCreneaux();
-  }, [terrainId, selectedDate]);
+  }, [terrainId, selectedDate, creneauSuggereId]);
 
   // Chargement du terrain et des avis
   useEffect(() => {
@@ -555,6 +582,12 @@ export default function DetailTerrain({ currentUser }) {
               ) : (
                 /* CRÉNEAUX HORAIRES DISPONIBLES */
                 <div className="space-y-3 pt-4 border-t border-gray-100">
+
+                  {infoSuggestion && (
+                    <div className="p-3 bg-vert-clair rounded-[8px] border border-vert-principal/30 text-vert-principal text-xs font-medium">
+                      {infoSuggestion}
+                    </div>
+                  )}
 
                   {/* Titre */}
                   <div className="flex items-center justify-between">

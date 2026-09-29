@@ -28,7 +28,7 @@ export default function Accueil() {
   // État du Widget Assistant IA (Panneau flottant)
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [aiMessages, setAiMessages] = useState([
-    { id: 1, sender: 'bot', text: "Bonjour ! Je suis l'assistant Sama-Terrain. Quel quartier ou créneau cherchez-vous à Dakar ?" }
+    { id: 1, sender: 'bot', text: "Bonjour ! Je suis l'assistant Sama-Terrain. Dites-moi par exemple « Je veux réserver demain à 20h » et je vérifie les créneaux disponibles pour vous." }
   ]);
   const [aiInput, setAiInput] = useState('');
   const [aiEnAttente, setAiEnAttente] = useState(false);
@@ -82,6 +82,13 @@ export default function Accueil() {
   const envoyerMessageIA = async (messageEnvoye) => {
     if (!messageEnvoye || aiEnAttente) return;
 
+    // Messages précédents de l'utilisateur, pour que l'assistant garde le
+    // fil d'une réservation préparée en plusieurs échanges.
+    const historique = aiMessages
+      .filter((msg) => msg.sender === 'user')
+      .map((msg) => msg.text)
+      .slice(-6);
+
     const userMsg = { id: Date.now(), sender: 'user', text: messageEnvoye };
     setAiMessages((prev) => [...prev, userMsg]);
     setAiInput('');
@@ -89,17 +96,19 @@ export default function Accueil() {
 
     let texteReponse;
     let liensReponse = [];
+    let propositionReponse = null;
     try {
-      const reponse = await iaService.envoyerMessageChatbot(messageEnvoye);
+      const reponse = await iaService.envoyerMessageChatbot(messageEnvoye, historique);
       texteReponse = reponse.texte;
       liensReponse = reponse.liens;
+      propositionReponse = reponse.proposition;
     } catch {
       texteReponse = "Désolé, je ne suis pas disponible pour le moment. Réessayez dans un instant.";
     }
 
     setAiMessages((prev) => [
       ...prev,
-      { id: Date.now() + 1, sender: 'bot', text: texteReponse, liens: liensReponse }
+      { id: Date.now() + 1, sender: 'bot', text: texteReponse, liens: liensReponse, proposition: propositionReponse }
     ]);
     setAiEnAttente(false);
   };
@@ -492,7 +501,7 @@ export default function Accueil() {
                 className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'} gap-1.5`}
               >
                 <div
-                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl leading-relaxed ${
+                  className={`max-w-[80%] px-4 py-2.5 rounded-2xl leading-relaxed whitespace-pre-line ${
                     msg.sender === 'user'
                       ? 'bg-vert-principal text-white'
                       : 'bg-vert-clair text-gray-800'
@@ -500,6 +509,21 @@ export default function Accueil() {
                 >
                   {msg.text}
                 </div>
+
+                {/* Récapitulatif d'un créneau vérifié en base par la plateforme
+                    (réservation assistée). Rien n'est encore réservé : la
+                    confirmation et le paiement se font sur la fiche du terrain. */}
+                {msg.proposition && (
+                  <div className="max-w-[80%] w-full bg-white border border-gray-200 rounded-xl p-3 space-y-1">
+                    <p className="font-bold text-gray-900">{msg.proposition.terrain}</p>
+                    <p className="text-gray-600">
+                      {new Date(`${msg.proposition.date}T00:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                      {' · '}{msg.proposition.heure_debut} - {msg.proposition.heure_fin}
+                    </p>
+                    <p className="font-bold text-vert-principal">{msg.proposition.prix.toLocaleString('fr-FR')} FCFA</p>
+                    <p className="text-[10px] text-gray-500">Disponibilité vérifiée à l'instant — non réservé tant que vous n'avez pas confirmé.</p>
+                  </div>
+                )}
 
                 {/* Liens de redirection suggérés par le chatbot (vers de vraies
                     pages : fiche terrain, recherche, réservations...) */}
