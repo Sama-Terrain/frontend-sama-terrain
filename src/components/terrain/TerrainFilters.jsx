@@ -10,7 +10,6 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
     date: 'Dim. 24 Novembre',
     types: [],
     surfaces: [],
-    maxPrix: 35000,
     equipements: [],
     ...(filters || initialFilters || {})
   });
@@ -67,7 +66,6 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
       date: 'Dim. 24 Novembre',
       types: [],
       surfaces: [],
-      maxPrix: 35000,
       equipements: []
     };
     if (onReset) onReset();
@@ -136,7 +134,8 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
           {[
             { id: '5v5', label: '5 contre 5' },
             { id: '6v6', label: '6 contre 6' },
-            { id: '7v7', label: '7 contre 7' }
+            { id: '7v7', label: '7 contre 7' },
+            { id: '11v11', label: '11 contre 11' }
           ].map((item) => (
             <label key={item.id} className="flex items-center gap-2.5 cursor-pointer py-1.5 -mx-1 px-1 rounded hover:bg-gray-50 transition-colors">
               <input
@@ -168,32 +167,6 @@ export default function TerrainFilters({ filters = {}, setFilters, onReset, init
               <span>{surf}</span>
             </label>
           ))}
-        </div>
-      </div>
-
-      {/* 5. Tarif Max (FCFA / H) */}
-      <div className="space-y-3 pt-2 border-t border-gray-100">
-        <div className="flex justify-between items-center">
-          <label className="text-xs font-bold text-gray-700 uppercase tracking-wide">
-            Tarif Max (FCFA / H)
-          </label>
-        </div>
-
-        {/* Curseur de prix */}
-        <input
-          type="range"
-          min="5000"
-          max="50000"
-          step="1000"
-          value={activeFilters?.maxPrix || activeFilters?.prixMax || 35000}
-          onChange={(e) => updateFilters((prev) => ({ ...prev, maxPrix: Number(e.target.value), prixMax: Number(e.target.value) }))}
-          className="w-full h-2 sm:h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#004030] touch-none"
-        />
-
-        <div className="flex justify-between text-xs font-bold text-gray-600">
-          <span>5 000</span>
-          <span className="text-vert-principal font-black">{(activeFilters?.maxPrix || activeFilters?.prixMax || 35000).toLocaleString()}</span>
-          <span>50 000</span>
         </div>
       </div>
 

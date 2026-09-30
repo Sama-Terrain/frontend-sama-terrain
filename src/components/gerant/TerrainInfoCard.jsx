@@ -1,15 +1,7 @@
 import React from 'react';
-import { Info, Pencil, Shirt, Lightbulb, Droplet, Car, Coffee, Users } from 'lucide-react';
+import { Info, Pencil } from 'lucide-react';
 import Button from '../ui/Button';
-
-const EQUIPEMENT_ICONS = {
-  Vestiaires: Shirt,
-  'Éclairage nocturne': Lightbulb,
-  Douches: Droplet,
-  Parking: Car,
-  Buvette: Coffee,
-  Tribune: Users,
-};
+import { ICONES_EQUIPEMENTS } from '../../utils/equipements';
 
 function InfoField({ label, value }) {
   return (
@@ -60,7 +52,7 @@ export default function TerrainInfoCard({ terrain, onModifier }) {
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Équipements</p>
           <div className="flex flex-wrap gap-2">
             {terrain.equipements.map((equipement) => {
-              const Icon = EQUIPEMENT_ICONS[equipement];
+              const Icon = ICONES_EQUIPEMENTS[equipement];
               return (
                 <span
                   key={equipement}
