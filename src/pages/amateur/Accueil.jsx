@@ -8,6 +8,7 @@ import { iaService } from '../../services/iaService';
 import { VILLES } from '../../utils/villes';
 import { FAQ_ACCUEIL } from '../../utils/faqAccueil';
 import FAQAccordion from '../../components/ui/FAQAccordion';
+import CarteDesTerrains from '../../components/terrain/CarteDesTerrains';
 import heroBg from '../../assets/herobg.jpeg';
 import ctaBg from '../../assets/cta.png';
 import chatbotGif from '../../assets/chatbot.gif';
@@ -410,24 +411,21 @@ export default function Accueil() {
             </ul>
           </div>
 
-          {/* Visuel Carte Dakar : vraie carte (pas un simple visuel décoratif) */}
-          <div className="rounded-[8px] border border-emerald-100 relative min-h-[280px] overflow-hidden">
-            <iframe
-              title="Carte des terrains à Dakar"
-              src="https://maps.google.com/maps?q=Dakar,%20S%C3%A9n%C3%A9gal&z=11&output=embed"
-              className="absolute inset-0 w-full h-full border-0"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
+          {/* Carte réelle : un marqueur par terrain ayant une position GPS.
+              "isolate" garde les z-index de la carte à l'intérieur de ce bloc
+              (sinon ils passeraient par-dessus le chatbot ou la barre de navigation). */}
+          <div className="rounded-[8px] border border-emerald-100 relative isolate min-h-[320px] overflow-hidden">
+            <CarteDesTerrains onVoirTerrain={(id) => navigate(`/terrains/${id}`)} />
 
-            <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-full text-xs font-bold text-[#004030] border border-gray-200 flex items-center gap-2 shadow-sm pointer-events-none">
+            {/* z-[500] : au-dessus des calques de la carte */}
+            <div className="absolute z-[500] top-4 left-4 bg-white px-3 py-1.5 rounded-full text-xs font-bold text-[#004030] border border-gray-200 flex items-center gap-2 shadow-sm pointer-events-none">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               Terrains disponibles à Dakar, Mermoz, Almadies, Yoff...
             </div>
 
             <button
               onClick={() => navigate('/terrains')}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full text-xs font-bold text-vert-principal border border-gray-200 shadow-sm hover:bg-gray-50 cursor-pointer"
+              className="absolute z-[500] bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full text-xs font-bold text-vert-principal border border-gray-200 shadow-sm hover:bg-gray-50 cursor-pointer"
             >
               Explorer tous les terrains →
             </button>

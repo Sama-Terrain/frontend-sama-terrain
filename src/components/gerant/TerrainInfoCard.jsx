@@ -2,6 +2,7 @@ import React from 'react';
 import { Info, Pencil } from 'lucide-react';
 import Button from '../ui/Button';
 import { ICONES_EQUIPEMENTS } from '../../utils/equipements';
+import CarteTerrain from '../terrain/CarteTerrain';
 
 function InfoField({ label, value }) {
   return (
@@ -64,6 +65,16 @@ export default function TerrainInfoCard({ terrain, onModifier }) {
               );
             })}
           </div>
+        </div>
+
+        <div className="border-t border-gray-100 pt-5 space-y-3">
+          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wide">Localisation</p>
+          <CarteTerrain
+            latitude={terrain.latitude}
+            longitude={terrain.longitude}
+            adresse={terrain.adresse}
+            ville={terrain.ville}
+          />
         </div>
       </div>
 
