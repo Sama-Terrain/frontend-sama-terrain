@@ -16,7 +16,13 @@ function normaliserCreneau(creneau) {
     id: creneau.id,
     heure: `${debut} - ${fin}`,
     prix: creneau.prix,
-    disponible: creneau.statut === 'disponible',
+    // Calculé par le backend en tenant compte des portions : le terrain
+    // complet n'est pas disponible si une de ses portions est réservée.
+    disponible: creneau.disponible ?? creneau.statut === 'disponible',
+    // 0 = terrain complet (ou terrain simple), 1, 2, 3... = portion.
+    portion: creneau.portion || 0,
+    // "Terrain complet", "Portion 2"... (vide pour un terrain simple).
+    libellePortion: creneau.libelle_portion || '',
   };
 }
 
@@ -45,9 +51,13 @@ export const creneauService = {
   async genererCreneaux({ terrainId, creneaux, joursSelectionnes, prixParCreneau, nombreJours = 28 }) {
     // On récupère les créneaux déjà existants pour ne pas créer de doublons
     // (le backend refuse deux créneaux à la même date/heure pour un terrain).
+    // Seuls les créneaux "terrain complet" (portion 0) sont gérés ici : pour
+    // un terrain divisible, le backend crée et met à jour les portions tout seul.
     const { data: existants } = await api.get(`/terrains/${terrainId}/creneaux`);
     const existantsParCle = new Map(
-      existants.map((c) => [`${c.date}_${c.heure_debut.slice(0, 5)}`, c])
+      existants
+        .filter((c) => !c.portion)
+        .map((c) => [`${c.date}_${c.heure_debut.slice(0, 5)}`, c])
     );
 
     let crees = 0;

@@ -36,7 +36,8 @@ function normaliserReservationGerant(r) {
     joueur: r.nom_complet,
     initiales,
     terrainId: r.terrain_id,
-    terrain: r.terrain_nom,
+    // Pour un terrain divisible, le gérant voit quelle partie est louée.
+    terrain: r.libelle_portion ? `${r.terrain_nom} · ${r.libelle_portion}` : r.terrain_nom,
     date: new Date(r.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }),
     dateIso: r.date,
     creneau: `${r.heure_debut.slice(0, 5)} - ${r.heure_fin.slice(0, 5)}`,
@@ -214,7 +215,7 @@ export const gerantService = {
         ticket: {
           code: ticket.code,
           client: ticket.client,
-          terrain: ticket.terrain,
+          terrain: ticket.libelle_portion ? `${ticket.terrain} · ${ticket.libelle_portion}` : ticket.terrain,
           creneau: `${ticket.heure_debut.slice(0, 5)} - ${ticket.heure_fin.slice(0, 5)}`,
           montantRestant: ticket.montant_restant,
         },

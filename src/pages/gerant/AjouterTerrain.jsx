@@ -68,6 +68,17 @@ function SelectField({ label, value, onChange, options, errorMessage = '' }) {
   );
 }
 
+// Découpage possible d'un grand terrain en portions louées séparément.
+// Position dans la liste + 1 = nombre de portions (1 = terrain simple).
+const OPTIONS_PORTIONS = [
+  'Terrain simple (non divisible)',
+  'Divisible en 2 portions',
+  'Divisible en 3 portions',
+  'Divisible en 4 portions',
+  'Divisible en 5 portions',
+  'Divisible en 6 portions',
+];
+
 export default function AjouterTerrain({ onLogout }) {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -85,6 +96,8 @@ export default function AjouterTerrain({ onLogout }) {
     heureFermeture: '23:00',
     equipements: ['Vestiaires', 'Éclairage nocturne', 'Douches'],
     description: '',
+    nombrePortions: 1,
+    prixPortion: '',
   });
   const [photos, setPhotos] = useState([]);
   const [chargementTerrain, setChargementTerrain] = useState(modeEdition);
@@ -108,6 +121,8 @@ export default function AjouterTerrain({ onLogout }) {
           heureFermeture: terrain.heure_fermeture?.slice(0, 5) || '23:00',
           equipements: terrain.equipements,
           description: terrain.description,
+          nombrePortions: terrain.nombre_portions || 1,
+          prixPortion: terrain.prix_portion || '',
         });
       } catch (error) {
         console.error('Erreur chargement terrain à modifier:', error);
@@ -197,6 +212,15 @@ export default function AjouterTerrain({ onLogout }) {
     }
 
     erreurs.prixHeure = validerNombre(form.prixHeure, 'Le prix par heure', { min: 500 });
+
+    // Terrain divisible : le prix d'une portion doit dépasser l'avance minimum
+    // (10 000 FCFA), sinon aucun joueur ne pourrait réserver une portion.
+    if (form.nombrePortions > 1) {
+      erreurs.prixPortion = validerNombre(form.prixPortion, "Le prix d'une portion", { min: 500 });
+      if (!erreurs.prixPortion && Number(form.prixPortion) <= 10000) {
+        erreurs.prixPortion = "Le prix d'une portion doit dépasser 10 000 FCFA (avance minimum demandée aux joueurs).";
+      }
+    }
 
     if (form.heureOuverture && form.heureFermeture && form.heureOuverture >= form.heureFermeture) {
       erreurs.heures = "L'heure de fermeture doit être après l'heure d'ouverture.";
@@ -343,6 +367,33 @@ export default function AjouterTerrain({ onLogout }) {
               onChange={(e) => handleField('surface', e.target.value)}
               options={SURFACES}
             />
+            <div className="flex flex-col gap-1 w-full">
+              <SelectField
+                label="Découpage du terrain"
+                value={OPTIONS_PORTIONS[form.nombrePortions - 1]}
+                onChange={(e) => handleField('nombrePortions', OPTIONS_PORTIONS.indexOf(e.target.value) + 1)}
+                options={OPTIONS_PORTIONS}
+                errorMessage={erreursChamps.nombre_portions}
+              />
+              {form.nombrePortions > 1 && (
+                <span className="text-xs text-gray-500">
+                  Les joueurs pourront louer le terrain complet ou une seule portion (Portion 1 à {form.nombrePortions}).
+                  Les créneaux des portions sont créés automatiquement avec vos créneaux.
+                </span>
+              )}
+            </div>
+            {form.nombrePortions > 1 && (
+              <Input
+                label="Prix d'une portion par heure (FCFA)"
+                type="number"
+                min={10500}
+                step={500}
+                placeholder="Ex : 30 000"
+                value={form.prixPortion}
+                onChange={(e) => handleField('prixPortion', e.target.value)}
+                errorMessage={erreursChamps.prixPortion}
+              />
+            )}
             <Input
               label="Prix par heure (FCFA)"
               type="number"

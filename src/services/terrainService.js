@@ -39,6 +39,7 @@ function normaliserTerrain(terrain) {
     heureOuverture: terrain.heure_ouverture,
     heureFermeture: terrain.heure_fermeture,
     photos: terrain.photos,
+    nombrePortions: terrain.nombre_portions || 1,
   };
 }
 
@@ -119,7 +120,7 @@ export const terrainService = {
 
   // Transforme le formulaire d'AjouterTerrain.jsx en FormData (nécessaire
   // pour envoyer les photos en même temps que les champs texte).
-  _construireFormData({ nom, type, ville, adresse, capacite, surface, prixHeure, heureOuverture, heureFermeture, equipements, description, photos }) {
+  _construireFormData({ nom, type, ville, adresse, capacite, surface, prixHeure, heureOuverture, heureFermeture, equipements, description, nombrePortions, prixPortion, photos }) {
     const formData = new FormData();
     formData.append('nom', nom);
     formData.append('type', type);
@@ -131,6 +132,10 @@ export const terrainService = {
     formData.append('heure_ouverture', heureOuverture);
     formData.append('heure_fermeture', heureFermeture);
     formData.append('description', description);
+    // 1 = terrain simple, 2 à 6 = terrain divisible en portions.
+    formData.append('nombre_portions', nombrePortions || 1);
+    // Prix d'une portion : envoyé seulement pour un terrain divisible.
+    if (nombrePortions > 1) formData.append('prix_portion', prixPortion);
     // Le champ "equipements" est un JSONField côté backend : avec du
     // multipart/form-data, il doit être envoyé comme UNE chaîne JSON
     // (et non répété plusieurs fois), sinon DRF refuse de le décoder.
@@ -186,6 +191,7 @@ function extraireErreurTerrain(error) {
 // bon champ plutôt que seulement dans l'alerte générique.
 const CHAMPS_BACKEND_VERS_FORMULAIRE = {
   prix_heure: 'prixHeure',
+  prix_portion: 'prixPortion',
   heure_ouverture: 'heures',
   heure_fermeture: 'heures',
 };
