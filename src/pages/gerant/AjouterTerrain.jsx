@@ -16,6 +16,7 @@ import Input from '../../components/ui/Input';
 import { VILLES } from '../../utils/villes';
 import { EQUIPEMENTS_DISPONIBLES } from '../../utils/equipements';
 import Alert from '../../components/ui/Alert';
+import ChoixPositionCarte from '../../components/terrain/ChoixPositionCarte';
 import { terrainService } from '../../services/terrainService';
 import { validerTexteObligatoire, validerNombre } from '../../utils/validation';
 
@@ -98,6 +99,8 @@ export default function AjouterTerrain({ onLogout }) {
     description: '',
     nombrePortions: 1,
     prixPortion: '',
+    latitude: '',
+    longitude: '',
   });
   const [photos, setPhotos] = useState([]);
   const [chargementTerrain, setChargementTerrain] = useState(modeEdition);
@@ -123,6 +126,8 @@ export default function AjouterTerrain({ onLogout }) {
           description: terrain.description,
           nombrePortions: terrain.nombre_portions || 1,
           prixPortion: terrain.prix_portion || '',
+          latitude: terrain.latitude ?? '',
+          longitude: terrain.longitude ?? '',
         });
       } catch (error) {
         console.error('Erreur chargement terrain à modifier:', error);
@@ -344,6 +349,25 @@ export default function AjouterTerrain({ onLogout }) {
               onChange={(e) => handleField('adresse', e.target.value)}
               errorMessage={erreursChamps.adresse}
             />
+          </div>
+
+          {/* Position GPS : plus précise que l'adresse écrite */}
+          <div className="space-y-3 pt-2">
+            <div>
+              <p className="text-sm font-medium text-gray-800">Position du terrain sur la carte (recommandé)</p>
+              <p className="text-xs text-gray-500">
+                Permet aux joueurs de trouver le terrain facilement et de lancer un itinéraire.
+              </p>
+            </div>
+            <ChoixPositionCarte
+              latitude={form.latitude}
+              longitude={form.longitude}
+              onChange={(latitude, longitude) => {
+                handleField('latitude', latitude);
+                handleField('longitude', longitude);
+              }}
+            />
+            {erreursChamps.latitude && <p className="text-sm text-red-600">{erreursChamps.latitude}</p>}
           </div>
         </div>
 

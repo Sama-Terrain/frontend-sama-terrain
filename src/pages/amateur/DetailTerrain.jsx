@@ -9,6 +9,7 @@ import { creneauService } from '../../services/creneauService';
 import { reservationService } from '../../services/reservationService';
 import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
 import { ICONES_EQUIPEMENTS } from '../../utils/equipements';
+import CarteTerrain from '../../components/terrain/CarteTerrain';
 
 export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
@@ -929,17 +930,13 @@ export default function DetailTerrain({ currentUser }) {
             
             <div className="bg-white rounded-[8px] p-4 border border-gray-200 space-y-3">
               <h4 className="text-xs font-bold text-gray-900 uppercase">Localisation du terrain</h4>
-              <div className="h-44 rounded-[8px] border border-gray-200 overflow-hidden">
-                <iframe
-                  title={`Carte de ${terrain?.nom || 'ce terrain'}`}
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                    `${terrain?.adresse || ''}, ${terrain?.ville || ''}, Sénégal`
-                  )}&z=14&output=embed`}
-                  className="w-full h-full border-0"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
-              </div>
+              {/* Position GPS exacte si le gérant l'a indiquée, sinon carte par adresse */}
+              <CarteTerrain
+                latitude={terrain?.latitude}
+                longitude={terrain?.longitude}
+                adresse={terrain?.adresse}
+                ville={terrain?.ville}
+              />
               <p className="text-[11px] text-gray-500 flex items-center gap-1">
                 <MapPin size={12} className="shrink-0 text-vert-principal" />
                 <span>{terrain?.adresse}, {terrain?.ville}</span>

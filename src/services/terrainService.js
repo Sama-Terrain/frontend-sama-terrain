@@ -120,12 +120,15 @@ export const terrainService = {
 
   // Transforme le formulaire d'AjouterTerrain.jsx en FormData (nécessaire
   // pour envoyer les photos en même temps que les champs texte).
-  _construireFormData({ nom, type, ville, adresse, capacite, surface, prixHeure, heureOuverture, heureFermeture, equipements, description, nombrePortions, prixPortion, photos }) {
+  _construireFormData({ nom, type, ville, adresse, latitude, longitude, capacite, surface, prixHeure, heureOuverture, heureFermeture, equipements, description, nombrePortions, prixPortion, photos }) {
     const formData = new FormData();
     formData.append('nom', nom);
     formData.append('type', type);
     formData.append('ville', ville);
     formData.append('adresse', adresse);
+    // Position GPS facultative : une valeur vide est enregistrée comme "aucune position".
+    formData.append('latitude', latitude ?? '');
+    formData.append('longitude', longitude ?? '');
     formData.append('capacite', capacite);
     formData.append('surface', surface);
     formData.append('prix_heure', prixHeure);
