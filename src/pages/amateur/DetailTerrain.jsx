@@ -493,7 +493,12 @@ export default function DetailTerrain({ currentUser }) {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                {[terrain?.surface, terrain?.type, ...(terrain?.equipements || [])]
+                {[
+                  terrain?.surface,
+                  terrain?.type,
+                  terrain?.nombrePortions > 1 ? `Divisible en ${terrain.nombrePortions} portions` : null,
+                  ...(terrain?.equipements || []),
+                ]
                   .filter(Boolean)
                   .map((badge) => (
                   <Badge
@@ -600,6 +605,14 @@ export default function DetailTerrain({ currentUser }) {
                     </span>
                   </div>
 
+                  {/* Terrain divisible : on explique la règle au joueur */}
+                  {terrain?.nombrePortions > 1 && (
+                    <p className="text-[11px] text-gray-500">
+                      Ce terrain peut être loué en entier ou par portion. Le terrain complet n'est
+                      disponible que si toutes ses portions sont libres à cette heure.
+                    </p>
+                  )}
+
                   {/* Créneaux */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
 
@@ -632,6 +645,10 @@ export default function DetailTerrain({ currentUser }) {
                               {slot.heure}
                             </p>
 
+                            {slot.libellePortion && (
+                              <p className="text-[10px] font-semibold mt-0.5">{slot.libellePortion}</p>
+                            )}
+
                             <p className="text-[10px] mt-1">
                               {slot.prix.toLocaleString()} FCFA
                             </p>
@@ -649,9 +666,16 @@ export default function DetailTerrain({ currentUser }) {
                           key={slot.id}
                           type="button"
                           onClick={() => {
-                            setSelectedCreneaux((prev) =>
-                              isSelected ? prev.filter((c) => c.id !== slot.id) : [...prev, slot]
-                            );
+                            setSelectedCreneaux((prev) => {
+                              if (isSelected) return prev.filter((c) => c.id !== slot.id);
+
+                              // Le terrain complet et une de ses portions, à la même heure,
+                              // occupent la même surface : choisir l'un retire l'autre.
+                              const sansConflit = prev.filter(
+                                (c) => c.heure_debut !== slot.heure_debut || (c.portion !== 0 && slot.portion !== 0)
+                              );
+                              return [...sansConflit, slot];
+                            });
                           }}
                           className={`
                             min-h-[64px]
@@ -688,6 +712,13 @@ export default function DetailTerrain({ currentUser }) {
                           <p className="text-sm font-extrabold leading-none">
                             {slot.heure}
                           </p>
+
+                          {/* Partie du terrain (terrain divisible uniquement) */}
+                          {slot.libellePortion && (
+                            <p className={`text-[10px] font-bold mt-1 ${isSelected ? 'text-white' : 'text-vert-principal'}`}>
+                              {slot.libellePortion}
+                            </p>
+                          )}
 
                           {/* Prix */}
                           <p

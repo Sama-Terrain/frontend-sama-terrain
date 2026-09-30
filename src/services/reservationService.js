@@ -34,7 +34,8 @@ function normaliserReservation(r) {
     ...r,
     id: r.id,
     terrainId: r.terrain_id,
-    nomTerrain: r.terrain_nom,
+    // Pour un terrain divisible, on précise la partie louée (ex: "Portion 2").
+    nomTerrain: r.libelle_portion ? `${r.terrain_nom} · ${r.libelle_portion}` : r.terrain_nom,
     image: r.terrain_image,
     status: infosStatut.label,
     statusBadgeClass: infosStatut.badge,
