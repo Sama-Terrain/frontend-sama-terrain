@@ -8,6 +8,7 @@ import { avisService } from '../../services/avisService';
 import { creneauService } from '../../services/creneauService';
 import { reservationService } from '../../services/reservationService';
 import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
+import { ICONES_EQUIPEMENTS } from '../../utils/equipements';
 
 export default function DetailTerrain({ currentUser }) {
   const { id } = useParams();
@@ -497,7 +498,6 @@ export default function DetailTerrain({ currentUser }) {
                   terrain?.surface,
                   terrain?.type,
                   terrain?.nombrePortions > 1 ? `Divisible en ${terrain.nombrePortions} portions` : null,
-                  ...(terrain?.equipements || []),
                 ]
                   .filter(Boolean)
                   .map((badge) => (
@@ -509,6 +509,29 @@ export default function DetailTerrain({ currentUser }) {
                     {badge}
                   </Badge>
                 ))}
+              </div>
+
+              {/* Équipements choisis par le gérant à l'ajout du terrain */}
+              <div className="pt-4 border-t border-gray-100">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">Équipements</h3>
+                {terrain?.equipements?.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {terrain.equipements.map((equipement) => {
+                      const Icone = ICONES_EQUIPEMENTS[equipement];
+                      return (
+                        <span
+                          key={equipement}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-vert-clair text-vert-principal px-3.5 py-1.5 text-xs font-bold"
+                        >
+                          {Icone && <Icone size={13} />}
+                          <span>{equipement}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500">Aucun équipement renseigné pour ce terrain.</p>
+                )}
               </div>
 
               <div className="pt-4 border-t border-gray-100">

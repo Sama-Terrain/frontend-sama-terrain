@@ -14,7 +14,7 @@ export default function RechercheTerrains() {
   const [loading, setLoading] = useState(true);
   
   // État unique synchronisé pour les filtres. Par défaut on ne filtre rien
-  // (types vide, prix au maximum) pour ne pas cacher de terrains au premier
+  // (aucun type, aucune surface) pour ne pas cacher de terrains au premier
   // affichage : seule la recherche depuis le hero de l'accueil pré-remplit
   // la zone.
   const [filters, setFilters] = useState({
@@ -22,7 +22,6 @@ export default function RechercheTerrains() {
     date: 'Dim. 24 Novembre',
     types: [],
     surfaces: [],
-    maxPrix: 50000,
     equipements: []
   });
 
@@ -51,7 +50,6 @@ export default function RechercheTerrains() {
       date: 'Dim. 24 Novembre',
       types: [],
       surfaces: [],
-      maxPrix: 50000,
       equipements: []
     });
   };
@@ -64,7 +62,7 @@ export default function RechercheTerrains() {
         return false;
       }
     }
-    // Type (5v5, 6v6, 7v7)
+    // Type (5v5, 6v6, 7v7, 11v11)
     if (filters.types && filters.types.length > 0) {
       if (!filters.types.includes(terrain.type)) {
         return false;
@@ -75,10 +73,6 @@ export default function RechercheTerrains() {
       if (!filters.surfaces.includes(terrain.surface)) {
         return false;
       }
-    }
-    // Prix max
-    if (filters.maxPrix && terrain.prixHeure > filters.maxPrix) {
-      return false;
     }
     // Équipements
     if (filters.equipements && filters.equipements.length > 0) {
