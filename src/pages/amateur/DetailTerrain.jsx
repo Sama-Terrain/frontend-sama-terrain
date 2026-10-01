@@ -939,7 +939,7 @@ export default function DetailTerrain({ currentUser }) {
               />
               <p className="text-[11px] text-gray-500 flex items-center gap-1">
                 <MapPin size={12} className="shrink-0 text-vert-principal" />
-                <span>{terrain?.adresse}, {terrain?.ville}</span>
+                <span>{[terrain?.adresse, terrain?.ville].filter(Boolean).join(', ')}</span>
               </p>
             </div>
 

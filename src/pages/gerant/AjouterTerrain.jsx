@@ -89,7 +89,6 @@ export default function AjouterTerrain({ onLogout }) {
     nom: '',
     type: TYPES_TERRAIN[0],
     ville: VILLES[0],
-    adresse: '',
     capacite: '',
     surface: SURFACES[0],
     prixHeure: '',
@@ -116,7 +115,6 @@ export default function AjouterTerrain({ onLogout }) {
           nom: terrain.nom,
           type: terrain.type,
           ville: terrain.ville,
-          adresse: terrain.adresse,
           capacite: terrain.capacite,
           surface: terrain.surface,
           prixHeure: terrain.prix_heure,
@@ -202,7 +200,12 @@ export default function AjouterTerrain({ onLogout }) {
     const erreurs = {};
 
     erreurs.nom = validerTexteObligatoire(form.nom, 'Le nom du terrain', { max: 150 });
-    erreurs.adresse = validerTexteObligatoire(form.adresse, "L'adresse", { max: 255 });
+
+    // La position sur la carte remplace l'adresse écrite : sans elle, les
+    // joueurs ne peuvent pas trouver le terrain.
+    if (form.latitude === '' || form.latitude === null || form.longitude === '' || form.longitude === null) {
+      erreurs.latitude = 'Indiquez la position du terrain : cliquez sur la carte ou utilisez votre position.';
+    }
 
     // On valide d'abord que c'est un nombre entier positif, puis on vérifie
     // séparément la cohérence avec le type de terrain choisi, pour pouvoir
@@ -252,9 +255,9 @@ export default function AjouterTerrain({ onLogout }) {
 
     setEnvoiEnCours(true);
 
-    // On envoie le nom/adresse "nettoyés" (sans espaces en trop en début/fin),
-    // même si l'utilisateur les a saisis avec ces espaces.
-    const formNettoye = { ...form, nom: form.nom.trim(), adresse: form.adresse.trim() };
+    // On envoie le nom "nettoyé" (sans espaces en trop en début/fin),
+    // même si l'utilisateur l'a saisi avec ces espaces.
+    const formNettoye = { ...form, nom: form.nom.trim() };
 
     const resultat = modeEdition
       ? await terrainService.modifierTerrain(id, { ...formNettoye, photos })
@@ -342,19 +345,12 @@ export default function AjouterTerrain({ onLogout }) {
               onChange={(e) => handleField('ville', e.target.value)}
               options={VILLES}
             />
-            <Input
-              label="Adresse complète"
-              placeholder="Ex : Route de Ouakam, Dakar"
-              value={form.adresse}
-              onChange={(e) => handleField('adresse', e.target.value)}
-              errorMessage={erreursChamps.adresse}
-            />
           </div>
 
-          {/* Position GPS : plus précise que l'adresse écrite */}
+          {/* Position GPS obligatoire : remplace l'adresse écrite, souvent imprécise */}
           <div className="space-y-3 pt-2">
             <div>
-              <p className="text-sm font-medium text-gray-800">Position du terrain sur la carte (recommandé)</p>
+              <p className="text-sm font-medium text-gray-800">Position du terrain sur la carte *</p>
               <p className="text-xs text-gray-500">
                 Permet aux joueurs de trouver le terrain facilement et de lancer un itinéraire.
               </p>
@@ -367,7 +363,9 @@ export default function AjouterTerrain({ onLogout }) {
                 handleField('longitude', longitude);
               }}
             />
-            {erreursChamps.latitude && <p className="text-sm text-red-600">{erreursChamps.latitude}</p>}
+            {erreursChamps.latitude && (
+              <p role="alert" className="text-sm text-red-600">{erreursChamps.latitude}</p>
+            )}
           </div>
         </div>
 

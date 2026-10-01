@@ -41,7 +41,8 @@ export default function TerrainInfoCard({ terrain, onModifier }) {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-5">
           <InfoField label="Nom du terrain" value={terrain.nom} />
           <InfoField label="Ville" value={terrain.ville} />
-          <InfoField label="Adresse" value={terrain.adresse} />
+          {/* Adresse écrite : seulement pour les anciens terrains (remplacée par la carte) */}
+          {terrain.adresse && <InfoField label="Adresse" value={terrain.adresse} />}
           <InfoField label="Type" value={terrain.type} />
           <InfoField label="Surface" value={terrain.surface} />
           <InfoField label="Capacité" value={terrain.capacite} />
