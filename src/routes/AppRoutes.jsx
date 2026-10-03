@@ -29,6 +29,7 @@ import GerantStatistiques from '../pages/gerant/Statistiques';
 import InsightsIA from '../pages/gerant/InsightsIA';
 import GerantProfil from '../pages/gerant/Profil';
 import Abonnement from '../pages/gerant/Abonnement';
+import Portefeuille from '../pages/gerant/Portefeuille';
 import AbonnementSucces from '../pages/gerant/AbonnementSucces';
 import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
 
@@ -46,6 +47,7 @@ import ModerationAvis from '../pages/admin/ModerationAvis';
 import Statistiques from '../pages/admin/Statistiques';
 import Parametres from '../pages/admin/Parametres';
 import GerantDetail from '../pages/admin/GerantDetail';
+import Retraits from '../pages/admin/Retraits';
 
 export default function AppRoutes({ searchParams }) {
   const { currentUser, logout } = useAuth();
@@ -157,6 +159,17 @@ export default function AppRoutes({ searchParams }) {
         }
       />
 
+      {/* Portefeuille : comme l'abonnement, accessible MÊME avec un abonnement
+          expiré (le gérant doit toujours pouvoir retirer l'argent qui lui revient) */}
+      <Route
+        path="/gerant/portefeuille"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.GERANT]}>
+            <Portefeuille onLogout={logout} />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Routes Espace Gérant : réservées aux gérants avec un abonnement actif */}
       <Route path="/gerant/dashboard" element={pageGerant(<GerantDashboard onLogout={logout} />)} />
       <Route path="/gerant/terrains" element={pageGerant(<MesTerrains onLogout={logout} />)} />
@@ -179,6 +192,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/admin/validation-gerants" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ValiderGerants onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/moderation-avis" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ModerationAvis onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/statistiques" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Statistiques onLogout={logout} /></ProtectedRoute>} />
+      <Route path="/admin/retraits" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Retraits onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/parametres" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Parametres onLogout={logout} /></ProtectedRoute>} />
 
       {/* Routes Authentification */}

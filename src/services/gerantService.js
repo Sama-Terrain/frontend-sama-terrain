@@ -290,4 +290,39 @@ export const gerantService = {
     const { data } = await api.get('/gerant/insights-ia/');
     return data;
   },
+
+  // Portefeuille ("wallet") : les avances payées par les joueurs arrivent
+  // sur le compte de la plateforme et créditent ce solde, que le gérant
+  // retire vers son numéro Wave / Orange Money.
+  async getPortefeuille() {
+    const { data } = await api.get('/gerant/portefeuille/');
+    return data;
+  },
+
+  // numero : 9 chiffres locaux (sans +221).
+  async enregistrerNumeroRetrait(operateur, numero) {
+    try {
+      const { data } = await api.put('/gerant/portefeuille/', { operateur, numero: `221${numero}` });
+      return { success: true, portefeuille: data };
+    } catch (error) {
+      const erreurs = error.response?.data || {};
+      return {
+        success: false,
+        error: erreurs.numero?.[0] || erreurs.operateur?.[0] || 'Impossible d\'enregistrer le numéro.',
+      };
+    }
+  },
+
+  async demanderRetrait(montant) {
+    try {
+      const { data } = await api.post('/gerant/portefeuille/retraits/', { montant });
+      return { success: true, retrait: data };
+    } catch (error) {
+      const erreurs = error.response?.data || {};
+      return {
+        success: false,
+        error: erreurs.detail || erreurs.montant?.[0] || 'Impossible de demander le retrait.',
+      };
+    }
+  },
 };

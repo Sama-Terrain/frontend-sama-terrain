@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Wallet } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import AdminKpiCard from '../../components/admin/AdminKpiCard';
 import RevenusChart from '../../components/gerant/RevenusChart';
@@ -12,6 +14,7 @@ import { gerantService } from '../../services/gerantService';
  * 1. Les 4 cartes de KPI (Réservations du jour, Revenus du mois, Taux d'occupation, Avis moyen).
  * 2. Le graphique des revenus des 30 derniers jours.
  * 3. Le tableau des réservations récentes.
+ * + un rappel tant que le numéro Wave / Orange Money de retrait n'est pas renseigné.
  */
 export default function GerantDashboard({ onLogout }) {
   const [stats, setStats] = useState([]);
@@ -19,6 +22,14 @@ export default function GerantDashboard({ onLogout }) {
   const [reservations, setReservations] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [numeroRetraitManquant, setNumeroRetraitManquant] = useState(false);
+
+  // Chargé à part : une erreur ici ne doit pas empêcher d'afficher le tableau de bord.
+  useEffect(() => {
+    gerantService.getPortefeuille()
+      .then((portefeuille) => setNumeroRetraitManquant(!portefeuille.numero_retrait))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -58,6 +69,22 @@ export default function GerantDashboard({ onLogout }) {
 
   return (
     <GerantLayout title="Tableau de bord" profile={profile} onLogout={onLogout}>
+
+      {numeroRetraitManquant && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-[10px] bg-amber-50 border border-amber-200">
+          <Wallet size={20} className="text-amber-600 shrink-0" />
+          <p className="text-sm text-amber-800 flex-1">
+            <span className="font-bold">Recevez votre argent :</span> indiquez votre numéro Wave ou
+            Orange Money pour retirer les avances payées par les joueurs.
+          </p>
+          <Link
+            to="/gerant/portefeuille"
+            className="text-sm font-bold text-white bg-vert-principal px-4 py-2 rounded-[8px] hover:bg-vert-survol transition-colors text-center"
+          >
+            Ajouter mon numéro
+          </Link>
+        </div>
+      )}
 
       {/* SECTION 1 : CARTES DES 4 KPIs */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
