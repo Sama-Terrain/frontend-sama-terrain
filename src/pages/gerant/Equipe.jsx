@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, ShieldCheck, ShieldOff, Mail, History, Info, X } from 'lucide-react';
+import { UserPlus, ShieldCheck, ShieldOff, Mail, History, X } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
@@ -128,22 +128,6 @@ export default function Equipe({ onLogout }) {
 
   return (
     <GerantLayout title="Mon équipe" profile={profile} onLogout={onLogout}>
-
-      {/* EXPLICATION DES DROITS */}
-      <section className="bg-white rounded-[12px] border border-gray-200 p-5 flex gap-3">
-        <Info size={18} className="text-vert-principal shrink-0 mt-0.5" />
-        <div className="text-sm text-gray-600 leading-relaxed space-y-1">
-          <p>
-            Chaque employé a <strong className="text-gray-900">son propre compte</strong> : plus besoin de partager votre mot de passe.
-            Vous voyez dans le <button type="button" onClick={() => navigate('/gerant/journal')} className="font-bold text-vert-principal hover:underline cursor-pointer">journal d'activité</button> qui
-            a validé un ticket, encaissé un solde ou modifié des créneaux.
-          </p>
-          <p>
-            <strong className="text-gray-900">Ils peuvent :</strong> voir les réservations, scanner les tickets, gérer les créneaux et tarifs.{' '}
-            <strong className="text-gray-900">Ils ne peuvent pas :</strong> voir vos revenus et statistiques, retirer de l'argent, gérer l'abonnement ou l'équipe.
-          </p>
-        </div>
-      </section>
 
       {message && <Alert type={message.type} message={message.texte} onClose={() => setMessage(null)} />}
 
