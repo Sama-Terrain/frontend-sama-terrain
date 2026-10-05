@@ -268,21 +268,6 @@ export const gerantService = {
     }));
   },
 
-  // Recommandations générées par le micro-service IA (pas encore déployé,
-  // voir IAPredictionsView) : on tente pour le premier terrain du gérant,
-  // et on renvoie simplement une liste vide si le service est indisponible.
-  async getRecommandationsIA() {
-    const terrains = await this.getMesTerrains();
-    if (terrains.length === 0) return [];
-
-    try {
-      const { data } = await api.get(`/ia/predictions/${terrains[0].id}/`);
-      return data.recommandations || [];
-    } catch {
-      return [];
-    }
-  },
-
   // Vue d'ensemble IA (page "Insights IA") : occupation prévue des 7
   // prochains jours, recommandations tarifaires et alertes, agrégées sur
   // tous les terrains du gérant connecté.
