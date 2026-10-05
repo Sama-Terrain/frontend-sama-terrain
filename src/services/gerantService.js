@@ -45,6 +45,17 @@ function normaliserReservationGerant(r) {
     statut: infosStatut.label,
     statutBadgeClass: infosStatut.badge,
     statutBrut: r.statut,
+    // Infos complémentaires affichées dans le détail d'une réservation
+    // (ReservationDetailModal.jsx).
+    idBrut: r.id,
+    telephone: r.telephone,
+    dateLongue: new Date(r.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    montantAvance: r.montant_avance,
+    resteAPayer: r.reste_a_payer,
+    moyenPaiement: LABELS_MOYEN_PAIEMENT[r.moyen_paiement] ?? r.moyen_paiement,
+    transactionId: r.transaction_id,
+    reserveeLe: new Date(r.cree_le).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }),
+    ticket: r.ticket,
   };
 }
 

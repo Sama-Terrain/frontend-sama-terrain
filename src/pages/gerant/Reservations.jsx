@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import ReservationsActiviteBanner from '../../components/gerant/ReservationsActiviteBanner';
 import ReservationsFiltersBar from '../../components/gerant/ReservationsFiltersBar';
 import ReservationsTable from '../../components/gerant/ReservationsTable';
+import ReservationDetailModal from '../../components/gerant/ReservationDetailModal';
 import { gerantService } from '../../services/gerantService';
 
 const STATUT_LABEL_TO_VALUE = {
@@ -25,6 +27,15 @@ export default function Reservations({ onLogout }) {
   const [terrainSelectionne, setTerrainSelectionne] = useState('Tous les terrains');
   const [statutSelectionne, setStatutSelectionne] = useState('Toutes');
   const [page, setPage] = useState(1);
+
+  // La réservation ouverte en détail est dans l'URL (?reservation=12) : on
+  // peut ainsi l'ouvrir directement depuis une notification de la cloche.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const idReservationOuverte = searchParams.get('reservation');
+  const reservationOuverte = reservations.find((r) => String(r.idBrut) === idReservationOuverte) || null;
+
+  const ouvrirDetail = (reservation) => setSearchParams({ reservation: String(reservation.idBrut) });
+  const fermerDetail = () => setSearchParams({});
 
   useEffect(() => {
     async function loadReservations() {
@@ -114,7 +125,10 @@ export default function Reservations({ onLogout }) {
         page={pageAffichee}
         totalPages={totalPages}
         onPageChange={setPage}
+        onView={ouvrirDetail}
       />
+
+      <ReservationDetailModal reservation={reservationOuverte} onClose={fermerDetail} />
 
     </GerantLayout>
   );
