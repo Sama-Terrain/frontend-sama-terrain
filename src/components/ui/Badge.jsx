@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Props du composant :
 // - statut : L'état à afficher ('disponible', 'reserve', 'complet', 'en_attente', 'forte_demande', 'actif', 'inactif', 'suspendu')
 // - children : Texte personnalisé optionnel

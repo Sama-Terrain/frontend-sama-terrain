@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Composant JourToggle
  * Pastille de sélection d'un jour de la semaine (L, M, M, J, V, S, D),

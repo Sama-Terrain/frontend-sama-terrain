@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Composant DernieresValidationsList
  * Historique des derniers tickets scannés par le gérant (validés, expirés

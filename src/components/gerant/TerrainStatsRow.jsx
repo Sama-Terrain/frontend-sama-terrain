@@ -1,4 +1,3 @@
-import React from 'react';
 import { CalendarCheck, Wallet, Star, PieChart } from 'lucide-react';
 import RatingStars from '../ui/RatingStars';
 

@@ -30,7 +30,19 @@ export default function MesReservations() {
   }, []);
 
   const handleAnnuler = async (resId) => {
-    if (!window.confirm('Voulez-vous vraiment annuler cette réservation ?')) return;
+    // On prévient le joueur AVANT qu'il confirme : montant remboursé et
+    // frais de transaction retenus (à sa charge), ou avance perdue à moins de 24h.
+    let avertissement = '';
+    try {
+      const apercu = await reservationService.previsualiserAnnulation(resId);
+      avertissement = apercu.remboursementTotal
+        ? `\n\nVous serez remboursé de ${apercu.montantRembourse.toLocaleString()} FCFA (frais de transaction de ${apercu.fraisAnnulation.toLocaleString()} FCFA déduits).`
+        : "\n\nLe match est dans moins de 24h : l'avance ne sera pas remboursée.";
+    } catch {
+      // Aperçu indisponible : on laisse quand même le joueur annuler.
+    }
+
+    if (!window.confirm(`Voulez-vous vraiment annuler cette réservation ?${avertissement}`)) return;
 
     const resultat = await reservationService.annulerReservation(resId);
 
@@ -41,7 +53,7 @@ export default function MesReservations() {
 
     window.alert(
       resultat.remboursementTotal
-        ? `Réservation annulée. Vous serez remboursé de ${resultat.montantRembourse.toLocaleString()} FCFA.`
+        ? `Réservation annulée. Vous serez remboursé de ${resultat.montantRembourse.toLocaleString()} FCFA (après déduction de ${resultat.fraisAnnulation.toLocaleString()} FCFA de frais de transaction).`
         : "Réservation annulée. Comme c'était à moins de 24h du match, l'avance n'est pas remboursée."
     );
 
@@ -55,9 +67,10 @@ export default function MesReservations() {
 
   // Revient à la page 1 dès qu'on change d'onglet, pour ne jamais rester
   // bloqué sur une page devenue vide.
-  useEffect(() => {
+  const changerOnglet = (onglet) => {
+    setActiveTab(onglet);
     setPage(1);
-  }, [activeTab]);
+  };
 
   const totalPages = Math.max(1, Math.ceil(filteredReservations.length / RESERVATIONS_PAR_PAGE));
   const pageAffichee = Math.min(page, totalPages);
@@ -108,7 +121,7 @@ export default function MesReservations() {
         <div className="border-b border-gray-200">
           <div className="flex space-x-8">
             <button
-              onClick={() => setActiveTab('a-venir')}
+              onClick={() => changerOnglet('a-venir')}
               className={`pb-4 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'a-venir'
                   ? 'text-vert-principal border-b-2 border-[#004030]'
@@ -119,7 +132,7 @@ export default function MesReservations() {
             </button>
 
             <button
-              onClick={() => setActiveTab('passees')}
+              onClick={() => changerOnglet('passees')}
               className={`pb-4 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'passees'
                   ? 'text-vert-principal border-b-2 border-[#004030]'
@@ -130,7 +143,7 @@ export default function MesReservations() {
             </button>
 
             <button
-              onClick={() => setActiveTab('annulees')}
+              onClick={() => changerOnglet('annulees')}
               className={`pb-4 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                 activeTab === 'annulees'
                   ? 'text-vert-principal border-b-2 border-[#004030]'

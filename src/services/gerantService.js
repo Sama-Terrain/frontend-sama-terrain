@@ -268,26 +268,46 @@ export const gerantService = {
     }));
   },
 
-  // Recommandations générées par le micro-service IA (pas encore déployé,
-  // voir IAPredictionsView) : on tente pour le premier terrain du gérant,
-  // et on renvoie simplement une liste vide si le service est indisponible.
-  async getRecommandationsIA() {
-    const terrains = await this.getMesTerrains();
-    if (terrains.length === 0) return [];
-
-    try {
-      const { data } = await api.get(`/ia/predictions/${terrains[0].id}/`);
-      return data.recommandations || [];
-    } catch {
-      return [];
-    }
-  },
-
   // Vue d'ensemble IA (page "Insights IA") : occupation prévue des 7
   // prochains jours, recommandations tarifaires et alertes, agrégées sur
   // tous les terrains du gérant connecté.
   async getInsightsIA() {
     const { data } = await api.get('/gerant/insights-ia/');
     return data;
+  },
+
+  // Portefeuille ("wallet") : les avances payées par les joueurs arrivent
+  // sur le compte de la plateforme et créditent ce solde, que le gérant
+  // retire vers son numéro Wave / Orange Money.
+  async getPortefeuille() {
+    const { data } = await api.get('/gerant/portefeuille/');
+    return data;
+  },
+
+  // numero : 9 chiffres locaux (sans +221).
+  async enregistrerNumeroRetrait(operateur, numero) {
+    try {
+      const { data } = await api.put('/gerant/portefeuille/', { operateur, numero: `221${numero}` });
+      return { success: true, portefeuille: data };
+    } catch (error) {
+      const erreurs = error.response?.data || {};
+      return {
+        success: false,
+        error: erreurs.numero?.[0] || erreurs.operateur?.[0] || 'Impossible d\'enregistrer le numéro.',
+      };
+    }
+  },
+
+  async demanderRetrait(montant) {
+    try {
+      const { data } = await api.post('/gerant/portefeuille/retraits/', { montant });
+      return { success: true, retrait: data };
+    } catch (error) {
+      const erreurs = error.response?.data || {};
+      return {
+        success: false,
+        error: erreurs.detail || erreurs.montant?.[0] || 'Impossible de demander le retrait.',
+      };
+    }
   },
 };

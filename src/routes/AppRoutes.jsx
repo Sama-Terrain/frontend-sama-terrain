@@ -29,6 +29,7 @@ import GerantStatistiques from '../pages/gerant/Statistiques';
 import InsightsIA from '../pages/gerant/InsightsIA';
 import GerantProfil from '../pages/gerant/Profil';
 import Abonnement from '../pages/gerant/Abonnement';
+import Portefeuille from '../pages/gerant/Portefeuille';
 import AbonnementSucces from '../pages/gerant/AbonnementSucces';
 import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
 
@@ -38,6 +39,11 @@ import Inscription from '../pages/auth/Inscription';
 import VerificationEmail from '../pages/auth/VerificationEmail';
 import MotDePasseOublie from '../pages/auth/MotDePasseOublie';
 
+// Pages Support & Légal (publiques)
+import PolitiqueConfidentialite from '../pages/legal/PolitiqueConfidentialite';
+import ConditionsUtilisation from '../pages/legal/ConditionsUtilisation';
+import SupportLegal from '../pages/legal/SupportLegal';
+
 // Pages Admin
 import AdminDashboard from '../pages/admin/Dashboard';
 import Utilisateurs from '../pages/admin/Utilisateurs';
@@ -46,8 +52,9 @@ import ModerationAvis from '../pages/admin/ModerationAvis';
 import Statistiques from '../pages/admin/Statistiques';
 import Parametres from '../pages/admin/Parametres';
 import GerantDetail from '../pages/admin/GerantDetail';
+import Retraits from '../pages/admin/Retraits';
 
-export default function AppRoutes({ searchParams }) {
+export default function AppRoutes() {
   const { currentUser, logout } = useAuth();
 
   // Petit helper pour éviter de répéter la même double protection sur chaque
@@ -74,7 +81,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/accueil" element={<Navigate to="/" replace />} />
 
       {/* Routes Terrains */}
-      <Route path="/terrains" element={<RechercheTerrains initialSearch={searchParams} />} />
+      <Route path="/terrains" element={<RechercheTerrains />} />
       <Route path="/terrains/:id" element={<DetailTerrain currentUser={currentUser} />} />
 
       {/* Routes du parcours de réservation (réservées aux amateurs connectés) */}
@@ -157,6 +164,17 @@ export default function AppRoutes({ searchParams }) {
         }
       />
 
+      {/* Portefeuille : comme l'abonnement, accessible MÊME avec un abonnement
+          expiré (le gérant doit toujours pouvoir retirer l'argent qui lui revient) */}
+      <Route
+        path="/gerant/portefeuille"
+        element={
+          <ProtectedRoute allowedRoles={[ROLES.GERANT]}>
+            <Portefeuille onLogout={logout} />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Routes Espace Gérant : réservées aux gérants avec un abonnement actif */}
       <Route path="/gerant/dashboard" element={pageGerant(<GerantDashboard onLogout={logout} />)} />
       <Route path="/gerant/terrains" element={pageGerant(<MesTerrains onLogout={logout} />)} />
@@ -179,6 +197,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/admin/validation-gerants" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ValiderGerants onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/moderation-avis" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><ModerationAvis onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/statistiques" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Statistiques onLogout={logout} /></ProtectedRoute>} />
+      <Route path="/admin/retraits" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Retraits onLogout={logout} /></ProtectedRoute>} />
       <Route path="/admin/parametres" element={<ProtectedRoute allowedRoles={[ROLES.ADMIN]}><Parametres onLogout={logout} /></ProtectedRoute>} />
 
       {/* Routes Authentification */}
@@ -186,6 +205,11 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/register" element={<Inscription />} />
       <Route path="/verify-email" element={<VerificationEmail />} />
       <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+
+      {/* Routes Support & Légal (publiques) */}
+      <Route path="/support" element={<SupportLegal />} />
+      <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
+      <Route path="/confidentialite" element={<PolitiqueConfidentialite />} />
 
       {/* Fallback route inconnue -> Redirection Accueil */}
       <Route path="*" element={<Navigate to="/" replace />} />

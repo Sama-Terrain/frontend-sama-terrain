@@ -94,6 +94,22 @@ export const adminService = {
     await api.patch(`/admin/gerants/${id}/rejeter/`, { motif });
   },
 
+  // Retraits demandés par les gérants (versement manuel par l'admin).
+  async getRetraits(statut) {
+    const { data } = await api.get('/admin/retraits/', { params: statut ? { statut } : {} });
+    return data;
+  },
+
+  async marquerRetraitVerse(id, referenceTransaction) {
+    const { data } = await api.post(`/admin/retraits/${id}/verse/`, { reference_transaction: referenceTransaction });
+    return data;
+  },
+
+  async marquerRetraitEchoue(id, motif) {
+    const { data } = await api.post(`/admin/retraits/${id}/echec/`, { motif });
+    return data;
+  },
+
   async getReviews() {
     const { data } = await api.get('/admin/avis/');
     return data.map(normaliserAvisModeration);

@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Props du composant :
 // - label : Le texte affiché au-dessus du champ
 // - placeholder : Le texte indicatif quand le champ est vide

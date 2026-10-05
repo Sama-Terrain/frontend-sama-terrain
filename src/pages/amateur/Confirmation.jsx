@@ -22,15 +22,19 @@ export default function Confirmation() {
   const reservations = location.state?.reservations
     || (location.state?.reservation ? [location.state.reservation] : null);
 
+  const aucuneReservation = !reservations || reservations.length === 0;
+
   const [indexActif, setIndexActif] = useState(0);
 
+  // On dépend du booléen (et non du tableau, recréé à chaque rendu) pour ne
+  // pas relancer l'effet inutilement.
   useEffect(() => {
-    if (!reservations || reservations.length === 0) {
+    if (aucuneReservation) {
       navigate('/terrains', { replace: true });
     }
-  }, [reservations, navigate]);
+  }, [aucuneReservation, navigate]);
 
-  if (!reservations || reservations.length === 0) {
+  if (aucuneReservation) {
     return null;
   }
 

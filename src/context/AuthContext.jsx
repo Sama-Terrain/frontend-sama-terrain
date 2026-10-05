@@ -1,10 +1,6 @@
-import React, { createContext, useState } from 'react';
+import { useState } from 'react';
 import { authService } from '../services/authService';
-
-// Contexte React qui garde en mémoire l'utilisateur connecté (amateur, gérant ou admin)
-// et le rend disponible partout dans l'application sans avoir à le faire passer
-// de composant en composant (props drilling).
-export const AuthContext = createContext(null);
+import { AuthContext } from './contexteAuth';
 
 const CLE_STOCKAGE = 'sama_current_user';
 

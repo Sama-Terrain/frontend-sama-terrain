@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -6,6 +5,7 @@ import {
   Calendar,
   ClipboardCheck,
   DollarSign,
+  Wallet,
   QrCode,
   BarChart3,
   Sparkles,
@@ -29,6 +29,7 @@ export default function GerantSidebar({ onLogout, onMobileClose }) {
     { id: 'creneaux', label: 'Créneaux & tarifs', path: '/gerant/creneaux', icon: Calendar },
     { id: 'reservations', label: 'Réservations', path: '/gerant/reservations', icon: ClipboardCheck },
     { id: 'revenus', label: 'Revenus', path: '/gerant/revenus', icon: DollarSign },
+    { id: 'portefeuille', label: 'Mon portefeuille', path: '/gerant/portefeuille', icon: Wallet },
     { id: 'scanner', label: 'Scanner Ticket', path: '/gerant/scanner', icon: QrCode },
     { id: 'statistiques', label: 'Statistiques', path: '/gerant/statistiques', icon: BarChart3 },
     { id: 'insights', label: 'Insights IA', path: '/gerant/insights', icon: Sparkles },

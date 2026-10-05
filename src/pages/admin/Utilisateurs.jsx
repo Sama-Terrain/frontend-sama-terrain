@@ -71,9 +71,13 @@ export default function Utilisateurs({ onLogout }) {
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   // Réinitialiser la page quand les filtres changent
-  useEffect(() => {
+  const changerFiltre = (setter) => (valeur) => {
+    setter(valeur);
     setPage(1);
-  }, [search, city, activeTab]);
+  };
+  const changerOnglet = changerFiltre(setActiveTab);
+  const changerRecherche = changerFiltre(setSearch);
+  const changerVille = changerFiltre(setCity);
 
   // Active/suspend le compte (bouton "Modifier"), avec confirmation puisque
   // ça bloque immédiatement la connexion de la personne concernée.
@@ -160,7 +164,7 @@ export default function Utilisateurs({ onLogout }) {
             <button
               key={tab}
               type="button"
-              onClick={() => setActiveTab(tab)}
+              onClick={() => changerOnglet(tab)}
               className={`flex flex-1 items-center justify-center rounded-md px-1.5 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs leading-tight text-center transition truncate ${
                 activeTab === tab
                   ? "bg-vert-principal font-bold text-white"
@@ -180,7 +184,7 @@ export default function Utilisateurs({ onLogout }) {
           <input
             type="text"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => changerRecherche(event.target.value)}
             placeholder="Rechercher..."
             className="w-full min-w-0 bg-transparent text-xs sm:text-sm text-[#111827] outline-none placeholder:text-[#9ca3af]"
           />
@@ -190,7 +194,7 @@ export default function Utilisateurs({ onLogout }) {
         <div className="relative flex flex-1 items-center">
           <select
             value={city}
-            onChange={(event) => setCity(event.target.value)}
+            onChange={(event) => changerVille(event.target.value)}
             className="w-full appearance-none rounded-[8px] border border-[#e5e7eb] bg-white px-[14px] py-[10px] text-[14px] text-[#111827] outline-none"
           >
             <option>Toutes les villes</option>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -6,6 +5,7 @@ import {
   FileCheck,
   MessageSquare,
   BarChart3,
+  Send,
   Settings,
   LogOut,
   X,
@@ -52,6 +52,12 @@ export default function AdminSidebar({ onLogout, onMobileClose }) {
       label: 'Statistiques',
       path: '/admin/statistiques',
       icon: BarChart3,
+    },
+    {
+      id: 'retraits',
+      label: 'Retraits gérants',
+      path: '/admin/retraits',
+      icon: Send,
     },
     {
       id: 'parametres',

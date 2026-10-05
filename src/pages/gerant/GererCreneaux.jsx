@@ -43,6 +43,23 @@ export default function GererCreneaux({ onLogout }) {
   const [envoiEnCours, setEnvoiEnCours] = useState(false);
   const [messageApplication, setMessageApplication] = useState('');
 
+  // Sélectionne un terrain et ré-initialise le formulaire (tarifs & grille)
+  // à partir de ses horaires et de son prix par défaut.
+  const selectionnerTerrain = (cfg) => {
+    setTerrainId(cfg.terrainId);
+
+    const creneauxTerrain = generateCreneaux(cfg.ouverture, cfg.fermeture);
+    if (creneauxTerrain.length === 0) return;
+
+    const prixInitiaux = {};
+    creneauxTerrain.forEach((creneau) => {
+      prixInitiaux[creneau.label] = cfg.prixParDefaut;
+    });
+    setPrixParCreneau(prixInitiaux);
+    setJoursSelectionnes(JOURS_SEMAINE_OUVRABLE);
+    setGrille(buildGrilleInitiale(creneauxTerrain, cfg.prixParDefaut));
+  };
+
   useEffect(() => {
     async function loadConfigs() {
       try {
@@ -65,7 +82,7 @@ export default function GererCreneaux({ onLogout }) {
         setConfigs(configsData);
         setProfile(profileData);
         if (configsData.length > 0) {
-          setTerrainId(configsData[0].terrainId);
+          selectionnerTerrain(configsData[0]);
         }
       } catch (error) {
         console.error('Erreur chargement des créneaux gérant:', error);
@@ -84,19 +101,6 @@ export default function GererCreneaux({ onLogout }) {
     if (!config) return [];
     return generateCreneaux(config.ouverture, config.fermeture);
   }, [config]);
-
-  // Ré-initialise le formulaire (tarifs & grille) à chaque changement de terrain
-  useEffect(() => {
-    if (!config || creneaux.length === 0) return;
-
-    const prixInitiaux = {};
-    creneaux.forEach((creneau) => {
-      prixInitiaux[creneau.label] = config.prixParDefaut;
-    });
-    setPrixParCreneau(prixInitiaux);
-    setJoursSelectionnes(JOURS_SEMAINE_OUVRABLE);
-    setGrille(buildGrilleInitiale(creneaux, config.prixParDefaut));
-  }, [config, creneaux]);
 
   const handleToggleJour = (jour) => {
     setJoursSelectionnes((current) =>
@@ -159,7 +163,7 @@ export default function GererCreneaux({ onLogout }) {
         <div className="relative w-full sm:w-72">
           <select
             value={terrainId ?? ''}
-            onChange={(e) => setTerrainId(Number(e.target.value))}
+            onChange={(e) => selectionnerTerrain(configs.find((item) => item.terrainId === Number(e.target.value)))}
             className="w-full appearance-none border border-gray-200 rounded-[8px] px-4 py-2.5 text-sm font-bold text-gray-900 outline-none focus:border-vert-principal cursor-pointer"
           >
             {configs.map((item) => (

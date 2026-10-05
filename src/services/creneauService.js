@@ -64,6 +64,12 @@ export const creneauService = {
     let misAJour = 0;
     let erreurs = 0;
 
+    // Heure actuelle "HH:MM" : les créneaux du jour déjà commencés sont
+    // ignorés (le backend les refuse, et la liste ci-dessus ne les renvoie
+    // pas, on les prendrait donc à tort pour des créneaux à créer).
+    const maintenant = new Date();
+    const heureActuelle = `${String(maintenant.getHours()).padStart(2, '0')}:${String(maintenant.getMinutes()).padStart(2, '0')}`;
+
     for (let i = 0; i < nombreJours; i += 1) {
       const date = new Date();
       date.setDate(date.getDate() + i);
@@ -76,6 +82,7 @@ export const creneauService = {
       for (const creneau of creneaux) {
         const prix = prixParCreneau[creneau.label];
         if (!prix) continue;
+        if (i === 0 && creneau.debut <= heureActuelle) continue;
 
         const cle = `${dateStr}_${creneau.debut}`;
         const existant = existantsParCle.get(cle);

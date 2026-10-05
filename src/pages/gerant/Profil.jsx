@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import { useAuth } from '../../hooks/useAuth';
 import { authService } from '../../services/authService';
@@ -24,7 +22,6 @@ const ONGLETS = ['Informations personnelles', 'Sécurité'];
  * complexe (nom, quartier, adresse...) restent gérées depuis "Mes terrains".
  */
 export default function GerantProfil({ onLogout }) {
-  const navigate = useNavigate();
   const { currentUser, login } = useAuth();
   const [ongletActif, setOngletActif] = useState(ONGLETS[0]);
 

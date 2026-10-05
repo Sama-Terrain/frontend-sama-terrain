@@ -1,4 +1,3 @@
-import React from 'react';
 import { MapPin, Calendar, Clock } from 'lucide-react';
 
 // Affiche le récapitulatif de la réservation avant paiement (terrain, date, créneau(x), montants).
