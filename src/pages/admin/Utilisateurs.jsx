@@ -49,6 +49,7 @@ export default function Utilisateurs({ onLogout }) {
   const usersByRole = users.filter(user => {
     if (activeTab === 'Joueurs') return user.role === 'Amateur';
     if (activeTab === 'Gérants') return user.role === 'Gérant';
+    if (activeTab === 'Employés') return user.role === 'Employé';
     if (activeTab === 'Admins') return user.role === 'Admin';
     return true;
   });
@@ -151,7 +152,7 @@ export default function Utilisateurs({ onLogout }) {
     );
   }
 
-  const tabs = ["Joueurs", "Gérants", "Admins"];
+  const tabs = ["Joueurs", "Gérants", "Employés", "Admins"];
 
   return (
     <AdminLayout title="Gestion des Utilisateurs" profile={profile} onLogout={onLogout}>

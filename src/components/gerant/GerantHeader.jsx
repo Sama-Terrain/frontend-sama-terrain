@@ -88,6 +88,7 @@ export default function GerantHeader({ title = 'Tableau de bord', profile, onMen
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="text-xs font-bold text-gray-900">{gerantName}</p>
                   {profile?.email && <p className="text-[11px] text-gray-500 truncate">{profile.email}</p>}
+                  {profile?.role && <p className="text-[11px] font-semibold text-vert-principal mt-0.5">{profile.role}</p>}
                 </div>
 
                 <button

@@ -56,6 +56,8 @@ function normaliserReservationGerant(r) {
     transactionId: r.transaction_id,
     reserveeLe: new Date(r.cree_le).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }),
     ticket: r.ticket,
+    // { montant, moyen_paiement, encaisse_par, le } ou null si pas encore encaissé.
+    soldeEncaisse: r.solde_encaisse,
   };
 }
 
@@ -74,8 +76,14 @@ export const gerantService = {
     const resultat = await authService.getUtilisateurConnecte();
     if (!resultat.success) return null;
 
-    const { prenom, nom, initiales } = resultat.user;
-    return { name: `${prenom} ${nom}`, role: 'Gérant', initials: initiales };
+    const { prenom, nom, initiales, email, role, equipe } = resultat.user;
+    return {
+      name: `${prenom} ${nom}`,
+      email,
+      // Un employé voit pour qui il travaille (ex: "Employé · Amadou Diouf").
+      role: role === 'employe' ? `Employé · ${equipe?.proprietaire_nom ?? ''}` : 'Gérant',
+      initials: initiales,
+    };
   },
 
   // 4 KPIs affichés en haut du tableau de bord.

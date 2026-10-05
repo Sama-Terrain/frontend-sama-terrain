@@ -1,6 +1,8 @@
 import { X, User, Phone, MapPin, Calendar, Clock, Wallet, Ticket } from 'lucide-react';
 
 const formatMontant = (value) => `${(value ?? 0).toLocaleString('fr-FR')} FCFA`;
+const formatDateHeure = (iso) => new Date(iso).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+const LIBELLES_MOYEN = { cash: 'espèces', wave: 'Wave', orange_money: 'Orange Money' };
 
 function Ligne({ libelle, children }) {
   return (
@@ -20,6 +22,7 @@ export default function ReservationDetailModal({ reservation, onClose }) {
   if (!reservation) return null;
 
   const ticket = reservation.ticket;
+  const solde = reservation.soldeEncaisse;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs overflow-y-auto" onClick={onClose}>
@@ -89,7 +92,18 @@ export default function ReservationDetailModal({ reservation, onClose }) {
               <Ligne libelle="Avance payée en ligne">
                 <span className="text-vert-principal">{formatMontant(reservation.montantAvance)}</span>
               </Ligne>
-              <Ligne libelle="Reste à encaisser sur place">{formatMontant(reservation.resteAPayer)}</Ligne>
+              {solde ? (
+                <Ligne libelle="Solde encaissé sur place">
+                  {formatMontant(solde.montant)} ({LIBELLES_MOYEN[solde.moyen_paiement] || solde.moyen_paiement})
+                  {solde.encaisse_par && (
+                    <span className="block text-[11px] font-semibold text-gray-500">
+                      par {solde.encaisse_par}, le {formatDateHeure(solde.le)}
+                    </span>
+                  )}
+                </Ligne>
+              ) : (
+                <Ligne libelle="Reste à encaisser sur place">{formatMontant(reservation.resteAPayer)}</Ligne>
+              )}
               <Ligne libelle="Moyen de paiement">{reservation.moyenPaiement || '—'}</Ligne>
               {reservation.transactionId && (
                 <Ligne libelle="Référence transaction">
@@ -110,7 +124,12 @@ export default function ReservationDetailModal({ reservation, onClose }) {
                   </Ligne>
                   <Ligne libelle="État">
                     {ticket.utilise ? (
-                      <span className="text-gray-500">Déjà scanné</span>
+                      <span className="text-gray-500">
+                        Scanné{ticket.valide_par ? ` par ${ticket.valide_par}` : ''}
+                        {ticket.utilise_le && (
+                          <span className="block text-[11px] font-semibold">le {formatDateHeure(ticket.utilise_le)}</span>
+                        )}
+                      </span>
                     ) : (
                       <span className="text-emerald-700">Valide, pas encore scanné</span>
                     )}

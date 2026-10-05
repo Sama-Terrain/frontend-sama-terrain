@@ -9,10 +9,14 @@ import {
   QrCode,
   BarChart3,
   Sparkles,
+  Users,
+  History,
   LogOut,
   X,
 } from 'lucide-react';
 import logoSamaClair from '../../assets/sama-logo-clair.png';
+import { useAuth } from '../../hooks/useAuth';
+import { ROLES, getHomeRouteForRole } from '../../utils/roles';
 
 /**
  * Composant GerantSidebar
@@ -22,18 +26,26 @@ import logoSamaClair from '../../assets/sama-logo-clair.png';
 export default function GerantSidebar({ onLogout, onMobileClose }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser } = useAuth();
+  const estEmploye = currentUser?.role === ROLES.EMPLOYE;
 
-  const menuItems = [
+  // `equipe: true` : entrée aussi visible par les employés du gérant
+  // (le quotidien). Le reste (argent, statistiques, équipe) est réservé
+  // au propriétaire.
+  const tousLesMenus = [
     { id: 'dashboard', label: 'Tableau de bord', path: '/gerant/dashboard', icon: LayoutDashboard },
     { id: 'terrains', label: 'Mes terrains', path: '/gerant/terrains', icon: Layers },
-    { id: 'creneaux', label: 'Créneaux & tarifs', path: '/gerant/creneaux', icon: Calendar },
-    { id: 'reservations', label: 'Réservations', path: '/gerant/reservations', icon: ClipboardCheck },
+    { id: 'creneaux', label: 'Créneaux & tarifs', path: '/gerant/creneaux', icon: Calendar, equipe: true },
+    { id: 'reservations', label: 'Réservations', path: '/gerant/reservations', icon: ClipboardCheck, equipe: true },
     { id: 'revenus', label: 'Revenus', path: '/gerant/revenus', icon: DollarSign },
     { id: 'portefeuille', label: 'Mon portefeuille', path: '/gerant/portefeuille', icon: Wallet },
-    { id: 'scanner', label: 'Scanner Ticket', path: '/gerant/scanner', icon: QrCode },
+    { id: 'scanner', label: 'Scanner Ticket', path: '/gerant/scanner', icon: QrCode, equipe: true },
     { id: 'statistiques', label: 'Statistiques', path: '/gerant/statistiques', icon: BarChart3 },
     { id: 'insights', label: 'Insights IA', path: '/gerant/insights', icon: Sparkles },
+    { id: 'equipe', label: 'Mon équipe', path: '/gerant/equipe', icon: Users },
+    { id: 'journal', label: "Journal d'activité", path: '/gerant/journal', icon: History },
   ];
+  const menuItems = estEmploye ? tousLesMenus.filter((item) => item.equipe) : tousLesMenus;
 
   const handleLogoutClick = async () => {
     if (onLogout) await onLogout();
@@ -49,7 +61,7 @@ export default function GerantSidebar({ onLogout, onMobileClose }) {
           <div
             className="flex items-center space-x-3 cursor-pointer"
             onClick={() => {
-              navigate('/gerant/dashboard');
+              navigate(getHomeRouteForRole(currentUser?.role));
               if (onMobileClose) onMobileClose();
             }}
           >

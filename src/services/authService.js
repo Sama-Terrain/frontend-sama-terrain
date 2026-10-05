@@ -14,7 +14,7 @@ function ajouterInitiales(user) {
 }
 
 // Traduit les erreurs renvoyées par DRF (souvent {champ: [message]}) en un texte lisible.
-function extraireMessageErreur(error) {
+export function extraireMessageErreur(error) {
   const donnees = error.response?.data;
   if (!donnees) return 'Une erreur réseau est survenue.';
   if (typeof donnees === 'string') return donnees;
@@ -29,7 +29,7 @@ function extraireMessageErreur(error) {
 // que le formulaire puisse afficher chaque erreur backend sous le bon
 // champ (ex: {email: "Un compte existe déjà avec cet email."}), plutôt que
 // juste la première erreur dans une alerte générique.
-function extraireErreursChamps(error) {
+export function extraireErreursChamps(error) {
   const donnees = error.response?.data;
   if (!donnees || typeof donnees !== 'object') return {};
 

@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Alert from '../../components/ui/Alert';
@@ -16,9 +16,12 @@ import { validerEmail, validerMotDePasse, validerConfirmationMotDePasse } from '
  */
 export default function MotDePasseOublie() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [etape, setEtape] = useState(1);
 
-  const [email, setEmail] = useState('');
+  // Pré-rempli quand on arrive depuis l'email d'invitation d'un employé
+  // (lien /mot-de-passe-oublie?email=...).
+  const [email, setEmail] = useState(() => searchParams.get('email') || '');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [nouveauMotDePasse, setNouveauMotDePasse] = useState('');
   const [confirmationMotDePasse, setConfirmationMotDePasse] = useState('');

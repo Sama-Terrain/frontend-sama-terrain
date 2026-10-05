@@ -2,6 +2,8 @@ import { useState } from 'react';
 import GerantSidebar from './GerantSidebar';
 import GerantHeader from './GerantHeader';
 import AbonnementTrialBanner from './AbonnementTrialBanner';
+import { useAuth } from '../../hooks/useAuth';
+import { ROLES } from '../../utils/roles';
 
 /**
  * Composant GerantLayout
@@ -12,6 +14,7 @@ import AbonnementTrialBanner from './AbonnementTrialBanner';
  */
 export default function GerantLayout({ children, title, profile, onLogout }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { currentUser } = useAuth();
 
   const handleMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -39,7 +42,7 @@ export default function GerantLayout({ children, title, profile, onLogout }) {
         <GerantHeader title={title} profile={profile} onMenuToggle={handleMenuToggle} onLogout={onLogout} />
 
         <main className="flex-1 p-4 sm:p-6 lg:px-10 lg:py-8 space-y-6 lg:space-y-8 max-w-7xl w-full mx-auto overflow-y-auto">
-          <AbonnementTrialBanner />
+          {currentUser?.role === ROLES.GERANT && <AbonnementTrialBanner />}
           {children}
         </main>
 
