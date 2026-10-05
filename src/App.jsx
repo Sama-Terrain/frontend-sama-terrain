@@ -39,12 +39,14 @@ function AppContent() {
       );
     }
 
-  // Masquer la Navbar et le Footer grand public sur les pages auth et les espaces
+  // Masquer la Navbar et le Footer grand public sur les pages auth, les pages
+  // légales (qui ont leur propre en-tête avec retour à l'accueil) et les espaces
   // admin / gérant connectés (qui ont leur propre sidebar + header dédiés).
   // Note : '/gerant' seul (page publique "Devenir Gérant") garde la Navbar ;
   // seul '/gerant/...' (espace connecté) la masque.
   const isAuthOrAdminPage =
-    ['/login', '/register', '/verify-email', '/mot-de-passe-oublie'].includes(location.pathname) ||
+    ['/login', '/register', '/verify-email', '/mot-de-passe-oublie',
+      '/support', '/conditions-utilisation', '/confidentialite'].includes(location.pathname) ||
     location.pathname.startsWith('/admin') ||
     location.pathname.startsWith('/gerant/');
 

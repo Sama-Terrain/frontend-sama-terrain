@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Check, Download, Share2, X } from 'lucide-react';
 
@@ -37,21 +38,25 @@ export default function TicketQR({ ticket, onClose }) {
         }
     };
 
-    return (
+    // Rendu dans un portail, directement sous <body> : à l'impression
+    // ("Télécharger"), global.css masque tout le reste de la page (header,
+    // footer, contenu derrière la modale) pour n'imprimer que le ticket,
+    // sur une seule page.
+    return createPortal(
         <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 overflow-y-auto"
+            className="ticket-impression fixed inset-0 bg-black/50 backdrop-blur-xs z-50 overflow-y-auto print:static print:bg-transparent print:backdrop-blur-none print:overflow-visible"
             onClick={onClose}
         >
-            <div className="min-h-screen flex items-center justify-center p-2 sm:p-4">
+            <div className="min-h-screen flex items-center justify-center p-2 sm:p-4 print:min-h-0 print:p-0">
 
                 <div
-                    className="bg-white rounded-2xl sm:rounded-[28px] p-2.5 sm:p-6 max-w-[280px] sm:max-w-md w-full relative shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200 text-left my-2 sm:my-8"
+                    className="bg-white rounded-2xl sm:rounded-[28px] p-2.5 sm:p-6 max-w-[280px] sm:max-w-md w-full relative shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200 text-left my-2 sm:my-8 print:shadow-none print:border-gray-300 print:my-0 print:break-inside-avoid"
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* BOUTON FERMER */}
                     <button
                         onClick={onClose}
-                        className="absolute top-1.5 right-1.5 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 cursor-pointer"
+                        className="print:hidden absolute top-1.5 right-1.5 sm:top-4 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100 cursor-pointer"
                         title="Fermer"
                     >
                         <X size={14} className="sm:w-5 sm:h-5" />
@@ -136,8 +141,8 @@ export default function TicketQR({ ticket, onClose }) {
 
                     </div>
 
-                    {/* BOUTONS D'ACTION */}
-                    <div className="grid grid-cols-2 gap-1.5 sm:gap-3 pt-0.5">
+                    {/* BOUTONS D'ACTION (absents du ticket imprimé) */}
+                    <div className="grid grid-cols-2 gap-1.5 sm:gap-3 pt-0.5 print:hidden">
 
                         <button
                             onClick={handleDownload}
@@ -158,6 +163,7 @@ export default function TicketQR({ ticket, onClose }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }

@@ -71,3 +71,21 @@
 .hover\:text-vert-principal:hover {
   color: var(--vert-principal);
 }
+
+/* Impression du ticket (bouton "Télécharger" de TicketQR) : on n'imprime que
+   le ticket, sans header ni footer ni le reste de la page, sur une seule page. */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body:has(.ticket-impression) > *:not(.ticket-impression) {
+    display: none !important;
+  }
+
+  .ticket-impression {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
