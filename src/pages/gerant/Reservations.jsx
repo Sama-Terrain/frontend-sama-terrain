@@ -63,9 +63,14 @@ export default function Reservations({ onLogout }) {
   }, [reservations, terrainSelectionne, statutSelectionne]);
 
   // Réinitialise la page quand les filtres changent
-  useEffect(() => {
+  const changerTerrain = (terrain) => {
+    setTerrainSelectionne(terrain);
     setPage(1);
-  }, [terrainSelectionne, statutSelectionne]);
+  };
+  const changerStatut = (statut) => {
+    setStatutSelectionne(statut);
+    setPage(1);
+  };
 
   const RESERVATIONS_PAR_PAGE = 10;
   const totalPages = Math.max(1, Math.ceil(reservationsFiltrees.length / RESERVATIONS_PAR_PAGE));
@@ -98,9 +103,9 @@ export default function Reservations({ onLogout }) {
         periodeLabel={activite?.periodeLabel}
         terrains={terrains}
         terrainSelectionne={terrainSelectionne}
-        onChangeTerrain={setTerrainSelectionne}
+        onChangeTerrain={changerTerrain}
         statutSelectionne={statutSelectionne}
-        onChangeStatut={setStatutSelectionne}
+        onChangeStatut={changerStatut}
       />
 
       <ReservationsTable

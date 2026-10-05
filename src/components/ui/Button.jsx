@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Props du composant :
 // - children : Le texte ou le contenu du bouton
 // - variant : Le style visuel ('primary', 'secondary', 'destructive', 'ghost', 'disabled', 'gold', 'outline')

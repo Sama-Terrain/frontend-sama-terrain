@@ -74,6 +74,7 @@ export const reservationService = {
     return {
       remboursementTotal: data.remboursement_possible,
       montantRembourse: data.montant_rembourse,
+      fraisAnnulation: data.frais_annulation,
     };
   },
 
@@ -84,6 +85,7 @@ export const reservationService = {
         success: true,
         remboursementTotal: data.remboursement_possible,
         montantRembourse: data.montant_rembourse,
+        fraisAnnulation: data.frais_annulation,
       };
     } catch (error) {
       return { success: false, error: error.response?.data?.detail || 'Erreur lors de l\'annulation.' };

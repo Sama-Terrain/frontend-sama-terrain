@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import Button from '../../components/ui/Button';
@@ -24,7 +24,7 @@ export default function Connexion() {
 
   // Commun à la connexion classique et à la connexion Google : une fois
   // connecté, on mémorise l'utilisateur puis on l'envoie au bon endroit.
-  const apresConnexionReussie = (user) => {
+  const apresConnexionReussie = useCallback((user) => {
     login(user);
 
     // Si l'email n'est pas encore vérifié (cas impossible avec Google, qui
@@ -36,7 +36,7 @@ export default function Connexion() {
 
     // Admin et gérant sont redirigés directement vers leur tableau de bord
     navigate(getHomeRouteForRole(user.role));
-  };
+  }, [login, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +82,7 @@ export default function Connexion() {
       }
       apresConnexionReussie(resultat.user);
     });
-  }, []);
+  }, [apresConnexionReussie]);
 
   return (
     <div className="min-h-screen bg-white flex font-sans relative">

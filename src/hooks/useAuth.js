@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/contexteAuth';
 
 // Hook pratique pour lire l'utilisateur connecté et se connecter/déconnecter
 // depuis n'importe quel composant : const { currentUser, login, logout } = useAuth();

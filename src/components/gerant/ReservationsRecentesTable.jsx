@@ -1,5 +1,3 @@
-import React from 'react';
-
 // utils/formatPrix.js est actuellement vide dans le projet ; formatage local en attendant son implémentation.
 const formatMontant = (value) => `${value.toLocaleString('fr-FR')} FCFA`;
 

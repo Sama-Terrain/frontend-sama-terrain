@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Composant ActiviteRecenteList
  * Affiche la liste du flux d'activités récents du système avec badges colorés.

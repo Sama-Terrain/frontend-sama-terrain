@@ -44,8 +44,21 @@ export default function RechercheTerrains() {
     fetchTerrains();
   }, []);
 
+  // Revient à la page 1 dès que les filtres/tri changent le résultat, pour
+  // ne jamais rester bloqué sur une page devenue vide. Accepte une valeur
+  // ou une fonction, exactement comme setFilters.
+  const changerFiltres = (nouveauxFiltres) => {
+    setFilters(nouveauxFiltres);
+    setPage(1);
+  };
+
+  const changerTri = (tri) => {
+    setSortBy(tri);
+    setPage(1);
+  };
+
   const handleReset = () => {
-    setFilters({
+    changerFiltres({
       localisation: 'Tous les quartiers',
       date: 'Dim. 24 Novembre',
       types: [],
@@ -92,11 +105,6 @@ export default function RechercheTerrains() {
     return b.nombreAvis - a.nombreAvis;
   });
 
-  // Revient à la page 1 dès que les filtres/tri changent le résultat, pour
-  // ne jamais rester bloqué sur une page devenue vide.
-  useEffect(() => {
-    setPage(1);
-  }, [filters, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(sortedTerrains.length / TERRAINS_PAR_PAGE));
   const pageAffichee = Math.min(page, totalPages);
@@ -116,7 +124,7 @@ export default function RechercheTerrains() {
           <div className="lg:col-span-1">
             <TerrainFilters
               filters={filters}
-              setFilters={setFilters}
+              setFilters={changerFiltres}
               onReset={handleReset}
             />
           </div>
@@ -135,7 +143,7 @@ export default function RechercheTerrains() {
                 <span className="text-gray-500 font-medium hidden xs:inline">Trier par :</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => changerTri(e.target.value)}
                   className="bg-transparent font-bold text-gray-900 focus:outline-none cursor-pointer max-w-[140px] sm:max-w-none"
                 >
                   <option value="Recommandé">Recommandé</option>

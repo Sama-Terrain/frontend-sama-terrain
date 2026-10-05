@@ -1,4 +1,3 @@
-import React from 'react';
 import RatingStars from '../ui/RatingStars';
 
 /**

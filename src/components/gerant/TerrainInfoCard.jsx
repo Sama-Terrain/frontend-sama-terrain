@@ -1,4 +1,3 @@
-import React from 'react';
 import { Info, Pencil } from 'lucide-react';
 import Button from '../ui/Button';
 import { ICONES_EQUIPEMENTS } from '../../utils/equipements';

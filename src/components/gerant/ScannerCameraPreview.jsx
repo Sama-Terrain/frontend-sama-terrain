@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import jsQR from 'jsqr';
 import { VideoOff, ScanLine } from 'lucide-react';
 

@@ -39,6 +39,11 @@ import Inscription from '../pages/auth/Inscription';
 import VerificationEmail from '../pages/auth/VerificationEmail';
 import MotDePasseOublie from '../pages/auth/MotDePasseOublie';
 
+// Pages Support & Légal (publiques)
+import PolitiqueConfidentialite from '../pages/legal/PolitiqueConfidentialite';
+import ConditionsUtilisation from '../pages/legal/ConditionsUtilisation';
+import SupportLegal from '../pages/legal/SupportLegal';
+
 // Pages Admin
 import AdminDashboard from '../pages/admin/Dashboard';
 import Utilisateurs from '../pages/admin/Utilisateurs';
@@ -49,7 +54,7 @@ import Parametres from '../pages/admin/Parametres';
 import GerantDetail from '../pages/admin/GerantDetail';
 import Retraits from '../pages/admin/Retraits';
 
-export default function AppRoutes({ searchParams }) {
+export default function AppRoutes() {
   const { currentUser, logout } = useAuth();
 
   // Petit helper pour éviter de répéter la même double protection sur chaque
@@ -76,7 +81,7 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/accueil" element={<Navigate to="/" replace />} />
 
       {/* Routes Terrains */}
-      <Route path="/terrains" element={<RechercheTerrains initialSearch={searchParams} />} />
+      <Route path="/terrains" element={<RechercheTerrains />} />
       <Route path="/terrains/:id" element={<DetailTerrain currentUser={currentUser} />} />
 
       {/* Routes du parcours de réservation (réservées aux amateurs connectés) */}
@@ -200,6 +205,11 @@ export default function AppRoutes({ searchParams }) {
       <Route path="/register" element={<Inscription />} />
       <Route path="/verify-email" element={<VerificationEmail />} />
       <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+
+      {/* Routes Support & Légal (publiques) */}
+      <Route path="/support" element={<SupportLegal />} />
+      <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
+      <Route path="/confidentialite" element={<PolitiqueConfidentialite />} />
 
       {/* Fallback route inconnue -> Redirection Accueil */}
       <Route path="*" element={<Navigate to="/" replace />} />

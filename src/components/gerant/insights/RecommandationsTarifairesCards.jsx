@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Composant RecommandationsTarifairesCards
  * Créneaux disponibles pour lesquels l'IA recommande un prix différent du

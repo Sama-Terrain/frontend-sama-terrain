@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Props du composant :
 // - checked : état actuel du switch (true = actif)
 // - onChange : fonction appelée au changement d'état

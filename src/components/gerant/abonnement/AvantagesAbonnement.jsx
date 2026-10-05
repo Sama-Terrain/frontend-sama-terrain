@@ -1,4 +1,3 @@
-import React from 'react';
 import { Check } from 'lucide-react';
 
 // Liste des avantages inclus dans l'abonnement, réutilisée sur les écrans

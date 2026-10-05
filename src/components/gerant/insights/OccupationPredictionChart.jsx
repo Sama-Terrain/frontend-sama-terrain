@@ -1,4 +1,3 @@
-import React from 'react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, LabelList } from 'recharts';
 
 /**

@@ -88,7 +88,7 @@ export default function Inscription() {
       login(resultat.user);
       navigate(getHomeRouteForRole(resultat.user.role));
     });
-  }, []);
+  }, [login, navigate]);
 
   return (
     <div className="min-h-screen bg-white flex font-sans relative">

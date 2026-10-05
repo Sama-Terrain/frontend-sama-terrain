@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Props du composant :
 // - type : Le type d'alerte ('success', 'error', 'warning', 'info')
 // - message : Le texte du message à afficher

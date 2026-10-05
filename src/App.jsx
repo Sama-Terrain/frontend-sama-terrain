@@ -20,10 +20,6 @@ function AppContent() {
     // permettant de le déconnecter depuis le contexte d'authentification.
     const { currentUser, logout } = useAuth();
 
-    // Crée une variable d'état appelée "searchParams".
-    // Elle permet de stocker les paramètres de recherche.
-    const [searchParams, setSearchParams] = useState({});
-
     // Crée une variable d'état "splashTermine" qui indique si l'écran
     // de démarrage (Splash Screen) a déjà été affiché.
     const [splashTermine, setSplashTermine] = useState(
@@ -62,7 +58,7 @@ function AppContent() {
       )}
 
       <main className={`flex-1 ${!isAuthOrAdminPage ? 'pb-16 md:pb-0' : ''}`}>
-        <AppRoutes searchParams={searchParams} />
+        <AppRoutes />
       </main>
 
       {!isAuthOrAdminPage && (

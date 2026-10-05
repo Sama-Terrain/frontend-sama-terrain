@@ -1,4 +1,3 @@
-import React from 'react';
 import logoWave from '../../assets/logo-wave.png';
 import logoOrangeMoney from '../../assets/logo-orange-money.jpeg';
 

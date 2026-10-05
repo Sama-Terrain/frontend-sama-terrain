@@ -55,29 +55,29 @@ export default function Footer() {
 
           {/* Colonne 3: Support & Légal (Titre en #D4AF37) */}
           <div>
-            <h4 className="text-sm font-bold text-dore mb-4 tracking-wide">
+            <Link to="/support" className="block text-sm font-bold text-dore mb-4 tracking-wide hover:text-dore-survol">
               Support & Légal
-            </h4>
+            </Link>
             <ul className="space-y-2.5 text-sm text-gray-300">
               <li>
-                <a href="#cgu" className="hover:text-white transition-colors">
+                <Link to="/conditions-utilisation" className="hover:text-white transition-colors">
                   Conditions d'utilisation
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#confidentialite" className="hover:text-white transition-colors">
+                <Link to="/confidentialite" className="hover:text-white transition-colors">
                   Politique de confidentialité
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#faq" className="hover:text-white transition-colors">
+                <Link to="/support#faq" className="hover:text-white transition-colors">
                   FAQ
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#contact" className="hover:text-white transition-colors">
+                <Link to="/support#contact" className="hover:text-white transition-colors">
                   Nous contacter
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -89,8 +89,8 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm text-gray-300 mb-6">
               <li>Dakar, Sénégal</li>
-              <li>contact@samaterrain.sn</li>
-              <li>+221 33 800 00 00</li>
+              <li>contact@sama-terrain.site</li>
+              <li>+221 78 466 75 55</li>
             </ul>
 
             {/* Icones Réseaux Sociaux Cercle Vert */}

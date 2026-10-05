@@ -32,6 +32,8 @@ export default function Accueil() {
     { id: 1, sender: 'bot', text: "Bonjour ! Je suis l'assistant Sama-Terrain. Dites-moi par exemple « Je veux réserver demain à 20h » et je vérifie les créneaux disponibles pour vous." }
   ]);
   const [aiInput, setAiInput] = useState('');
+  // Identifiant unique de chaque message (le message d'accueil a l'id 1).
+  const prochainIdMessage = useRef(2);
   const [aiEnAttente, setAiEnAttente] = useState(false);
 
   // Vidéo "Comment ça marche ?"
@@ -90,7 +92,7 @@ export default function Accueil() {
       .map((msg) => msg.text)
       .slice(-6);
 
-    const userMsg = { id: Date.now(), sender: 'user', text: messageEnvoye };
+    const userMsg = { id: prochainIdMessage.current++, sender: 'user', text: messageEnvoye };
     setAiMessages((prev) => [...prev, userMsg]);
     setAiInput('');
     setAiEnAttente(true);
@@ -109,7 +111,7 @@ export default function Accueil() {
 
     setAiMessages((prev) => [
       ...prev,
-      { id: Date.now() + 1, sender: 'bot', text: texteReponse, liens: liensReponse, proposition: propositionReponse }
+      { id: prochainIdMessage.current++, sender: 'bot', text: texteReponse, liens: liensReponse, proposition: propositionReponse }
     ]);
     setAiEnAttente(false);
   };
@@ -266,7 +268,7 @@ export default function Accueil() {
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
             </div>
             <span className="bg-gray-800 text-gray-300 text-[11px] font-semibold px-3 py-1 rounded-full">
-              sama-terrain.sn
+              sama-terrain.site
             </span>
           </div>
 

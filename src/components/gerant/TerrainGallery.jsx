@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Composant TerrainGallery
  * Grande photo principale + grille de 4 miniatures (la dernière affichant

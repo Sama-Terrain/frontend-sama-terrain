@@ -54,9 +54,10 @@ export default function ModerationAvis({ onLogout }) {
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
 
   // Réinitialiser la page quand les filtres changent
-  useEffect(() => {
+  const changerOnglet = (onglet) => {
+    setActiveTab(onglet);
     setCurrentPage(1);
-  }, [activeTab]);
+  };
 
   // Lève le signalement : l'avis reste visible publiquement.
   const handleApprove = async (review) => {
@@ -95,7 +96,7 @@ export default function ModerationAvis({ onLogout }) {
         {/* En attente */}
         <button
           type="button"
-          onClick={() => setActiveTab("pending")}
+          onClick={() => changerOnglet("pending")}
           className={`flex flex-1 items-center justify-center rounded-[6px] px-[16px] py-[10px] text-[12px] font-bold transition-colors ${
             activeTab === "pending"
               ? "bg-vert-principal text-white"
@@ -108,7 +109,7 @@ export default function ModerationAvis({ onLogout }) {
         {/* Approuvés */}
         <button
           type="button"
-          onClick={() => setActiveTab("approved")}
+          onClick={() => changerOnglet("approved")}
           className={`flex flex-1 items-center justify-center rounded-[6px] px-[16px] py-[10px] text-[12px] font-bold transition-colors ${
             activeTab === "approved"
               ? "bg-vert-principal text-white"

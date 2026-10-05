@@ -1,4 +1,3 @@
-import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Check, Download, Share2, X } from 'lucide-react';
 

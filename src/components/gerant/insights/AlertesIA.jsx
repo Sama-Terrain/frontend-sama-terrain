@@ -1,4 +1,3 @@
-import React from 'react';
 import { Bell, TrendingUp, Users } from 'lucide-react';
 
 const ICONES_PAR_TYPE = {

@@ -20,7 +20,7 @@ export const FAQ_ACCUEIL = [
   {
     question: 'Puis-je annuler ma réservation et me faire rembourser ?',
     reponse:
-      "Oui, gratuitement jusqu'à 24 heures avant l'heure du match : l'avance payée en ligne est alors intégralement remboursée sur le même moyen de paiement utilisé. Passé ce délai, l'annulation reste possible mais l'avance n'est plus remboursable.",
+      "Oui, jusqu'à 24 heures avant l'heure du match : l'avance payée en ligne vous est remboursée sur le même moyen de paiement, moins les frais de transaction (PayTech, Wave ou Orange Money), qui restent à votre charge. Le montant exact remboursé est affiché avant que vous confirmiez. Passé ce délai, l'annulation reste possible mais l'avance n'est plus remboursable.",
   },
   {
     question: "Que se passe-t-il si je ne paie pas l'avance à temps ?",
