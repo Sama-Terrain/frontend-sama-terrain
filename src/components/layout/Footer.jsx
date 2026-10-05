@@ -90,7 +90,7 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm text-gray-300 mb-6">
               <li>Dakar, Sénégal</li>
               <li>contact@sama-terrain.site</li>
-              <li>+221 78 466 75 55</li>
+              <li>+221 78 466 74 55</li>
             </ul>
 
             {/* Icones Réseaux Sociaux Cercle Vert */}
