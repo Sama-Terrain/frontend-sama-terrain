@@ -55,6 +55,7 @@ function normaliserReservationGerant(r) {
     moyenPaiement: LABELS_MOYEN_PAIEMENT[r.moyen_paiement] ?? r.moyen_paiement,
     transactionId: r.transaction_id,
     reserveeLe: new Date(r.cree_le).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }),
+    creeLeIso: r.cree_le,
     ticket: r.ticket,
     // { montant, moyen_paiement, encaisse_par, le } ou null si pas encore encaissé.
     soldeEncaisse: r.solde_encaisse,
@@ -108,6 +109,34 @@ export const gerantService = {
         montant: jour.montant,
       })),
     };
+  },
+
+  // Nombre de réservations payées (confirmées ou déjà jouées) reçues chaque
+  // jour sur les 30 derniers jours : la courbe du volume d'activité, à côté
+  // de celle des revenus sur le tableau de bord.
+  async getReservations30Jours() {
+    const toutes = await this.getReservationsGerant();
+    const cleJour = (date) =>
+      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+    const jours = Array.from({ length: 30 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - 29 + i);
+      return {
+        cle: cleJour(date),
+        jour: date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+        nombre: 0,
+      };
+    });
+
+    toutes
+      .filter((r) => r.statutBrut === 'confirmee' || r.statutBrut === 'terminee')
+      .forEach((r) => {
+        const jour = jours.find((j) => j.cle === cleJour(new Date(r.creeLeIso)));
+        if (jour) jour.nombre += 1;
+      });
+
+    return { data: jours, total: jours.reduce((somme, j) => somme + j.nombre, 0) };
   },
 
   // Les 5 réservations les plus récentes, toutes terrains confondus.

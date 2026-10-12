@@ -4,6 +4,7 @@ import { Wallet } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import AdminKpiCard from '../../components/admin/AdminKpiCard';
 import RevenusChart from '../../components/gerant/RevenusChart';
+import ReservationsCourbe from '../../components/gerant/ReservationsCourbe';
 import ReservationsRecentesTable from '../../components/gerant/ReservationsRecentesTable';
 import { gerantService } from '../../services/gerantService';
 
@@ -12,13 +13,15 @@ import { gerantService } from '../../services/gerantService';
  *
  * Rassemble :
  * 1. Les 4 cartes de KPI (Réservations du jour, Revenus du mois, Taux d'occupation, Avis moyen).
- * 2. Le graphique des revenus des 30 derniers jours.
+ * 2. La courbe des revenus des 30 derniers jours, et à côté la courbe du
+ *    nombre de réservations reçues sur la même période.
  * 3. Le tableau des réservations récentes.
  * + un rappel tant que le numéro Wave / Orange Money de retrait n'est pas renseigné.
  */
 export default function GerantDashboard({ onLogout }) {
   const [stats, setStats] = useState([]);
   const [revenus, setRevenus] = useState(null);
+  const [reservations30Jours, setReservations30Jours] = useState(null);
   const [reservations, setReservations] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,15 +38,17 @@ export default function GerantDashboard({ onLogout }) {
     async function loadDashboardData() {
       try {
         setLoading(true);
-        const [statsData, revenusData, reservationsData, profileData] = await Promise.all([
+        const [statsData, revenusData, reservations30JoursData, reservationsData, profileData] = await Promise.all([
           gerantService.getGerantStats(),
           gerantService.getRevenus30Jours(),
+          gerantService.getReservations30Jours(),
           gerantService.getReservationsRecentes(),
           gerantService.getGerantProfile(),
         ]);
 
         setStats(statsData);
         setRevenus(revenusData);
+        setReservations30Jours(reservations30JoursData);
         setReservations(reservationsData);
         setProfile(profileData);
       } catch (error) {
@@ -99,9 +104,10 @@ export default function GerantDashboard({ onLogout }) {
         ))}
       </section>
 
-      {/* SECTION 2 : GRAPHIQUE DES REVENUS */}
-      <section>
+      {/* SECTION 2 : COURBE DES REVENUS ET COURBE DES RÉSERVATIONS, CÔTE À CÔTE */}
+      <section className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
         <RevenusChart data={revenus} total={revenus?.total} />
+        <ReservationsCourbe data={reservations30Jours} />
       </section>
 
       {/* SECTION 3 : RÉSERVATIONS RÉCENTES */}

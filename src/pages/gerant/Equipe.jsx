@@ -161,7 +161,8 @@ export default function Equipe({ onLogout }) {
               />
             </div>
             <p className="text-xs text-gray-500">
-              Un email d'invitation lui sera envoyé : il choisira lui-même son mot de passe. Vous ne le connaîtrez jamais.
+              Un email d'invitation lui sera envoyé avec un lien (valable 3 jours) : il choisira lui-même son mot de passe
+              et sera connecté directement. Vous ne connaîtrez jamais son mot de passe.
             </p>
             <button
               type="submit"

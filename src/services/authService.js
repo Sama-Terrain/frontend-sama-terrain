@@ -17,7 +17,10 @@ function ajouterInitiales(user) {
 export function extraireMessageErreur(error) {
   const donnees = error.response?.data;
   if (!donnees) return 'Une erreur réseau est survenue.';
-  if (typeof donnees === 'string') return donnees;
+  // Erreur serveur : Django renvoie alors une page HTML en anglais
+  // ("Server Error (500)"), qu'on ne doit jamais afficher telle quelle.
+  if (error.response.status >= 500) return 'Une erreur est survenue sur le serveur. Réessayez dans un instant.';
+  if (typeof donnees === 'string') return 'Une erreur est survenue.';
   if (donnees.detail) return donnees.detail;
 
   const premierChamp = Object.values(donnees)[0];
@@ -226,6 +229,36 @@ export const authService = {
   },
 
   // "Mot de passe oublié" — étape 2 : code + nouveau mot de passe.
+  // Lien d'invitation d'un employé (envoyé par son gérant) : vérifie qu'il est
+  // encore valable et récupère de quoi l'accueillir (prénom, employeur).
+  verifierLienActivation: async (uid, token) => {
+    try {
+      const { data } = await api.get('/auth/activer-compte', { params: { uid, token }, sansAuthentification: true });
+      return { success: true, prenom: data.prenom, email: data.email, employeur: data.employeur };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  // L'employé choisit son mot de passe depuis ce lien : pas de code à saisir
+  // (son email est déjà vérifié), il est connecté directement.
+  activerCompteEmploye: async (uid, token, nouveauMotDePasse) => {
+    try {
+      const { data } = await api.post(
+        '/auth/activer-compte',
+        { uid, token, nouveau_mot_de_passe: nouveauMotDePasse },
+        { sansAuthentification: true },
+      );
+
+      localStorage.setItem(CLE_ACCESS_TOKEN, data.access);
+      localStorage.setItem(CLE_REFRESH_TOKEN, data.refresh);
+
+      return { success: true, user: ajouterInitiales(data.user) };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
   reinitialiserMotDePasse: async (email, code, nouveauMotDePasse) => {
     try {
       await api.post('/auth/reinitialiser-mot-de-passe', {

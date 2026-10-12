@@ -40,6 +40,7 @@ import Connexion from '../pages/auth/Connexion';
 import Inscription from '../pages/auth/Inscription';
 import VerificationEmail from '../pages/auth/VerificationEmail';
 import MotDePasseOublie from '../pages/auth/MotDePasseOublie';
+import ActiverCompte from '../pages/auth/ActiverCompte';
 
 // Pages Support & Légal (publiques)
 import PolitiqueConfidentialite from '../pages/legal/PolitiqueConfidentialite';
@@ -211,6 +212,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Inscription />} />
       <Route path="/verify-email" element={<VerificationEmail />} />
       <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+      <Route path="/activer-compte" element={<ActiverCompte />} />
 
       {/* Routes Support & Légal (publiques) */}
       <Route path="/support" element={<SupportLegal />} />
