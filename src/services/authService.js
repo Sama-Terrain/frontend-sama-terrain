@@ -98,10 +98,18 @@ export const authService = {
     }
   },
 
+  // Vérification de l'email après l'inscription. L'utilisateur est connecté
+  // directement (user renvoyé), sauf un gérant dont la demande n'est pas
+  // encore validée (compte inactif) : user vaut alors null.
   verifyCode: async (email, code) => {
     try {
-      await api.post('/auth/verify-email', { email, code });
-      return { success: true };
+      const { data } = await api.post('/auth/verify-email', { email, code }, { sansAuthentification: true });
+
+      if (!data.access) return { success: true, user: null };
+
+      localStorage.setItem(CLE_ACCESS_TOKEN, data.access);
+      localStorage.setItem(CLE_REFRESH_TOKEN, data.refresh);
+      return { success: true, user: ajouterInitiales(data.user) };
     } catch (error) {
       return { success: false, error: extraireMessageErreur(error) };
     }
@@ -109,7 +117,7 @@ export const authService = {
 
   resendCode: async (email) => {
     try {
-      await api.post('/auth/resend-code', { email });
+      await api.post('/auth/resend-code', { email }, { sansAuthentification: true });
       return { success: true };
     } catch (error) {
       return { success: false, error: extraireMessageErreur(error) };
@@ -221,14 +229,13 @@ export const authService = {
   // "Mot de passe oublié" — étape 1 : envoie un code à 6 chiffres par email.
   demanderReinitialisationMotDePasse: async (email) => {
     try {
-      await api.post('/auth/mot-de-passe-oublie', { email });
+      await api.post('/auth/mot-de-passe-oublie', { email }, { sansAuthentification: true });
       return { success: true };
     } catch (error) {
       return { success: false, error: extraireMessageErreur(error) };
     }
   },
 
-  // "Mot de passe oublié" — étape 2 : code + nouveau mot de passe.
   // Lien d'invitation d'un employé (envoyé par son gérant) : vérifie qu'il est
   // encore valable et récupère de quoi l'accueillir (prénom, employeur).
   verifierLienActivation: async (uid, token) => {
@@ -259,14 +266,32 @@ export const authService = {
     }
   },
 
+  // "Mot de passe oublié" — étape 2 : vérifie seulement le code reçu par email.
+  verifierCodeReinitialisation: async (email, code) => {
+    try {
+      await api.post('/auth/verifier-code-reinitialisation', { email, code }, { sansAuthentification: true });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: extraireMessageErreur(error) };
+    }
+  },
+
+  // "Mot de passe oublié" — étape 3 : nouveau mot de passe. L'utilisateur est
+  // connecté directement (user renvoyé), sauf si son compte n'est pas encore
+  // activé (ex: gérant en attente de validation) : user vaut alors null.
   reinitialiserMotDePasse: async (email, code, nouveauMotDePasse) => {
     try {
-      await api.post('/auth/reinitialiser-mot-de-passe', {
-        email,
-        code,
-        nouveau_mot_de_passe: nouveauMotDePasse,
-      });
-      return { success: true };
+      const { data } = await api.post(
+        '/auth/reinitialiser-mot-de-passe',
+        { email, code, nouveau_mot_de_passe: nouveauMotDePasse },
+        { sansAuthentification: true },
+      );
+
+      if (!data.access) return { success: true, user: null };
+
+      localStorage.setItem(CLE_ACCESS_TOKEN, data.access);
+      localStorage.setItem(CLE_REFRESH_TOKEN, data.refresh);
+      return { success: true, user: ajouterInitiales(data.user) };
     } catch (error) {
       return { success: false, error: extraireMessageErreur(error) };
     }
