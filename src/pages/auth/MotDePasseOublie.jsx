@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -15,46 +15,26 @@ import { validerEmail, validerMotDePasse, validerConfirmationMotDePasse } from '
  * Étape 1 : l'utilisateur saisit son email, reçoit un code à 6 chiffres.
  * Étape 2 : il saisit ce code + son nouveau mot de passe.
  *
- * Depuis la page de connexion, l'email déjà tapé est transmis : le code est
- * alors envoyé automatiquement et on arrive directement à l'étape 2.
+ * Depuis la page de connexion, l'email déjà tapé est transmis et pré-rempli
+ * à l'étape 1 : l'utilisateur n'a pas à le ressaisir, il peut le corriger
+ * puis cliquer lui-même sur "Envoyer le code".
  */
 export default function MotDePasseOublie() {
   const navigate = useNavigate();
   const location = useLocation();
   const [etape, setEtape] = useState(1);
 
-  // Email transmis par la page de connexion (déjà saisi par l'utilisateur).
-  const emailTransmis = location.state?.email || '';
-  const envoiAutomatique = Boolean(emailTransmis) && !validerEmail(emailTransmis);
-  const envoiAutomatiqueLance = useRef(false);
-
-  const [email, setEmail] = useState(emailTransmis);
+  // Pré-rempli avec l'email déjà tapé sur la page de connexion.
+  const [email, setEmail] = useState(() => location.state?.email || '');
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [nouveauMotDePasse, setNouveauMotDePasse] = useState('');
   const [confirmationMotDePasse, setConfirmationMotDePasse] = useState('');
 
-  const [chargement, setChargement] = useState(envoiAutomatique);
+  const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState('');
   const [succes, setSucces] = useState(false);
 
   const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
-
-  // Email valide reçu de la page de connexion : on envoie le code tout de
-  // suite (une seule fois, même si React monte l'effet deux fois en dev).
-  useEffect(() => {
-    if (!envoiAutomatique || envoiAutomatiqueLance.current) return;
-    envoiAutomatiqueLance.current = true;
-
-    authService.demanderReinitialisationMotDePasse(emailTransmis).then((resultat) => {
-      setChargement(false);
-      if (resultat.success) {
-        setEtape(2);
-      } else {
-        // Ex: aucun compte avec cet email : on reste à l'étape 1 pour le corriger.
-        setErreur(resultat.error);
-      }
-    });
-  }, [envoiAutomatique, emailTransmis]);
 
   const handleChangeCode = (index, value) => {
     value = value.replace(/\D/g, '');
@@ -144,9 +124,7 @@ export default function MotDePasseOublie() {
           </h1>
 
           <p className="text-xs text-gray-600 max-w-sm mx-auto leading-relaxed">
-            {etape === 1 && envoiAutomatique && chargement
-              ? null
-              : etape === 1
+            {etape === 1
               ? 'Entrez votre email, nous vous enverrons un code de réinitialisation.'
               : (
                 <>
@@ -159,14 +137,7 @@ export default function MotDePasseOublie() {
           {erreur && <Alert type="error" message={erreur} />}
           {succes && <Alert type="success" message="Mot de passe réinitialisé avec succès ! Redirection..." />}
 
-          {etape === 1 && envoiAutomatique && chargement ? (
-            <div className="py-6 space-y-4">
-              <div className="w-10 h-10 border-4 border-vert-principal border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs text-gray-500 font-semibold">
-                Envoi du code à <strong className="text-gray-900">{emailTransmis}</strong>...
-              </p>
-            </div>
-          ) : etape === 1 ? (
+          {etape === 1 ? (
             <form onSubmit={handleDemanderCode} className="space-y-4 text-left">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-gray-800">Email</label>

@@ -55,7 +55,6 @@ function normaliserReservationGerant(r) {
     moyenPaiement: LABELS_MOYEN_PAIEMENT[r.moyen_paiement] ?? r.moyen_paiement,
     transactionId: r.transaction_id,
     reserveeLe: new Date(r.cree_le).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }),
-    creeLeIso: r.cree_le,
     ticket: r.ticket,
     // { montant, moyen_paiement, encaisse_par, le } ou null si pas encore encaissé.
     soldeEncaisse: r.solde_encaisse,
@@ -111,32 +110,28 @@ export const gerantService = {
     };
   },
 
-  // Nombre de réservations payées (confirmées ou déjà jouées) reçues chaque
-  // jour sur les 30 derniers jours : la courbe du volume d'activité, à côté
-  // de celle des revenus sur le tableau de bord.
-  async getReservations30Jours() {
+  // Répartition par statut des réservations du mois en cours (matchs du
+  // mois), pour le diagramme circulaire du tableau de bord.
+  async getReservationsDuMoisParStatut() {
     const toutes = await this.getReservationsGerant();
-    const cleJour = (date) =>
-      `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const maintenant = new Date();
+    const prefixeMois = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}`;
+    const duMois = toutes.filter((r) => r.dateIso.startsWith(prefixeMois));
 
-    const jours = Array.from({ length: 30 }, (_, i) => {
-      const date = new Date();
-      date.setDate(date.getDate() - 29 + i);
-      return {
-        cle: cleJour(date),
-        jour: date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
-        nombre: 0,
-      };
-    });
+    const STATUTS = [
+      { statut: 'confirmee', name: 'Confirmées', color: '#004030' },
+      { statut: 'terminee', name: 'Terminées', color: '#7FB8A3' },
+      { statut: 'en_attente', name: 'En attente', color: '#D4AF37' },
+      { statut: 'annulee', name: 'Annulées', color: '#EF4444' },
+    ];
 
-    toutes
-      .filter((r) => r.statutBrut === 'confirmee' || r.statutBrut === 'terminee')
-      .forEach((r) => {
-        const jour = jours.find((j) => j.cle === cleJour(new Date(r.creeLeIso)));
-        if (jour) jour.nombre += 1;
-      });
-
-    return { data: jours, total: jours.reduce((somme, j) => somme + j.nombre, 0) };
+    return {
+      total: duMois.length,
+      periodeLabel: maintenant.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+      data: STATUTS
+        .map((s) => ({ ...s, value: duMois.filter((r) => r.statutBrut === s.statut).length }))
+        .filter((s) => s.value > 0),
+    };
   },
 
   // Les 5 réservations les plus récentes, toutes terrains confondus.
