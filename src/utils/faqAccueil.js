@@ -30,7 +30,7 @@ export const FAQ_ACCUEIL = [
   {
     question: 'Comment devenir gérant et publier mon terrain ?',
     reponse:
-      "Remplissez le formulaire \"Devenir gérant\" avec un document justificatif (pièce d'identité ou registre de commerce). Après validation de votre compte par un administrateur (généralement sous 24h), vous bénéficiez de 7 jours d'essai gratuit avant de passer à l'abonnement mensuel de 7 500 FCFA.",
+      "Remplissez le formulaire \"Devenir gérant\" avec un document justificatif (pièce d'identité ou registre de commerce). Après validation de votre compte par un administrateur (généralement sous 24h), vous bénéficiez de 7 jours d'essai gratuit avant de passer à l'abonnement mensuel de 40 000 FCFA.",
   },
   {
     question: 'Quels moyens de paiement acceptez-vous ?',

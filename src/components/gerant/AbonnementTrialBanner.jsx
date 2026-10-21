@@ -29,7 +29,7 @@ export default function AbonnementTrialBanner() {
       <div className="flex items-center gap-2.5 text-amber-800">
         <Clock size={16} className="shrink-0" />
         <p className="text-sm font-semibold">
-          Essai gratuit : il vous reste {joursRestants} jour{joursRestants > 1 ? 's' : ''} avant l'activation de l'abonnement (7 500 FCFA/mois).
+          Essai gratuit : il vous reste {joursRestants} jour{joursRestants > 1 ? 's' : ''} avant l'activation de l'abonnement (40 000 FCFA/mois).
         </p>
       </div>
       <Button
