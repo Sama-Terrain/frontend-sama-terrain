@@ -3,7 +3,7 @@ import { FileText } from 'lucide-react';
 import PageLegale from '../../components/legal/PageLegale';
 import { CONTACT_SUPPORT } from '../../utils/contactSupport';
 
-// Les règles métier (avance, 15 minutes, 24h, abonnement 7 500 FCFA...) sont
+// Les règles métier (avance, 15 minutes, 24h, abonnement 40 000 FCFA...) sont
 // les mêmes que dans IA/faq/politiques.txt et utils/faqAccueil.js : les
 // garder alignées si l'une d'elles change.
 const SECTIONS = [
@@ -78,7 +78,7 @@ const SECTIONS = [
     contenu: (
       <ul>
         <li>Toute demande de compte gérant doit être accompagnée d'un document justificatif (pièce d'identité ou registre de commerce) et est soumise à la validation d'un administrateur.</li>
-        <li>Après validation, le gérant bénéficie de <strong>7 jours d'essai gratuit</strong>, puis d'un <strong>abonnement mensuel de 7 500 FCFA</strong>. Sans renouvellement, l'accès à l'espace gérant est suspendu automatiquement jusqu'au paiement.</li>
+        <li>Après validation, le gérant bénéficie de <strong>7 jours d'essai gratuit</strong>, puis d'un <strong>abonnement mensuel de 40 000 FCFA</strong>. Sans renouvellement, l'accès à l'espace gérant est suspendu automatiquement jusqu'au paiement.</li>
         <li>Le gérant s'engage à publier des informations exactes (photos, prix, équipements, horaires) et à honorer les réservations confirmées.</li>
         <li>Les avances encaissées sont versées sur le portefeuille du gérant et deviennent retirables à moins de 24 heures du match, une fois la période de remboursement passée.</li>
       </ul>

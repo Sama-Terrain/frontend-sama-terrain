@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { ROLES, getHomeRouteForRole } from '../utils/roles';
+import { ROLES, ROLES_ESPACE_GERANT, getHomeRouteForRole } from '../utils/roles';
 import ProtectedRoute from './ProtectedRoute';
 import RequireAbonnementActif from './RequireAbonnementActif';
 
@@ -32,12 +32,15 @@ import Abonnement from '../pages/gerant/Abonnement';
 import Portefeuille from '../pages/gerant/Portefeuille';
 import AbonnementSucces from '../pages/gerant/AbonnementSucces';
 import AbonnementAnnule from '../pages/gerant/AbonnementAnnule';
+import Equipe from '../pages/gerant/Equipe';
+import JournalActivite from '../pages/gerant/JournalActivite';
 
 // Pages Authentification
 import Connexion from '../pages/auth/Connexion';
 import Inscription from '../pages/auth/Inscription';
 import VerificationEmail from '../pages/auth/VerificationEmail';
 import MotDePasseOublie from '../pages/auth/MotDePasseOublie';
+import ActiverCompte from '../pages/auth/ActiverCompte';
 
 // Pages Support & Légal (publiques)
 import PolitiqueConfidentialite from '../pages/legal/PolitiqueConfidentialite';
@@ -60,8 +63,10 @@ export default function AppRoutes() {
   // Petit helper pour éviter de répéter la même double protection sur chaque
   // page gérant : il faut être connecté EN TANT QUE gérant, ET avoir un
   // abonnement actif (essai en cours ou abonnement payé) pour y accéder.
-  const pageGerant = (element) => (
-    <ProtectedRoute allowedRoles={[ROLES.GERANT]}>
+  // Les pages du quotidien (réservations, scanner, créneaux, profil) sont
+  // aussi ouvertes aux employés du gérant : on leur passe ROLES_ESPACE_GERANT.
+  const pageGerant = (element, roles = [ROLES.GERANT]) => (
+    <ProtectedRoute allowedRoles={roles}>
       <RequireAbonnementActif>{element}</RequireAbonnementActif>
     </ProtectedRoute>
   );
@@ -181,13 +186,15 @@ export default function AppRoutes() {
       <Route path="/gerant/terrains/ajouter" element={pageGerant(<AjouterTerrain onLogout={logout} />)} />
       <Route path="/gerant/terrains/:id" element={pageGerant(<TerrainDetail onLogout={logout} />)} />
       <Route path="/gerant/terrains/:id/modifier" element={pageGerant(<AjouterTerrain onLogout={logout} />)} />
-      <Route path="/gerant/creneaux" element={pageGerant(<GererCreneaux onLogout={logout} />)} />
-      <Route path="/gerant/reservations" element={pageGerant(<Reservations onLogout={logout} />)} />
+      <Route path="/gerant/creneaux" element={pageGerant(<GererCreneaux onLogout={logout} />, ROLES_ESPACE_GERANT)} />
+      <Route path="/gerant/reservations" element={pageGerant(<Reservations onLogout={logout} />, ROLES_ESPACE_GERANT)} />
       <Route path="/gerant/revenus" element={pageGerant(<Revenus onLogout={logout} />)} />
-      <Route path="/gerant/scanner" element={pageGerant(<ScannerTicket onLogout={logout} />)} />
+      <Route path="/gerant/scanner" element={pageGerant(<ScannerTicket onLogout={logout} />, ROLES_ESPACE_GERANT)} />
       <Route path="/gerant/statistiques" element={pageGerant(<GerantStatistiques onLogout={logout} />)} />
       <Route path="/gerant/insights" element={pageGerant(<InsightsIA onLogout={logout} />)} />
-      <Route path="/gerant/profil" element={pageGerant(<GerantProfil onLogout={logout} />)} />
+      <Route path="/gerant/profil" element={pageGerant(<GerantProfil onLogout={logout} />, ROLES_ESPACE_GERANT)} />
+      <Route path="/gerant/equipe" element={pageGerant(<Equipe onLogout={logout} />)} />
+      <Route path="/gerant/journal" element={pageGerant(<JournalActivite onLogout={logout} />)} />
 
       {/* Routes Administrateur : réservées au rôle admin */}
       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -205,6 +212,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Inscription />} />
       <Route path="/verify-email" element={<VerificationEmail />} />
       <Route path="/mot-de-passe-oublie" element={<MotDePasseOublie />} />
+      <Route path="/activer-compte" element={<ActiverCompte />} />
 
       {/* Routes Support & Légal (publiques) */}
       <Route path="/support" element={<SupportLegal />} />

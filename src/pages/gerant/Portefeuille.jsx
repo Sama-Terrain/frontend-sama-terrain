@@ -3,10 +3,12 @@ import { Wallet, Clock, Send, CheckCircle2, AlertTriangle } from 'lucide-react';
 import GerantLayout from '../../components/gerant/GerantLayout';
 import { gerantService } from '../../services/gerantService';
 import { nettoyerTelephone, estNumeroSenegalaisValide } from '../../utils/telephone';
+import logoWave from '../../assets/logo-wave.png';
+import logoOrangeMoney from '../../assets/logo-orange-money.jpeg';
 
 const OPERATEURS = [
-  { valeur: 'wave', libelle: 'Wave' },
-  { valeur: 'orange_money', libelle: 'Orange Money' },
+  { valeur: 'wave', libelle: 'Wave', logo: logoWave },
+  { valeur: 'orange_money', libelle: 'Orange Money', logo: logoOrangeMoney },
 ];
 
 const STATUTS_RETRAIT = {
@@ -123,7 +125,8 @@ export default function Portefeuille({ onLogout }) {
   const retraitEnAttente = portefeuille.retraits.some((r) => r.statut === 'en_attente');
   const peutRetirer = numeroEnregistre && !retraitEnAttente
     && portefeuille.solde_disponible >= portefeuille.montant_retrait_minimum;
-  const libelleOperateur = OPERATEURS.find((o) => o.valeur === numeroEnregistre?.operateur)?.libelle;
+  const operateurEnregistre = OPERATEURS.find((o) => o.valeur === numeroEnregistre?.operateur);
+  const libelleOperateur = operateurEnregistre?.libelle;
 
   return (
     <GerantLayout title="Mon portefeuille" onLogout={onLogout}>
@@ -166,11 +169,14 @@ export default function Portefeuille({ onLogout }) {
 
             {numeroEnregistre && !modifierNumero ? (
               <div className="space-y-3">
-                <div className="flex items-start gap-3 p-4 rounded-[8px] bg-emerald-50 border border-emerald-200">
-                  <CheckCircle2 size={18} className="text-emerald-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-emerald-800">
-                    <span className="font-bold">{libelleOperateur}</span> · +221 {numeroEnregistre.numero.slice(3)}
-                  </p>
+                <div className="flex items-center gap-3 p-4 rounded-[8px] bg-emerald-50 border border-emerald-200">
+                  <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+                  <img
+                    src={operateurEnregistre?.logo}
+                    alt={libelleOperateur}
+                    className="h-8 w-auto object-contain rounded-[4px] bg-white"
+                  />
+                  <p className="text-sm font-bold text-emerald-800">+221 {numeroEnregistre.numero.slice(3)}</p>
                 </div>
                 <button
                   type="button"
@@ -197,13 +203,15 @@ export default function Portefeuille({ onLogout }) {
                       key={o.valeur}
                       type="button"
                       onClick={() => setOperateur(o.valeur)}
-                      className={`flex-1 px-4 py-2.5 rounded-[8px] text-sm font-bold border transition-colors cursor-pointer ${
+                      aria-pressed={operateur === o.valeur}
+                      title={o.libelle}
+                      className={`flex-1 flex items-center justify-center px-4 py-2.5 rounded-[8px] border-2 bg-white transition-colors cursor-pointer ${
                         operateur === o.valeur
-                          ? 'bg-vert-principal text-white border-vert-principal'
-                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                          ? 'border-vert-principal ring-2 ring-vert-principal/20'
+                          : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-gray-300'
                       }`}
                     >
-                      {o.libelle}
+                      <img src={o.logo} alt={o.libelle} className="h-8 w-auto object-contain rounded-[4px]" />
                     </button>
                   ))}
                 </div>

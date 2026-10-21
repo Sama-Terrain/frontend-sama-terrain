@@ -1,4 +1,5 @@
-import { Bell, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import NotificationsCloche from '../layout/NotificationsCloche';
 
 /**
  * Composant AdminHeader
@@ -31,14 +32,8 @@ export default function AdminHeader({ title = 'Tableau de Bord Admin', profile, 
       {/* NOTIFICATIONS & PROFILE */}
       <div className="flex items-center space-x-2 sm:space-x-6 shrink-0">
         
-        {/* BOUTON CLOCHE NOTIFICATION */}
-        <button
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ebf5f1] border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all cursor-pointer relative shadow-2xs shrink-0"
-          title="Notifications"
-        >
-          <Bell size={18} className="sm:w-5 sm:h-5" />
-          <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-white" />
-        </button>
+        {/* CLOCHE DE NOTIFICATIONS */}
+        <NotificationsCloche />
 
         {/* PROFIL SUPER ADMIN */}
         <div className="flex items-center space-x-2 sm:space-x-3">

@@ -65,7 +65,7 @@ export const adminService = {
 
   async getUsers() {
     const { data } = await api.get('/admin/utilisateurs/');
-    const LABELS_ROLE = { amateur: 'Amateur', gerant: 'Gérant', admin: 'Admin' };
+    const LABELS_ROLE = { amateur: 'Amateur', gerant: 'Gérant', employe: 'Employé', admin: 'Admin' };
 
     return data.map((u) => ({
       id: u.id,

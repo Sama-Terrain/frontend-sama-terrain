@@ -1,86 +1,95 @@
-import { useState, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { Clock, CheckCircle2 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
 import RetourAccueilButton from '../../components/auth/RetourAccueilButton';
+import SaisieCode from '../../components/auth/SaisieCode';
 import loginBg from '../../assets/terrain-login.png';
 import { authService } from '../../services/authService';
+import { useAuth } from '../../hooks/useAuth';
+import { getHomeRouteForRole } from '../../utils/roles';
 
+const CODE_VIDE = ['', '', '', '', '', ''];
+// Un code vient d'être envoyé à l'inscription : on attend avant d'en renvoyer un.
+const DELAI_RENVOI_SECONDES = 60;
+
+/**
+ * Page "Vérifiez votre e-mail" (après l'inscription d'un joueur ou la demande
+ * d'un gérant). Même comportement que "Mot de passe oublié" :
+ * - code collable, vérifié automatiquement dès le 6e chiffre ;
+ * - 5 essais maximum par code, renvoi possible après 60 secondes ;
+ * - une fois vérifié, le joueur est connecté directement. Le gérant, lui,
+ *   doit encore attendre la validation de sa demande par un administrateur.
+ */
 export default function VerificationEmail() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || 'mariegodmer@gmail.com';
-  // Un compte gérant reste inactif tant qu'un admin ne l'a pas validé : on
-  // ne peut pas le renvoyer directement vers /login (ça échouerait), on lui
-  // explique plutôt qu'il doit attendre la validation de sa demande.
+  const { login } = useAuth();
+  const email = location.state?.email;
   const depuisDevenirGerant = Boolean(location.state?.depuisDevenirGerant);
+
+  const [code, setCode] = useState(CODE_VIDE);
+  const [chargement, setChargement] = useState(false);
+  const [erreur, setErreur] = useState('');
+  const [info, setInfo] = useState('');
   const [demandeEnAttente, setDemandeEnAttente] = useState(false);
+  const [secondesAvantRenvoi, setSecondesAvantRenvoi] = useState(DELAI_RENVOI_SECONDES);
 
-  // Le backend envoie un code à 6 chiffres, donc 6 cases de saisie.
-  const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const inputRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
+  // Compte à rebours avant de pouvoir renvoyer un code.
+  useEffect(() => {
+    if (secondesAvantRenvoi <= 0) return undefined;
+    const minuteur = setTimeout(() => setSecondesAvantRenvoi((s) => s - 1), 1000);
+    return () => clearTimeout(minuteur);
+  }, [secondesAvantRenvoi]);
 
-  const handleChange = (index, value) => {
-    value = value.replace(/\D/g, '');
-    if (value.length > 1) {
-      value = value[value.length - 1];
-    }
+  // Page ouverte sans email (lien direct, rechargement...) : rien à vérifier.
+  if (!email) {
+    return <Navigate to="/login" replace />;
+  }
 
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-
-    if (value && index < 5) {
-      inputRefs[index + 1].current?.focus();
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
-      inputRefs[index - 1].current?.focus();
-    }
-  };
-
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    setError('');
-
-    const fullCode = code.join('');
-    if (fullCode.length < 6) {
-      setError('Veuillez entrer les 6 chiffres du code');
-      return;
-    }
-
-    const resultat = await authService.verifyCode(email, fullCode);
+  const handleVerifier = async (codeComplet) => {
+    if (chargement) return;
+    setErreur('');
+    setInfo('');
+    setChargement(true);
+    const resultat = await authService.verifyCode(email, codeComplet);
+    setChargement(false);
 
     if (!resultat.success) {
-      setError(resultat.error);
+      setErreur(resultat.error);
+      setCode(CODE_VIDE);
       return;
     }
 
-    setSuccess(true);
+    if (resultat.user) {
+      // Connecté directement, comme dans la plupart des applications.
+      login(resultat.user);
+      navigate(getHomeRouteForRole(resultat.user.role), { replace: true });
+      return;
+    }
 
     if (depuisDevenirGerant) {
-      // Le compte n'est pas encore actif (validation admin en attente) :
-      // on affiche l'info à la place de rediriger vers /login.
+      // Compte gérant pas encore actif (validation admin en attente).
       setDemandeEnAttente(true);
       return;
     }
 
-    setTimeout(() => {
-      navigate('/login');
-    }, 1500);
+    setInfo('E-mail vérifié avec succès ! Redirection...');
+    setTimeout(() => navigate('/login'), 1500);
   };
 
   const handleRenvoyerCode = async () => {
-    setError('');
+    setErreur('');
+    setInfo('');
     const resultat = await authService.resendCode(email);
     if (!resultat.success) {
-      setError(resultat.error);
+      setErreur(resultat.error);
+      return;
     }
+    setCode(CODE_VIDE);
+    setSecondesAvantRenvoi(DELAI_RENVOI_SECONDES);
+    setInfo('Un nouveau code vous a été envoyé.');
   };
 
   return (
@@ -88,76 +97,53 @@ export default function VerificationEmail() {
       <RetourAccueilButton />
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 md:p-16">
         <div className="w-full max-w-md space-y-6 text-center">
-          
+
           <h1 className="text-2xl sm:text-3xl font-extrabold text-vert-principal tracking-tight">
             VÉRIFIEZ VOTRE E-MAIL
           </h1>
 
           <p className="text-xs text-gray-600 max-w-sm mx-auto leading-relaxed">
-            Nous avons envoyé un code de vérification à<br />
+            Saisissez le code à 6 chiffres envoyé à<br />
             <strong className="text-gray-900 font-bold">{email}</strong>
           </p>
 
-          {error && (
-            <Alert type="error" message={error} />
-          )}
+          {erreur && <Alert type="error" message={erreur} />}
+          {info && <Alert type="success" message={info} />}
 
-          {success && (
-            <Alert
-              type="success"
-              message={
-                demandeEnAttente
-                  ? 'E-mail vérifié avec succès !'
-                  : 'E-mail vérifié avec succès ! Redirection...'
-              }
-            />
-          )}
+          <SaisieCode
+            chiffres={code}
+            onChange={(chiffres) => {
+              setCode(chiffres);
+              if (erreur) setErreur('');
+            }}
+            onComplete={handleVerifier}
+            disabled={chargement || demandeEnAttente}
+            enErreur={Boolean(erreur)}
+          />
 
-          <form onSubmit={handleVerify} className="space-y-8">
-            <div className="flex justify-center items-center space-x-2 sm:space-x-3 pt-2">
-              {code.map((digit, idx) => (
-                <input
-                  key={idx}
-                  ref={inputRefs[idx]}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(idx, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(idx, e)}
-                  className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl font-extrabold text-gray-900 bg-white border border-gray-200 rounded-[8px] focus:outline-none focus:border-vert-principal focus:ring-1 focus:ring-vert-principal shadow-sm"
-                />
-              ))}
-            </div>
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              rounded="8px"
-              fullWidth
-              className="uppercase tracking-wider"
-            >
-              VÉRIFIER
-            </Button>
-          </form>
+          {chargement && <p className="text-xs font-semibold text-gray-500">Vérification du code...</p>}
 
           <div className="space-y-2 pt-2">
             <div className="relative flex py-2 items-center">
               <div className="flex-grow border-t border-gray-100"></div>
               <span className="flex-shrink mx-4 text-[11px] text-gray-400">
-                Vous n'avez rien reçu ?
+                Vous n'avez rien reçu ? Pensez à vérifier vos spams.
               </span>
               <div className="flex-grow border-t border-gray-100"></div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleRenvoyerCode}
-              className="text-xs font-extrabold text-gray-900 hover:underline cursor-pointer"
-            >
-              Renvoyer le code
-            </button>
+            {secondesAvantRenvoi > 0 ? (
+              <p className="text-xs font-semibold text-gray-400">Renvoyer le code dans {secondesAvantRenvoi} s</p>
+            ) : (
+              <button
+                type="button"
+                onClick={handleRenvoyerCode}
+                disabled={chargement}
+                className="text-xs font-extrabold text-gray-900 hover:underline cursor-pointer disabled:opacity-50"
+              >
+                Renvoyer le code
+              </button>
+            )}
           </div>
 
           <div className="pt-6">

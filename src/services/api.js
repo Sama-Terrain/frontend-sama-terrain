@@ -18,7 +18,10 @@ export const CLE_REFRESH_TOKEN = 'sama_refresh_token';
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(CLE_ACCESS_TOKEN);
-  if (token) {
+  // `sansAuthentification: true` : route publique (ex: activation du compte
+  // d'un employé) où un éventuel ancien jeton, peut-être expiré, ne doit pas
+  // être envoyé (le backend le refuserait avec une erreur 401).
+  if (token && !config.sansAuthentification) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

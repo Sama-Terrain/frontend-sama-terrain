@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, Calendar, QrCode, ChevronDown, User, LogOut } from 'lucide-react';
+import { Menu, Calendar, QrCode, ChevronDown, User, LogOut } from 'lucide-react';
 import Button from '../ui/Button';
+import NotificationsCloche from '../layout/NotificationsCloche';
 
 /**
  * Composant GerantHeader
@@ -61,15 +62,8 @@ export default function GerantHeader({ title = 'Tableau de bord', profile, onMen
           <span className="sm:hidden whitespace-nowrap">Scanner</span>
         </Button>
 
-        {/* BOUTON CLOCHE NOTIFICATION */}
-        <button
-          className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ebf5f1] border border-gray-200 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all cursor-pointer relative shadow-2xs shrink-0"
-          title="Notifications"
-        >
-          <Bell size={18} className="sm:hidden" />
-          <Bell size={20} className="hidden sm:block" />
-          <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
-        </button>
+        {/* CLOCHE DE NOTIFICATIONS */}
+        <NotificationsCloche />
 
         {/* PROFIL GÉRANT */}
         <div className="relative">
@@ -94,6 +88,7 @@ export default function GerantHeader({ title = 'Tableau de bord', profile, onMen
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="text-xs font-bold text-gray-900">{gerantName}</p>
                   {profile?.email && <p className="text-[11px] text-gray-500 truncate">{profile.email}</p>}
+                  {profile?.role && <p className="text-[11px] font-semibold text-vert-principal mt-0.5">{profile.role}</p>}
                 </div>
 
                 <button

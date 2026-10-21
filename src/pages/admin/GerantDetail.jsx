@@ -190,7 +190,7 @@ export default function GerantDetail({ onLogout }) {
       <div className="bg-white rounded-[12px] p-6 border border-gray-200/80 shadow-2xs space-y-4">
         <div>
           <h3 className="text-base font-black text-gray-900">Paiements d'abonnement</h3>
-          <p className="text-xs text-gray-500">Ce que ce gérant a payé à Sama-Terrain pour son abonnement mensuel (7 500 FCFA).</p>
+          <p className="text-xs text-gray-500">Ce que ce gérant a payé à Sama-Terrain pour son abonnement mensuel (40 000 FCFA).</p>
         </div>
         {paiementsAbonnement.length === 0 ? (
           <p className="text-sm text-gray-500">Aucun paiement d'abonnement pour le moment (essai gratuit en cours ou pas encore renouvelé).</p>

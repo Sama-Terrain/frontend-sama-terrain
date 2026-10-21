@@ -45,6 +45,19 @@ function normaliserReservationGerant(r) {
     statut: infosStatut.label,
     statutBadgeClass: infosStatut.badge,
     statutBrut: r.statut,
+    // Infos complémentaires affichées dans le détail d'une réservation
+    // (ReservationDetailModal.jsx).
+    idBrut: r.id,
+    telephone: r.telephone,
+    dateLongue: new Date(r.date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
+    montantAvance: r.montant_avance,
+    resteAPayer: r.reste_a_payer,
+    moyenPaiement: LABELS_MOYEN_PAIEMENT[r.moyen_paiement] ?? r.moyen_paiement,
+    transactionId: r.transaction_id,
+    reserveeLe: new Date(r.cree_le).toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' }),
+    ticket: r.ticket,
+    // { montant, moyen_paiement, encaisse_par, le } ou null si pas encore encaissé.
+    soldeEncaisse: r.solde_encaisse,
   };
 }
 
@@ -63,8 +76,14 @@ export const gerantService = {
     const resultat = await authService.getUtilisateurConnecte();
     if (!resultat.success) return null;
 
-    const { prenom, nom, initiales } = resultat.user;
-    return { name: `${prenom} ${nom}`, role: 'Gérant', initials: initiales };
+    const { prenom, nom, initiales, email, role, equipe } = resultat.user;
+    return {
+      name: `${prenom} ${nom}`,
+      email,
+      // Un employé voit pour qui il travaille (ex: "Employé · Amadou Diouf").
+      role: role === 'employe' ? `Employé · ${equipe?.proprietaire_nom ?? ''}` : 'Gérant',
+      initials: initiales,
+    };
   },
 
   // 4 KPIs affichés en haut du tableau de bord.
@@ -88,6 +107,30 @@ export const gerantService = {
         jour: new Date(jour.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
         montant: jour.montant,
       })),
+    };
+  },
+
+  // Répartition par statut des réservations du mois en cours (matchs du
+  // mois), pour le diagramme circulaire du tableau de bord.
+  async getReservationsDuMoisParStatut() {
+    const toutes = await this.getReservationsGerant();
+    const maintenant = new Date();
+    const prefixeMois = `${maintenant.getFullYear()}-${String(maintenant.getMonth() + 1).padStart(2, '0')}`;
+    const duMois = toutes.filter((r) => r.dateIso.startsWith(prefixeMois));
+
+    const STATUTS = [
+      { statut: 'confirmee', name: 'Confirmées', color: '#004030' },
+      { statut: 'terminee', name: 'Terminées', color: '#7FB8A3' },
+      { statut: 'en_attente', name: 'En attente', color: '#D4AF37' },
+      { statut: 'annulee', name: 'Annulées', color: '#EF4444' },
+    ];
+
+    return {
+      total: duMois.length,
+      periodeLabel: maintenant.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+      data: STATUTS
+        .map((s) => ({ ...s, value: duMois.filter((r) => r.statutBrut === s.statut).length }))
+        .filter((s) => s.value > 0),
     };
   },
 

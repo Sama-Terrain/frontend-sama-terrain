@@ -159,7 +159,8 @@ export default function Connexion() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/mot-de-passe-oublie')}
+                // L'email déjà tapé est transmis : pas besoin de le ressaisir.
+                onClick={() => navigate('/mot-de-passe-oublie', { state: { email: email.trim() } })}
                 className="text-xs font-bold text-vert-principal hover:underline cursor-pointer"
               >
                 Mot de passe oublié ?
